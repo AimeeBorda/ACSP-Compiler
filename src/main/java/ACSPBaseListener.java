@@ -99,6 +99,18 @@ public class ACSPBaseListener implements ACSPListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterRefinedBy(ACSPParser.RefinedByContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitRefinedBy(ACSPParser.RefinedByContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterDefinitionLeft(ACSPParser.DefinitionLeftContext ctx) { }
 	/**
 	 * {@inheritDoc}

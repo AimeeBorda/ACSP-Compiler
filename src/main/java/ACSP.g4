@@ -1,9 +1,5 @@
 grammar ACSP;
 
-options
-{
-    language = Java;
-}
 
 spec
 	: definition*
@@ -18,7 +14,8 @@ definition
 
 channelDecl
 	: CHANNEL channelNames (channelColonType)?
-	;
+	 ;
+
 
 channelNames											//it should return a  list (check this in the antlr book)
 	: ID(COMMA ID)* 									//stores the IDs in a list (field)
@@ -34,7 +31,14 @@ simpleDefinition
 
 assertDefinition
 	: ASSERT definitionLeft COLLON LBRACKET checkConditionBody RBRACKET
+	| ASSERT definitionLeft refinedBy definitionLeft
 	;
+
+refinedBy :
+    TRACEREFINE
+    | FAILUREREFINE
+    | FAILUREDIVREFINE
+    ;
 
 definitionLeft
 	: defnCallLeft
@@ -80,19 +84,21 @@ set										//TODO: expand this rule
 proc									//TODO: came from rule _proc (try to make union of rules _proc and amb)
 	: Skip								//
 	| Stop
-	| ID ARROW proc	//TODO: replace with event
+	| ID ARROW proc	                    //TODO: replace with event
 	| proc ECHOICE proc
-	| proc ICHOICE proc
-	| proc INTL proc
+	//| proc ICHOICE proc
+	//| proc INTL proc
 	| IF boolExp THEN proc ELSE proc	//TODO: revise
-	| boolExp GUARD proc
+	//| boolExp GUARD proc
 	| proc BACKSLASH set
 	| proc LSYNC set RSYNC proc
-	| proc TIMEOUT proc						//timeout operator
-	| proc INTR proc						//interrupt operator
-	| proc SEMICOL proc						//sequential composition
+	//| proc TIMEOUT proc						//timeout operator
+	//| proc INTR proc						//interrupt operator
+	//| proc SEMICOL proc						//sequential composition
 	| LPAREN proc RPAREN
 	| ID								//TODO: revise
+	| ID PLING proc DOT proc // send process
+	| ID LBRACKET proc RBRACKET // location process
 	;
 
 
@@ -169,6 +175,7 @@ ARROW	:	'->';
 QUERY	:	'?';
 PLING	:	'!';
 CHANNEL	:	'channel';
+LOCATION:	'location';
 DOT	:	'.';
 LBRACE	: '{';
 RBRACE	: '}';
@@ -183,6 +190,9 @@ DIVERGENCE : 'divergence';
 FAILUREDIVE : ' [FD]';
 FAILURE : ' [F]';
 TRACE: ' [T]';
+TRACEREFINE : '[T=';
+FAILUREREFINE : '[F=';
+FAILUREDIVREFINE : '[FD=';
 FREE: ' free';
 
 

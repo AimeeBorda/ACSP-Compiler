@@ -52,6 +52,12 @@ public interface ACSPVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitAssertDefinition(ACSPParser.AssertDefinitionContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link ACSPParser#refinedBy}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitRefinedBy(ACSPParser.RefinedByContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link ACSPParser#definitionLeft}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

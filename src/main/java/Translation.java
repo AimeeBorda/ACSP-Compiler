@@ -1,9 +1,10 @@
-import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
 
-import java.io.*;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.List;
 import java.util.Optional;
 
@@ -38,7 +39,7 @@ public class Translation {
 
 
         writeToFile(cspProcess,output);
-        openFDR(output);
+        //openFDR(output);
     }
 
     private  ParseTree getParseTree(String input) throws IOException {
@@ -74,6 +75,7 @@ public class Translation {
 
 
     private  void writeToFile(String output, String fileName) throws FileNotFoundException {
+        System.out.println("output:" + output);
         PrintWriter out = new PrintWriter(fileName);
         out.println(output);
     }

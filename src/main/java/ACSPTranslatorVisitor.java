@@ -1,52 +1,108 @@
 public class ACSPTranslatorVisitor extends ACSPBaseVisitor<String> {
 
     @Override
-    public String visitSkipCmd(ACSPParser.SkipCmdContext ctx) {
-        return "SKIP";
+    public String visitSpec(ACSPParser.SpecContext ctx) {
+        return visitChildren(ctx);
     }
 
     @Override
-    public String visitChoiceCmd(ACSPParser.ChoiceCmdContext ctx) {
-        return super.visitChoiceCmd(ctx);
+    public String visitDefinition(ACSPParser.DefinitionContext ctx) {
+        return visitChildren(ctx);
     }
 
     @Override
-    public String visitIfCmd(ACSPParser.IfCmdContext ctx) {
-        return super.visitIfCmd(ctx);
+    public String visitChannelDecl(ACSPParser.ChannelDeclContext ctx) {
+        return visitChildren(ctx);
     }
 
     @Override
-    public String visitParallelCmd(ACSPParser.ParallelCmdContext ctx) {
-        return super.visitParallelCmd(ctx);
+    public String visitChannelNames(ACSPParser.ChannelNamesContext ctx) {
+        return visitChildren(ctx);
     }
 
     @Override
-    public String visitScopeCmd(ACSPParser.ScopeCmdContext ctx) {
-        return super.visitScopeCmd(ctx);
+    public String visitChannelColonType(ACSPParser.ChannelColonTypeContext ctx) {
+        return visitChildren(ctx);
     }
 
     @Override
-    public String visitOutputCmd(ACSPParser.OutputCmdContext ctx) {
-        return super.visitOutputCmd(ctx);
+    public String visitSimpleDefinition(ACSPParser.SimpleDefinitionContext ctx) {
+        return visitChildren(ctx);
     }
 
     @Override
-    public String visitLocCmd(ACSPParser.LocCmdContext ctx) {
-        return super.visitLocCmd(ctx);
+    public String visitAssertDefinition(ACSPParser.AssertDefinitionContext ctx) {
+        return visitChildren(ctx);
     }
 
     @Override
-    public String visitFuncCall(ACSPParser.FuncCallContext ctx) {
-        return super.visitFuncCall(ctx);
+    public String visitDefinitionLeft(ACSPParser.DefinitionLeftContext ctx) {
+        return visitChildren(ctx);
     }
 
     @Override
-    public String visitFuncDefn(ACSPParser.FuncDefnContext ctx) {
-        return super.visitFuncDefn(ctx);
+    public String visitDefnCallLeft(ACSPParser.DefnCallLeftContext ctx) {
+        return visitChildren(ctx);
     }
 
     @Override
-    public String visitStatement(ACSPParser.StatementContext ctx) {
-        return super.visitStatement(ctx);
+    public String visitAny(ACSPParser.AnyContext ctx) {
+        return visitChildren(ctx);
+    }
+
+    @Override
+    public String visitCheckConditionBody(ACSPParser.CheckConditionBodyContext ctx) {
+        return visitChildren(ctx);
+    }
+
+    @Override
+    public String visitModelCheckType(ACSPParser.ModelCheckTypeContext ctx) {
+        return ctx.getText();
+    }
+
+    @Override
+    public String visitType(ACSPParser.TypeContext ctx) {
+        return visitChildren(ctx);
+    }
+
+    @Override
+    public String visitSimple(ACSPParser.SimpleContext ctx) {
+        return visitChildren(ctx);
+    }
+
+    @Override
+    public String visitSet(ACSPParser.SetContext ctx) {
+        return visitChildren(ctx) ;
+    }
+
+    @Override
+    public String visitProc(ACSPParser.ProcContext ctx) {
+
+        return visitChildren(ctx);
+    }
+
+    @Override
+    public String visitBoolExp(ACSPParser.BoolExpContext ctx) {
+        return visitChildren(ctx);
+    }
+
+    @Override
+    public String visitBoolOrAmb(ACSPParser.BoolOrAmbContext ctx) {
+        return visitChildren(ctx);
+    }
+
+    @Override
+    public String visitExpr(ACSPParser.ExprContext ctx) {
+        return visitChildren(ctx) ;
+    }
+
+    @Override
+    public String visitNumber(ACSPParser.NumberContext ctx) {
+        return visitChildren(ctx);
+    }
+
+    @Override
+    public String visitComment(ACSPParser.CommentContext ctx) {
+        return visitChildren(ctx);
     }
 }

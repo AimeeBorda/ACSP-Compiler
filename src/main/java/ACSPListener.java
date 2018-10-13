@@ -77,6 +77,16 @@ public interface ACSPListener extends ParseTreeListener {
 	 */
 	void exitAssertDefinition(ACSPParser.AssertDefinitionContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link ACSPParser#refinedBy}.
+	 * @param ctx the parse tree
+	 */
+	void enterRefinedBy(ACSPParser.RefinedByContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ACSPParser#refinedBy}.
+	 * @param ctx the parse tree
+	 */
+	void exitRefinedBy(ACSPParser.RefinedByContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link ACSPParser#definitionLeft}.
 	 * @param ctx the parse tree
 	 */
