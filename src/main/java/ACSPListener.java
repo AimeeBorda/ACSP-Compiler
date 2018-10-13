@@ -7,103 +7,213 @@ import org.antlr.v4.runtime.tree.ParseTreeListener;
  */
 public interface ACSPListener extends ParseTreeListener {
 	/**
-	 * Enter a parse tree produced by {@link ACSPParser#skipCmd}.
+	 * Enter a parse tree produced by {@link ACSPParser#spec}.
 	 * @param ctx the parse tree
 	 */
-	void enterSkipCmd(ACSPParser.SkipCmdContext ctx);
+	void enterSpec(ACSPParser.SpecContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link ACSPParser#skipCmd}.
+	 * Exit a parse tree produced by {@link ACSPParser#spec}.
 	 * @param ctx the parse tree
 	 */
-	void exitSkipCmd(ACSPParser.SkipCmdContext ctx);
+	void exitSpec(ACSPParser.SpecContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link ACSPParser#choiceCmd}.
+	 * Enter a parse tree produced by {@link ACSPParser#definition}.
 	 * @param ctx the parse tree
 	 */
-	void enterChoiceCmd(ACSPParser.ChoiceCmdContext ctx);
+	void enterDefinition(ACSPParser.DefinitionContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link ACSPParser#choiceCmd}.
+	 * Exit a parse tree produced by {@link ACSPParser#definition}.
 	 * @param ctx the parse tree
 	 */
-	void exitChoiceCmd(ACSPParser.ChoiceCmdContext ctx);
+	void exitDefinition(ACSPParser.DefinitionContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link ACSPParser#ifCmd}.
+	 * Enter a parse tree produced by {@link ACSPParser#channelDecl}.
 	 * @param ctx the parse tree
 	 */
-	void enterIfCmd(ACSPParser.IfCmdContext ctx);
+	void enterChannelDecl(ACSPParser.ChannelDeclContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link ACSPParser#ifCmd}.
+	 * Exit a parse tree produced by {@link ACSPParser#channelDecl}.
 	 * @param ctx the parse tree
 	 */
-	void exitIfCmd(ACSPParser.IfCmdContext ctx);
+	void exitChannelDecl(ACSPParser.ChannelDeclContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link ACSPParser#parallelCmd}.
+	 * Enter a parse tree produced by {@link ACSPParser#channelNames}.
 	 * @param ctx the parse tree
 	 */
-	void enterParallelCmd(ACSPParser.ParallelCmdContext ctx);
+	void enterChannelNames(ACSPParser.ChannelNamesContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link ACSPParser#parallelCmd}.
+	 * Exit a parse tree produced by {@link ACSPParser#channelNames}.
 	 * @param ctx the parse tree
 	 */
-	void exitParallelCmd(ACSPParser.ParallelCmdContext ctx);
+	void exitChannelNames(ACSPParser.ChannelNamesContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link ACSPParser#scopeCmd}.
+	 * Enter a parse tree produced by {@link ACSPParser#channelColonType}.
 	 * @param ctx the parse tree
 	 */
-	void enterScopeCmd(ACSPParser.ScopeCmdContext ctx);
+	void enterChannelColonType(ACSPParser.ChannelColonTypeContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link ACSPParser#scopeCmd}.
+	 * Exit a parse tree produced by {@link ACSPParser#channelColonType}.
 	 * @param ctx the parse tree
 	 */
-	void exitScopeCmd(ACSPParser.ScopeCmdContext ctx);
+	void exitChannelColonType(ACSPParser.ChannelColonTypeContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link ACSPParser#outputCmd}.
+	 * Enter a parse tree produced by {@link ACSPParser#simpleDefinition}.
 	 * @param ctx the parse tree
 	 */
-	void enterOutputCmd(ACSPParser.OutputCmdContext ctx);
+	void enterSimpleDefinition(ACSPParser.SimpleDefinitionContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link ACSPParser#outputCmd}.
+	 * Exit a parse tree produced by {@link ACSPParser#simpleDefinition}.
 	 * @param ctx the parse tree
 	 */
-	void exitOutputCmd(ACSPParser.OutputCmdContext ctx);
+	void exitSimpleDefinition(ACSPParser.SimpleDefinitionContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link ACSPParser#locCmd}.
+	 * Enter a parse tree produced by {@link ACSPParser#assertDefinition}.
 	 * @param ctx the parse tree
 	 */
-	void enterLocCmd(ACSPParser.LocCmdContext ctx);
+	void enterAssertDefinition(ACSPParser.AssertDefinitionContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link ACSPParser#locCmd}.
+	 * Exit a parse tree produced by {@link ACSPParser#assertDefinition}.
 	 * @param ctx the parse tree
 	 */
-	void exitLocCmd(ACSPParser.LocCmdContext ctx);
+	void exitAssertDefinition(ACSPParser.AssertDefinitionContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link ACSPParser#funcCall}.
+	 * Enter a parse tree produced by {@link ACSPParser#definitionLeft}.
 	 * @param ctx the parse tree
 	 */
-	void enterFuncCall(ACSPParser.FuncCallContext ctx);
+	void enterDefinitionLeft(ACSPParser.DefinitionLeftContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link ACSPParser#funcCall}.
+	 * Exit a parse tree produced by {@link ACSPParser#definitionLeft}.
 	 * @param ctx the parse tree
 	 */
-	void exitFuncCall(ACSPParser.FuncCallContext ctx);
+	void exitDefinitionLeft(ACSPParser.DefinitionLeftContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link ACSPParser#funcDefn}.
+	 * Enter a parse tree produced by {@link ACSPParser#defnCallLeft}.
 	 * @param ctx the parse tree
 	 */
-	void enterFuncDefn(ACSPParser.FuncDefnContext ctx);
+	void enterDefnCallLeft(ACSPParser.DefnCallLeftContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link ACSPParser#funcDefn}.
+	 * Exit a parse tree produced by {@link ACSPParser#defnCallLeft}.
 	 * @param ctx the parse tree
 	 */
-	void exitFuncDefn(ACSPParser.FuncDefnContext ctx);
+	void exitDefnCallLeft(ACSPParser.DefnCallLeftContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link ACSPParser#statement}.
+	 * Enter a parse tree produced by {@link ACSPParser#any}.
 	 * @param ctx the parse tree
 	 */
-	void enterStatement(ACSPParser.StatementContext ctx);
+	void enterAny(ACSPParser.AnyContext ctx);
 	/**
-	 * Exit a parse tree produced by {@link ACSPParser#statement}.
+	 * Exit a parse tree produced by {@link ACSPParser#any}.
 	 * @param ctx the parse tree
 	 */
-	void exitStatement(ACSPParser.StatementContext ctx);
+	void exitAny(ACSPParser.AnyContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ACSPParser#checkConditionBody}.
+	 * @param ctx the parse tree
+	 */
+	void enterCheckConditionBody(ACSPParser.CheckConditionBodyContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ACSPParser#checkConditionBody}.
+	 * @param ctx the parse tree
+	 */
+	void exitCheckConditionBody(ACSPParser.CheckConditionBodyContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ACSPParser#modelCheckType}.
+	 * @param ctx the parse tree
+	 */
+	void enterModelCheckType(ACSPParser.ModelCheckTypeContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ACSPParser#modelCheckType}.
+	 * @param ctx the parse tree
+	 */
+	void exitModelCheckType(ACSPParser.ModelCheckTypeContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ACSPParser#type}.
+	 * @param ctx the parse tree
+	 */
+	void enterType(ACSPParser.TypeContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ACSPParser#type}.
+	 * @param ctx the parse tree
+	 */
+	void exitType(ACSPParser.TypeContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ACSPParser#simple}.
+	 * @param ctx the parse tree
+	 */
+	void enterSimple(ACSPParser.SimpleContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ACSPParser#simple}.
+	 * @param ctx the parse tree
+	 */
+	void exitSimple(ACSPParser.SimpleContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ACSPParser#set}.
+	 * @param ctx the parse tree
+	 */
+	void enterSet(ACSPParser.SetContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ACSPParser#set}.
+	 * @param ctx the parse tree
+	 */
+	void exitSet(ACSPParser.SetContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ACSPParser#proc}.
+	 * @param ctx the parse tree
+	 */
+	void enterProc(ACSPParser.ProcContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ACSPParser#proc}.
+	 * @param ctx the parse tree
+	 */
+	void exitProc(ACSPParser.ProcContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ACSPParser#boolExp}.
+	 * @param ctx the parse tree
+	 */
+	void enterBoolExp(ACSPParser.BoolExpContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ACSPParser#boolExp}.
+	 * @param ctx the parse tree
+	 */
+	void exitBoolExp(ACSPParser.BoolExpContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ACSPParser#boolOrAmb}.
+	 * @param ctx the parse tree
+	 */
+	void enterBoolOrAmb(ACSPParser.BoolOrAmbContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ACSPParser#boolOrAmb}.
+	 * @param ctx the parse tree
+	 */
+	void exitBoolOrAmb(ACSPParser.BoolOrAmbContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ACSPParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void enterExpr(ACSPParser.ExprContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ACSPParser#expr}.
+	 * @param ctx the parse tree
+	 */
+	void exitExpr(ACSPParser.ExprContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ACSPParser#number}.
+	 * @param ctx the parse tree
+	 */
+	void enterNumber(ACSPParser.NumberContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ACSPParser#number}.
+	 * @param ctx the parse tree
+	 */
+	void exitNumber(ACSPParser.NumberContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ACSPParser#comment}.
+	 * @param ctx the parse tree
+	 */
+	void enterComment(ACSPParser.CommentContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ACSPParser#comment}.
+	 * @param ctx the parse tree
+	 */
+	void exitComment(ACSPParser.CommentContext ctx);
 }
