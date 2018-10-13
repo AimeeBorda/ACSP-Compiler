@@ -66,11 +66,16 @@ public class Translation {
 
     private  Optional<List<String>> typeCheckProcess(){
         ACSPTypeChecker typeChecker = new ACSPTypeChecker();
-        if(typeChecker.visit(acspProcess)){
+        ACSPTypeChecker.InOut env = typeChecker.visit(acspProcess);
+        if(isWellTyped(env)){
             return Optional.empty();
         } else{
             return Optional.of(typeChecker.getErrors());
         }
+    }
+
+    private boolean isWellTyped(ACSPTypeChecker.InOut env){
+        return env!=null && env.isEmpty();
     }
 
 

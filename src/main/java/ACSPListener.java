@@ -177,6 +177,86 @@ public interface ACSPListener extends ParseTreeListener {
 	 */
 	void exitProc(ACSPParser.ProcContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link ACSPParser#locProcess}.
+	 * @param ctx the parse tree
+	 */
+	void enterLocProcess(ACSPParser.LocProcessContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ACSPParser#locProcess}.
+	 * @param ctx the parse tree
+	 */
+	void exitLocProcess(ACSPParser.LocProcessContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ACSPParser#locOutput}.
+	 * @param ctx the parse tree
+	 */
+	void enterLocOutput(ACSPParser.LocOutputContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ACSPParser#locOutput}.
+	 * @param ctx the parse tree
+	 */
+	void exitLocOutput(ACSPParser.LocOutputContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ACSPParser#parallelProc}.
+	 * @param ctx the parse tree
+	 */
+	void enterParallelProc(ACSPParser.ParallelProcContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ACSPParser#parallelProc}.
+	 * @param ctx the parse tree
+	 */
+	void exitParallelProc(ACSPParser.ParallelProcContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ACSPParser#eventHide}.
+	 * @param ctx the parse tree
+	 */
+	void enterEventHide(ACSPParser.EventHideContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ACSPParser#eventHide}.
+	 * @param ctx the parse tree
+	 */
+	void exitEventHide(ACSPParser.EventHideContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ACSPParser#ifStat}.
+	 * @param ctx the parse tree
+	 */
+	void enterIfStat(ACSPParser.IfStatContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ACSPParser#ifStat}.
+	 * @param ctx the parse tree
+	 */
+	void exitIfStat(ACSPParser.IfStatContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ACSPParser#chxProc}.
+	 * @param ctx the parse tree
+	 */
+	void enterChxProc(ACSPParser.ChxProcContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ACSPParser#chxProc}.
+	 * @param ctx the parse tree
+	 */
+	void exitChxProc(ACSPParser.ChxProcContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ACSPParser#prfProc}.
+	 * @param ctx the parse tree
+	 */
+	void enterPrfProc(ACSPParser.PrfProcContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ACSPParser#prfProc}.
+	 * @param ctx the parse tree
+	 */
+	void exitPrfProc(ACSPParser.PrfProcContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ACSPParser#terminalProc}.
+	 * @param ctx the parse tree
+	 */
+	void enterTerminalProc(ACSPParser.TerminalProcContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ACSPParser#terminalProc}.
+	 * @param ctx the parse tree
+	 */
+	void exitTerminalProc(ACSPParser.TerminalProcContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link ACSPParser#boolExp}.
 	 * @param ctx the parse tree
 	 */

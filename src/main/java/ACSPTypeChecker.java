@@ -1,121 +1,164 @@
-import java.util.ArrayList;
-import java.util.List;
+import org.antlr.v4.runtime.tree.TerminalNode;
 
-public class ACSPTypeChecker extends ACSPBaseVisitor<Boolean> {
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+
+public class ACSPTypeChecker extends ACSPBaseVisitor<ACSPTypeChecker.InOut> {
+
+    List<String> errors = new ArrayList<>();
+
+
+    @Override
+    public InOut visitLocProcess(ACSPParser.LocProcessContext ctx) {
+        InOut res = visitChildren(ctx);
+
+        if(res != null && res.isEmpty()){
+            String text = ctx.ID().getSymbol().getText();
+            res.addIn(text);
+            return res;
+        }
+
+        return res;
+    }
+
+
+    @Override
+    public InOut visitChannelNames(ACSPParser.ChannelNamesContext ctx) {
+        List<String> names = Arrays.asList(ctx.getText().split(","));
+
+        InOut inOut = new InOut();
+        inOut.in = new HashSet<>(names);
+        inOut.out = new HashSet<>(names);
+
+        return inOut;
+    }
+
+
+    @Override
+    public InOut visitSimpleDefinition(ACSPParser.SimpleDefinitionContext ctx) {
+        return visit(ctx.getChild(2));
+    }
+
+    @Override
+    public InOut visitAssertDefinition(ACSPParser.AssertDefinitionContext ctx) {
+        return new InOut();
+    }
+
+    @Override
+    public InOut visitRefinedBy(ACSPParser.RefinedByContext ctx) {
+        return new InOut();
+    }
+
+    @Override
+    public InOut visitDefinitionLeft(ACSPParser.DefinitionLeftContext ctx) {
+        return new InOut();
+    }
+
+    @Override
+    public InOut visitDefnCallLeft(ACSPParser.DefnCallLeftContext ctx) {
+        return new InOut();
+    }
+
+
+    @Override
+    public InOut visitType(ACSPParser.TypeContext ctx) {
+        return new InOut();
+    }
+
+    @Override
+    public InOut visitSimple(ACSPParser.SimpleContext ctx) {
+        return new InOut();
+    }
+
+
+    @Override
+    public InOut visitTerminalProc(ACSPParser.TerminalProcContext ctx) {
+        return new InOut();
+    }
+
+    @Override
+    public InOut visitBoolExp(ACSPParser.BoolExpContext ctx) {
+        return new InOut();
+    }
+
+    @Override
+    public InOut visitBoolOrAmb(ACSPParser.BoolOrAmbContext ctx) {
+        return new InOut();
+    }
+
+    @Override
+    public InOut visitExpr(ACSPParser.ExprContext ctx) {
+        return new InOut();
+    }
+
+    @Override
+    public InOut visitNumber(ACSPParser.NumberContext ctx) {
+        return new InOut();
+    }
+
+    @Override
+    public InOut visitComment(ACSPParser.CommentContext ctx) {
+        return new InOut();
+    }
+
+    @Override
+    public InOut visitLocOutput(ACSPParser.LocOutputContext ctx) {
+        InOut proc = visit(ctx.getChild(0));
+        InOut cont = visit(ctx.getChild(1));
+
+        if(proc != null && cont != null && proc.isEmpty()){
+            String text = ctx.ID().getSymbol().getText();
+            cont.addIn(text);
+
+           return cont;
+        }
+
+        return null;
+    }
+
+    @Override
+    public InOut visitParallelProc(ACSPParser.ParallelProcContext ctx) {
+        InOut left = visit(ctx.getChild(1));
+        InOut right = visit(ctx.getChild(3));
+        InOut L = visit(ctx.getChild(0));
+        InOut gamma = new InOut();
+
+        gamma.in.addAll(left.in);
+        gamma.in.addAll(right.in);
+        gamma.in.removeAll(L.in);
+
+        gamma.out.addAll(left.out);
+        gamma.out.addAll(right.out);
+        gamma.out.removeAll(L.out);
+
+
+
+        boolean cond1= left.in.stream().filter(right.out::contains).allMatch(L.in::contains);
+        boolean cond2= left.out.stream().filter(right.in::contains).allMatch(L.in::contains);
+        boolean cond3 = !(left.in.stream().anyMatch(right.in::contains));
+        boolean cond4 = right.out.stream().filter(left.out::contains).allMatch(gamma.out::contains);
+
+        return cond1 && cond2 && cond3 && cond4 ? gamma : null;
+    }
 
     public List<String> getErrors() {
         return errors;
     }
 
-    private List<String> errors = new ArrayList<String>();
 
-    @Override
-    public Boolean visitSpec(ACSPParser.SpecContext ctx) {
-        return true;// super.visitSpec(ctx);
+    public class InOut{
+        HashSet<String> in = new HashSet<>();
+        HashSet<String> out = new HashSet<>();
+
+        public void addIn(String text){
+            in.add(text);
+        }
+
+        public boolean isEmpty(){
+            return in.isEmpty() && out.isEmpty();
+        }
     }
 
-    @Override
-    public Boolean visitDefinition(ACSPParser.DefinitionContext ctx) {
-        return super.visitDefinition(ctx);
-    }
-
-    @Override
-    public Boolean visitChannelDecl(ACSPParser.ChannelDeclContext ctx) {
-        return super.visitChannelDecl(ctx);
-    }
-
-    @Override
-    public Boolean visitChannelNames(ACSPParser.ChannelNamesContext ctx) {
-        return super.visitChannelNames(ctx);
-    }
-
-    @Override
-    public Boolean visitChannelColonType(ACSPParser.ChannelColonTypeContext ctx) {
-        return super.visitChannelColonType(ctx);
-    }
-
-    @Override
-    public Boolean visitSimpleDefinition(ACSPParser.SimpleDefinitionContext ctx) {
-        return super.visitSimpleDefinition(ctx);
-    }
-
-    @Override
-    public Boolean visitAssertDefinition(ACSPParser.AssertDefinitionContext ctx) {
-        return true;
-    }
-
-    @Override
-    public Boolean visitRefinedBy(ACSPParser.RefinedByContext ctx) {
-        return super.visitRefinedBy(ctx);
-    }
-
-    @Override
-    public Boolean visitDefinitionLeft(ACSPParser.DefinitionLeftContext ctx) {
-        return super.visitDefinitionLeft(ctx);
-    }
-
-    @Override
-    public Boolean visitDefnCallLeft(ACSPParser.DefnCallLeftContext ctx) {
-        return super.visitDefnCallLeft(ctx);
-    }
-
-    @Override
-    public Boolean visitAny(ACSPParser.AnyContext ctx) {
-        return super.visitAny(ctx);
-    }
-
-    @Override
-    public Boolean visitCheckConditionBody(ACSPParser.CheckConditionBodyContext ctx) {
-        return super.visitCheckConditionBody(ctx);
-    }
-
-    @Override
-    public Boolean visitModelCheckType(ACSPParser.ModelCheckTypeContext ctx) {
-        return super.visitModelCheckType(ctx);
-    }
-
-    @Override
-    public Boolean visitType(ACSPParser.TypeContext ctx) {
-        return true;
-    }
-
-    @Override
-    public Boolean visitSimple(ACSPParser.SimpleContext ctx) {
-        return true;
-    }
-
-    @Override
-    public Boolean visitSet(ACSPParser.SetContext ctx) {
-        return true;
-    }
-
-    @Override
-    public Boolean visitProc(ACSPParser.ProcContext ctx) {
-        return super.visitProc(ctx);
-    }
-
-    @Override
-    public Boolean visitBoolExp(ACSPParser.BoolExpContext ctx) {
-        return true;
-    }
-
-    @Override
-    public Boolean visitBoolOrAmb(ACSPParser.BoolOrAmbContext ctx) {
-        return true;
-    }
-
-    @Override
-    public Boolean visitExpr(ACSPParser.ExprContext ctx) {
-        return true;
-    }
-
-    @Override
-    public Boolean visitNumber(ACSPParser.NumberContext ctx) {
-        return true;
-    }
-
-    @Override
-    public Boolean visitComment(ACSPParser.CommentContext ctx) {
-        return true;
-    }
 }

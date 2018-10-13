@@ -82,24 +82,32 @@ set										//TODO: expand this rule
 	;
 
 proc									//TODO: came from rule _proc (try to make union of rules _proc and amb)
-	: Skip								//
-	| Stop
-	| ID ARROW proc	                    //TODO: replace with event
-	| proc ECHOICE proc
-	//| proc ICHOICE proc
-	//| proc INTL proc
-	| IF boolExp THEN proc ELSE proc	//TODO: revise
-	//| boolExp GUARD proc
-	| proc BACKSLASH set
-	| proc LSYNC set RSYNC proc
-	//| proc TIMEOUT proc						//timeout operator
-	//| proc INTR proc						//interrupt operator
-	//| proc SEMICOL proc						//sequential composition
-	| LPAREN proc RPAREN
+	:
+	terminalProc
+	| locProcess          //TODO: replace with event
+	| locOutput
+	| parallelProc
+	| eventHide
+	| ifStat
 	| ID								//TODO: revise
-	| ID PLING proc DOT proc // send process
-	| ID LBRACKET proc RBRACKET // location process
+	| chxProc
+	| prfProc
 	;
+	//| proc TIMEOUT proc						//timeout operator
+    //| proc INTR proc						//interrupt operator
+    //| proc SEMICOL proc						//sequential composition
+    //| proc ICHOICE proc
+    //| proc INTL proc
+    //| boolExp GUARD proc
+
+locProcess : ID LBRACKET proc RBRACKET ;
+locOutput :  ID PLING proc DOT proc ;
+parallelProc :  LPAREN NEW channelNames RPAREN LPAREN proc LSYNC set RSYNC proc RPAREN;
+eventHide : LPAREN proc RPAREN BACKSLASH set;
+ifStat : IF boolExp THEN proc ELSE proc;
+chxProc : LPAREN proc ECHOICE proc;
+prfProc : ID ARROW proc	    ;
+terminalProc : Skip | Stop ;
 
 
 boolExp										//boolean expressions
@@ -148,6 +156,7 @@ NOT	: 'not';
 PLUS	: '+';
 TIMES	: '*';
 MINUS	: '-';
+NEW : 'new';
 DIV		: '/';
 MOD	: '%';
 IF : 'if' ;
@@ -175,7 +184,6 @@ ARROW	:	'->';
 QUERY	:	'?';
 PLING	:	'!';
 CHANNEL	:	'channel';
-LOCATION:	'location';
 DOT	:	'.';
 LBRACE	: '{';
 RBRACE	: '}';
