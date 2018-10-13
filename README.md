@@ -7,6 +7,6 @@ A compiler from A-CSP to CSP integrated with the FDR API.
 - Maven
 - Java 8 
 
-# Setup
+## Setup
 
-# Running the translator
+## Running the translator
