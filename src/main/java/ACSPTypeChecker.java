@@ -9,7 +9,6 @@ public class ACSPTypeChecker extends ACSPBaseVisitor<ACSPTypeChecker.InOut> {
 
     List<String> errors = new ArrayList<>();
 
-
     @Override
     public InOut visitLocProcess(ACSPParser.LocProcessContext ctx) {
         InOut res = visitChildren(ctx);
@@ -23,7 +22,6 @@ public class ACSPTypeChecker extends ACSPBaseVisitor<ACSPTypeChecker.InOut> {
         return res;
     }
 
-
     @Override
     public InOut visitChannelNames(ACSPParser.ChannelNamesContext ctx) {
         List<String> names = Arrays.asList(ctx.getText().split(","));
@@ -34,7 +32,6 @@ public class ACSPTypeChecker extends ACSPBaseVisitor<ACSPTypeChecker.InOut> {
 
         return inOut;
     }
-
 
     @Override
     public InOut visitSimpleDefinition(ACSPParser.SimpleDefinitionContext ctx) {
@@ -71,8 +68,7 @@ public class ACSPTypeChecker extends ACSPBaseVisitor<ACSPTypeChecker.InOut> {
     public InOut visitSimple(ACSPParser.SimpleContext ctx) {
         return new InOut();
     }
-
-
+    
     @Override
     public InOut visitTerminalProc(ACSPParser.TerminalProcContext ctx) {
         return new InOut();
@@ -113,9 +109,11 @@ public class ACSPTypeChecker extends ACSPBaseVisitor<ACSPTypeChecker.InOut> {
             cont.addIn(text);
 
            return cont;
+        } else {
+            errors.add("A process being communicated over " + ctx.ID() +" was not well-typed at \n"+ ctx.getText());
+            return null;
         }
 
-        return null;
     }
 
     @Override
@@ -138,15 +136,36 @@ public class ACSPTypeChecker extends ACSPBaseVisitor<ACSPTypeChecker.InOut> {
         boolean cond1= left.in.stream().filter(right.out::contains).allMatch(L.in::contains);
         boolean cond2= left.out.stream().filter(right.in::contains).allMatch(L.in::contains);
         boolean cond3 = !(left.in.stream().anyMatch(right.in::contains));
-        boolean cond4 = right.out.stream().filter(left.out::contains).allMatch(gamma.out::contains);
 
-        return cond1 && cond2 && cond3 && cond4 ? gamma : null;
+        if(cond1 && cond2 && cond3)
+            return gamma;
+        else{
+
+            if(!cond1){
+                String names = left.in.stream().filter(right.out::contains).filter(l -> !L.in.contains(l)).collect(Collectors.joining());
+                errors.add(names +" are in left in and right out but not in L (" + L.in.toString() +")");
+            }
+
+
+            if(!cond2){
+                String names = left.out.stream().filter(right.in::contains).filter(l -> !L.in.contains(l)).collect(Collectors.joining());
+                errors.add(names +" are in left out and right in but not in L (" + L.in.toString() +")");
+            }
+
+            if(!cond3){
+                String names = left.in.stream().filter(right.in::contains).collect(Collectors.joining());
+                errors.add(names +" are in left in and right in");
+            }
+
+
+
+            return null;
+        }
     }
 
     public List<String> getErrors() {
         return errors;
     }
-
 
     public class InOut{
         HashSet<String> in = new HashSet<>();
