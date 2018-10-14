@@ -11,8 +11,6 @@ public class Main {
         Translation t = new Translation(args[0]);
         t.translate();
     }
-
-
 }
 
 
