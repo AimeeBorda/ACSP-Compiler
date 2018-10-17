@@ -1,38 +1,24 @@
 grammar ACSP;
 
 
-spec
-	: definition*
-	;
+spec : definition*;
 
-definition
-	: channelDecl
-	| simpleDefinition
-	| assertDefinition
-	| comment
-	;
+definition : channelDecl | simpleDefinition | assertDefinition | comment;
 
-channelDecl
-	: CHANNEL channelNames (channelColonType)?
-	 ;
+channelDecl : CHANNEL channelNames (channelColonType)?;
 
 
-channelNames											//it should return a  list (check this in the antlr book)
-	: ID(COMMA ID)* 									//stores the IDs in a list (field)
-	;
+channelNames : ID(COMMA ID)*;										//it should return a  list (check this in the antlr book)
+	 									//stores the IDs in a list (field)
 
-channelColonType										//it should return the type
-	: COLLON  type
-	;
+channelColonType : COLLON  type	;								//it should return the type
 
-simpleDefinition
-	: definitionLeft EQUAL any
-	;
+
+simpleDefinition : definitionLeft EQUAL any;
 
 assertDefinition
 	: ASSERT definitionLeft COLLON LBRACKET checkConditionBody RBRACKET
-	| ASSERT definitionLeft refinedBy definitionLeft
-	;
+	| ASSERT definitionLeft refinedBy definitionLeft;
 
 refinedBy :
     TRACEREFINE
@@ -78,7 +64,7 @@ simple		//TODO: expand this rule
 	;
 
 set										//TODO: expand this rule
-	: LBRACE any* RBRACE
+	: LBRACE (any(COMMA any)*|(any DOT DOT any)?) RBRACE
 	;
 
 proc									//TODO: came from rule _proc (try to make union of rules _proc and amb)
@@ -88,32 +74,29 @@ proc									//TODO: came from rule _proc (try to make union of rules _proc and 
 	| locOutput
 	| parallelProc
 	| eventHide
-	| ifStat
-	| ID								//TODO: revise
+	| ifStat								//TODO: revise
 	| chxProc
 	| prfProc
+	| ID
+	| cspProc
 	;
-	//| proc TIMEOUT proc						//timeout operator
-    //| proc INTR proc						//interrupt operator
-    //| proc SEMICOL proc						//sequential composition
-    //| proc ICHOICE proc
-    //| proc INTL proc
-    //| boolExp GUARD proc
+
+cspProc :   LPAREN proc (TIMEOUT | INTR | SEMICOL | INTL) proc RPAREN
+           | boolExp GUARD proc;
 
 locProcess : ID LBRACKET proc RBRACKET ;
 locOutput :  ID PLING proc DOT proc ;
 parallelProc :  LPAREN NEW channelNames RPAREN LPAREN proc LSYNC set RSYNC proc RPAREN;
 eventHide : LPAREN proc RPAREN BACKSLASH set;
 ifStat : IF boolExp THEN proc ELSE proc;
-chxProc : LPAREN proc ECHOICE proc;
+chxProc : LPAREN proc ECHOICE proc RPAREN;
 prfProc : ID ARROW proc	    ;
 terminalProc : Skip | Stop ;
 
 
 boolExp										//boolean expressions
 	: NOT boolOrAmb
-	| expr (LT | GT | LTEQ | GTEQ) expr
-	| expr (EQ | NEQ) expr
+	| expr (LT | GT | LTEQ | GTEQ | EQ | NEQ) expr
 	| boolExp  (AND | OR) boolExp
 	| TRUE
 	| FALSE
@@ -128,9 +111,7 @@ boolOrAmb
 
 expr										//arith expressions
 	: MINUS expr
-	| expr MOD expr
-	| expr (TIMES | DIV) expr
-	| expr (PLUS | MINUS) expr
+	| expr (TIMES | DIV | PLUS | MINUS | MOD) expr
 	| LPAREN expr RPAREN
 	| number
 	| ID

@@ -118,9 +118,9 @@ public class ACSPTypeChecker extends ACSPBaseVisitor<ACSPTypeChecker.InOut> {
 
     @Override
     public InOut visitParallelProc(ACSPParser.ParallelProcContext ctx) {
-        InOut left = visit(ctx.getChild(1));
-        InOut right = visit(ctx.getChild(3));
-        InOut L = visit(ctx.getChild(0));
+        InOut left = visit(ctx.proc(0));
+        InOut right = visit(ctx.proc(1));
+        InOut L = visit(ctx.channelNames());
         InOut gamma = new InOut();
 
         gamma.in.addAll(left.in);

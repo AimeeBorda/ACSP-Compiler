@@ -1,4 +1,4 @@
-// Generated from /Users/aimee/IdeaProjects/untitled/src/main/java/ACSP.g4 by ANTLR 4.7
+// Generated from /Users/aimeeborda/ACSP-Compiler/src/main/java/ACSP.g4 by ANTLR 4.7
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
@@ -176,6 +176,16 @@ public interface ACSPListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitProc(ACSPParser.ProcContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ACSPParser#cspProc}.
+	 * @param ctx the parse tree
+	 */
+	void enterCspProc(ACSPParser.CspProcContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ACSPParser#cspProc}.
+	 * @param ctx the parse tree
+	 */
+	void exitCspProc(ACSPParser.CspProcContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link ACSPParser#locProcess}.
 	 * @param ctx the parse tree
