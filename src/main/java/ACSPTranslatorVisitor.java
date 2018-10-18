@@ -1,5 +1,7 @@
 import org.antlr.v4.runtime.tree.TerminalNode;
 
+import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -7,7 +9,11 @@ import java.util.stream.Collectors;
 
 public class ACSPTranslatorVisitor extends ACSPBaseVisitor<String> {
 
-    HashMap<String, ArrayList<String>> locations = new HashMap<>();
+    private HashMap<String, ArrayList<String>> locations;
+
+    public ACSPTranslatorVisitor(){
+        this.locations = new HashMap<>();;
+    }
 
     @Override
     public String visitSpec(ACSPParser.SpecContext ctx) {
@@ -53,43 +59,23 @@ public class ACSPTranslatorVisitor extends ACSPBaseVisitor<String> {
 
     @Override
     public String visitAssertDefinition(ACSPParser.AssertDefinitionContext ctx) {
-        if(ctx.refinedBy() == null){
-            return visit(ctx.ASSERT()) +" "+ visit(ctx.definitionLeft(0)) +" "+visit(ctx.COLLON()) +visit(ctx.LBRACKET()) + visit(ctx.checkConditionBody())+ visit(ctx.RBRACKET());
-        }else{
-            return visit(ctx.ASSERT()) +" "+visit(ctx.definitionLeft(0))+ "  "+visit(ctx.refinedBy()) +" "+ visit(ctx.definitionLeft(1));
-        }
+        return ctx.children.stream().map(c ->visit(c)).collect(Collectors.joining(" "));
     }
 
 
     @Override
     public String visitDefinitionLeft(ACSPParser.DefinitionLeftContext ctx) {
-        if(ctx.LPAREN() == null){
-
-            return visit(ctx.defnCallLeft());
-        }else{
-            return visit(ctx.defnCallLeft()) + visit(ctx.LPAREN()) + ctx.any().stream().map(c -> visit(c)).collect(Collectors.joining( " ")) + visit(ctx.RPAREN());
-        }
+        return ctx.children.stream().map(c ->visit(c)).collect(Collectors.joining(" "));
     }
 
     @Override
     public String visitCheckConditionBody(ACSPParser.CheckConditionBodyContext ctx) {
-        return    (ctx.DEADLOCK() != null ? ctx.DEADLOCK().getText() :"")
-                + (ctx.DIVERGENCE() != null ? ctx.DIVERGENCE().getText():"")
-                + (ctx.DETERMINISTIC() != null ? ctx.DETERMINISTIC().getText():"")
-                + (ctx.FREE() != null ? ctx.FREE().getText() :"")
-                + (ctx.modelCheckType()!= null?visit(ctx.modelCheckType()):"");
-
+        return  ctx.children.stream().map(c ->visit(c)).collect(Collectors.joining(" "));
     }
 
     @Override
     public String visitSet(ACSPParser.SetContext ctx) {
-
-        String join = ",";
-        if(ctx.DOT().size() > 0){
-            join = "..";
-        }
-
-        return visit(ctx.LBRACE()) + ctx.any().stream().map(c -> visit(c)).collect(Collectors.joining(join)) + visit(ctx.RBRACE());
+        return ctx.children.stream().map(c ->visit(c)).collect(Collectors.joining(" "));
     }
 
 
@@ -119,7 +105,7 @@ public class ACSPTranslatorVisitor extends ACSPBaseVisitor<String> {
 
     @Override
     public String visitNumber(ACSPParser.NumberContext ctx) {
-        return ctx.DIGIT().stream().map(c -> visit(c)).collect(Collectors.joining());
+        return ctx.children.stream().map(c ->visit(c)).collect(Collectors.joining());
     }
 
     @Override
@@ -127,12 +113,12 @@ public class ACSPTranslatorVisitor extends ACSPBaseVisitor<String> {
         return node.toString();
     }
 
-    @Override
-    public String visitIfStat(ACSPParser.IfStatContext ctx) {
-        return visit(ctx.IF()) +" " + visit(ctx.boolExp()) +"\n"
-                    + visit(ctx.THEN()) +" "+ visit(ctx.proc(0)) +"\n"+
-                 visit(ctx.ELSE()) +" "+ visit(ctx.proc(1)) +"\n";
-    }
+//    @Override
+//    public String visitIfStat(ACSPParser.IfStatContext ctx) {
+//        return visit(ctx.IF()) +" " + visit(ctx.boolExp()) +"\n"
+//                    + visit(ctx.THEN()) +" "+ visit(ctx.proc(0)) +"\n"+
+//                 visit(ctx.ELSE()) +" "+ visit(ctx.proc(1)) +"\n";
+//    }
 //
 //    @Override
 //    public String visitDefinition(ACSPParser.DefinitionContext ctx) {
@@ -179,26 +165,26 @@ public class ACSPTranslatorVisitor extends ACSPBaseVisitor<String> {
 //        return super.visitSimple(ctx);
 //    }
 
+    @Override
+    public String visitProc(ACSPParser.ProcContext ctx) {
+        return ctx.children.stream().map(c ->visit(c)).collect(Collectors.joining(" "));
+    }
+
 //    @Override
-//    public String visitProc(ACSPParser.ProcContext ctx) {
-//        return super.visitProc(ctx);
+//    public String visitEventHide(ACSPParser.EventHideContext ctx) {
+//        return ctx.children.stream().map(c ->visit(c)).collect(Collectors.joining(" "));
 //    }
 
-    @Override
-    public String visitEventHide(ACSPParser.EventHideContext ctx) {
-        return ctx.children.stream().map(c ->visit(c)).collect(Collectors.joining(" "));
-    }
-
-    @Override
-    public String visitChxProc(ACSPParser.ChxProcContext ctx) {
-        return ctx.children.stream().map(c ->visit(c)).collect(Collectors.joining(" "));
-    }
+//    @Override
+//    public String visitChxProc(ACSPParser.ChxProcContext ctx) {
+//        return ctx.children.stream().map(c ->visit(c)).collect(Collectors.joining(" "));
+//    }
 
 
-    @Override
-    public String visitPrfProc(ACSPParser.PrfProcContext ctx) {
-        return ctx.children.stream().map(c ->visit(c)).collect(Collectors.joining(" "));
-    }
+//    @Override
+//    public String visitPrfProc(ACSPParser.PrfProcContext ctx) {
+//        return ctx.children.stream().map(c ->visit(c)).collect(Collectors.joining(" "));
+//    }
 
 //    @Override
 //    public String visitTerminalProc(ACSPParser.TerminalProcContext ctx) {
@@ -209,6 +195,7 @@ public class ACSPTranslatorVisitor extends ACSPBaseVisitor<String> {
     public String visitBoolExp(ACSPParser.BoolExpContext ctx) {
         return ctx.children.stream().map(c ->visit(c)).collect(Collectors.joining(" "));
     }
+
 
 //    @Override
 //    public String visitBoolOrAmb(ACSPParser.BoolOrAmbContext ctx) {
@@ -226,8 +213,26 @@ public class ACSPTranslatorVisitor extends ACSPBaseVisitor<String> {
 //    }
 //
 
-    @Override
-    public String visitCspProc(ACSPParser.CspProcContext ctx) {
-        return ctx.children.stream().map(c ->visit(c)).collect(Collectors.joining(" "));
-    }
+//    @Override
+//    public String visitCspProc(ACSPParser.CspProcContext ctx) {
+//        return ctx.children.stream().map(c ->visit(c)).collect(Collectors.joining(" "));
+//    }
+
+
+//    @Override
+//    public String visitInclude(ACSPParser.IncludeContext ctx) {
+//
+//        Translation r = null;
+//        try {
+//            String fileName = visit(ctx.ID());
+//
+//            r = new Translation(fileName +".csp");
+//            r.translate();
+//
+//
+//            return "include "+fileName+".csp";
+//        } catch (IOException e) { }
+//
+//        return "";
+//    }
 }

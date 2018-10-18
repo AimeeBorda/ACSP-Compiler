@@ -69,10 +69,10 @@ public class ACSPTypeChecker extends ACSPBaseVisitor<ACSPTypeChecker.InOut> {
         return new InOut();
     }
     
-    @Override
-    public InOut visitTerminalProc(ACSPParser.TerminalProcContext ctx) {
-        return new InOut();
-    }
+//    @Override
+//    public InOut visitTerminalProc(ACSPParser.TerminalProcContext ctx) {
+//        return new InOut();
+//    }
 
     @Override
     public InOut visitBoolExp(ACSPParser.BoolExpContext ctx) {
@@ -161,6 +161,52 @@ public class ACSPTypeChecker extends ACSPBaseVisitor<ACSPTypeChecker.InOut> {
 
             return null;
         }
+    }
+
+    @Override
+    public InOut visitSpec(ACSPParser.SpecContext ctx) {
+        return super.visitSpec(ctx);
+    }
+
+    @Override
+    public InOut visitDefinition(ACSPParser.DefinitionContext ctx) {
+        return super.visitDefinition(ctx);
+    }
+
+    @Override
+    public InOut visitChannelDecl(ACSPParser.ChannelDeclContext ctx) {
+        return super.visitChannelDecl(ctx);
+    }
+
+    @Override
+    public InOut visitChannelColonType(ACSPParser.ChannelColonTypeContext ctx) {
+        return super.visitChannelColonType(ctx);
+    }
+
+
+    @Override
+    public InOut visitAny(ACSPParser.AnyContext ctx) {
+        return super.visitAny(ctx);
+    }
+
+    @Override
+    public InOut visitCheckConditionBody(ACSPParser.CheckConditionBodyContext ctx) {
+        return super.visitCheckConditionBody(ctx);
+    }
+
+    @Override
+    public InOut visitModelCheckType(ACSPParser.ModelCheckTypeContext ctx) {
+        return super.visitModelCheckType(ctx);
+    }
+
+    @Override
+    public InOut visitSet(ACSPParser.SetContext ctx) {
+        return super.visitSet(ctx);
+    }
+
+    @Override
+    public InOut visitProc(ACSPParser.ProcContext ctx) {
+        return super.visitProc(ctx);
     }
 
     public List<String> getErrors() {

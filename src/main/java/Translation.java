@@ -5,12 +5,12 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
 public class Translation {
     private ParseTree acspProcess;
-
 
     public Translation(String input) throws IOException {
         this.acspProcess = getParseTree(input);

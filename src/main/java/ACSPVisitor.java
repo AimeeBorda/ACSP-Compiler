@@ -112,12 +112,6 @@ public interface ACSPVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitProc(ACSPParser.ProcContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link ACSPParser#cspProc}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitCspProc(ACSPParser.CspProcContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link ACSPParser#locProcess}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -135,36 +129,6 @@ public interface ACSPVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitParallelProc(ACSPParser.ParallelProcContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link ACSPParser#eventHide}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitEventHide(ACSPParser.EventHideContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link ACSPParser#ifStat}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitIfStat(ACSPParser.IfStatContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link ACSPParser#chxProc}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitChxProc(ACSPParser.ChxProcContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link ACSPParser#prfProc}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitPrfProc(ACSPParser.PrfProcContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link ACSPParser#terminalProc}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitTerminalProc(ACSPParser.TerminalProcContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link ACSPParser#boolExp}.
 	 * @param ctx the parse tree

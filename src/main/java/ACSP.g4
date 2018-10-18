@@ -1,18 +1,14 @@
 grammar ACSP;
 
-
 spec : definition*;
 
-definition : channelDecl | simpleDefinition | assertDefinition | comment;
+definition : channelDecl | simpleDefinition | assertDefinition | comment ;
 
 channelDecl : CHANNEL channelNames (channelColonType)?;
 
+channelNames : ID(COMMA ID)*;										
 
-channelNames : ID(COMMA ID)*;										//it should return a  list (check this in the antlr book)
-	 									//stores the IDs in a list (field)
-
-channelColonType : COLLON  type	;								//it should return the type
-
+channelColonType : COLLON  type	;
 
 simpleDefinition : definitionLeft EQUAL any;
 
@@ -59,42 +55,42 @@ type
 	| set
 	;
 
-simple		//TODO: expand this rule
+simple
 	: ID
 	;
 
-set										//TODO: expand this rule
+set
 	: LBRACE (any(COMMA any)*|(any DOT DOT any)?) RBRACE
 	;
 
-proc									//TODO: came from rule _proc (try to make union of rules _proc and amb)
-	:
-	terminalProc
-	| locProcess          //TODO: replace with event
-	| locOutput
-	| parallelProc
-	| eventHide
-	| ifStat								//TODO: revise
-	| chxProc
-	| prfProc
-	| ID
-	| cspProc
-	;
-
-cspProc :   LPAREN proc (TIMEOUT | INTR | SEMICOL | INTL) proc RPAREN
-           | boolExp GUARD proc;
+proc
+	:Skip
+     	| Stop
+     	| ID ARROW proc
+     	| proc ECHOICE proc
+     	| proc ICHOICE proc
+     	| proc INTL proc
+     	| IF boolExp THEN proc ELSE proc
+     	| boolExp GUARD proc
+     	| proc BACKSLASH set
+     	| proc LSYNC set RSYNC proc
+     	| proc TIMEOUT proc
+     	| proc INTR proc
+     	| proc SEMICOL proc
+     	| LPAREN proc RPAREN
+     	| ID
+	    | locProcess
+	    | locOutput
+	    | parallelProc
+	    | LET simpleDefinition+ WITHIN any
+	    ;
 
 locProcess : ID LBRACKET proc RBRACKET ;
 locOutput :  ID PLING proc DOT proc ;
 parallelProc :  LPAREN NEW channelNames RPAREN LPAREN proc LSYNC set RSYNC proc RPAREN;
-eventHide : LPAREN proc RPAREN BACKSLASH set;
-ifStat : IF boolExp THEN proc ELSE proc;
-chxProc : LPAREN proc ECHOICE proc RPAREN;
-prfProc : ID ARROW proc	    ;
-terminalProc : Skip | Stop ;
 
 
-boolExp										//boolean expressions
+boolExp
 	: NOT boolOrAmb
 	| expr (LT | GT | LTEQ | GTEQ | EQ | NEQ) expr
 	| boolExp  (AND | OR) boolExp
@@ -109,7 +105,7 @@ boolOrAmb
 	| simple
 	;
 
-expr										//arith expressions
+expr
 	: MINUS expr
 	| expr (TIMES | DIV | PLUS | MINUS | MOD) expr
 	| LPAREN expr RPAREN
@@ -183,18 +179,15 @@ TRACEREFINE : '[T=';
 FAILUREREFINE : '[F=';
 FAILUREDIVREFINE : '[FD=';
 FREE: ' free';
+LET : 'let';
+WITHIN : 'within';
+INCLUDE : 'include';
+DBLQUOTE : '"';
+ACSP : 'acsp';
 
+DIGIT: ('0' .. '9');
+ID : [a-zA-Z][a-zA-Z0-9'_]*	;
 
-DIGIT
-   : ('0' .. '9')
-   ;
-ID : [a-zA-Z]+					//TODO: revise - ids do not allow numbers or special chars
-	;
+LINECOMMENT : ('--') ~('\r'|'\n')* -> channel (HIDDEN) ;
 
-LINECOMMENT
-    : ('--') ~('\r'|'\n')* -> channel (HIDDEN)
-    ;
-
-WS
-   : [ \r\n\t]+ -> channel (HIDDEN)
-   ;
+WS : [ \r\n\t]+ -> channel (HIDDEN);

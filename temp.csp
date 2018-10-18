@@ -1,6 +1,6 @@
 transparent normal 
 
-P = not 1
+P = let x1_' = y within let R = (l?id -> (map(l,id) /\ R)) within SKIP/\ R
 
 
 
