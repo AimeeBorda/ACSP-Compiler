@@ -165,10 +165,4 @@ public interface ACSPVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitNumber(ACSPParser.NumberContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link ACSPParser#comment}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitComment(ACSPParser.CommentContext ctx);
 }

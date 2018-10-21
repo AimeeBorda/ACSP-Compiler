@@ -94,10 +94,10 @@ public class ACSPTypeChecker extends ACSPBaseVisitor<ACSPTypeChecker.InOut> {
         return new InOut();
     }
 
-    @Override
-    public InOut visitComment(ACSPParser.CommentContext ctx) {
-        return new InOut();
-    }
+//    @Override
+//    public InOut visitComment(ACSPParser.CommentContext ctx) {
+//        return new InOut();
+//    }
 
     @Override
     public InOut visitLocOutput(ACSPParser.LocOutputContext ctx) {
@@ -226,4 +226,18 @@ public class ACSPTypeChecker extends ACSPBaseVisitor<ACSPTypeChecker.InOut> {
         }
     }
 
+    @Override
+    public InOut visitDataTypeDefinition(ACSPParser.DataTypeDefinitionContext ctx) {
+        return super.visitDataTypeDefinition(ctx);
+    }
+
+    @Override
+    public InOut visitSetComprehension(ACSPParser.SetComprehensionContext ctx) {
+        return super.visitSetComprehension(ctx);
+    }
+
+    @Override
+    public InOut visitEvent(ACSPParser.EventContext ctx) {
+        return super.visitEvent(ctx);
+    }
 }

@@ -322,18 +322,6 @@ public class ACSPBaseListener implements ACSPListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitNumber(ACSPParser.NumberContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterComment(ACSPParser.CommentContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitComment(ACSPParser.CommentContext ctx) { }
 
 	/**
 	 * {@inheritDoc}

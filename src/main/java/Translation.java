@@ -5,12 +5,11 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
 public class Translation {
-    private ParseTree acspProcess;
+    private ACSPParser acspProcess;
 
     public Translation(String input) throws IOException {
         this.acspProcess = getParseTree(input);
@@ -41,12 +40,14 @@ public class Translation {
         //openFDR(output);
     }
 
-    private  ParseTree getParseTree(String input) throws IOException {
+    private ACSPParser getParseTree(String input) throws IOException {
         ACSPLexer lexer = new ACSPLexer(CharStreams.fromFileName(input));
+        CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
         ACSPParser parser = new ACSPParser(new CommonTokenStream(lexer));
-        ACSPParser.SpecContext acspProcess = parser.spec();
 
-        return acspProcess;
+//        ACSPParser.SpecContext acspProcess = parser.spec();
+
+        return parser;
     }
 
     private  void showErrorMessages(List<String> errorMessages){
@@ -54,8 +55,8 @@ public class Translation {
     }
 
     private  String translateProcess(){
-        ACSPTranslatorVisitor translator = new ACSPTranslatorVisitor();
-        return translator.visit(acspProcess);
+        ACSPTranslatorVisitor translator = new ACSPTranslatorVisitor(acspProcess.getTokenStream());
+        return translator.visit(acspProcess.spec());
 
     }
 
@@ -65,7 +66,7 @@ public class Translation {
 
     private  Optional<List<String>> typeCheckProcess(){
         ACSPTypeChecker typeChecker = new ACSPTypeChecker();
-        ACSPTypeChecker.InOut env = typeChecker.visit(acspProcess);
+        ACSPTypeChecker.InOut env = typeChecker.visit(acspProcess.spec());
         if(isWellTyped(env)){
             return Optional.empty();
         } else{

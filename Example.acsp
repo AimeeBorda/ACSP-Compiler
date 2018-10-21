@@ -1,5 +1,3 @@
-
-
 EventsA = {|connect,disconnect,update|}
 MonitorsA = {}
 

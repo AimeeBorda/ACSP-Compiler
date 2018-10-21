@@ -266,14 +266,4 @@ public interface ACSPListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitNumber(ACSPParser.NumberContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link ACSPParser#comment}.
-	 * @param ctx the parse tree
-	 */
-	void enterComment(ACSPParser.CommentContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link ACSPParser#comment}.
-	 * @param ctx the parse tree
-	 */
-	void exitComment(ACSPParser.CommentContext ctx);
 }

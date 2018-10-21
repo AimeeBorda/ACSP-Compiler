@@ -2,7 +2,7 @@ grammar ACSP;
 
 spec : definition*;
 
-definition : dataTypeDefinition | channelDecl  | assertDefinition | comment | simpleDefinition ;
+definition : dataTypeDefinition | channelDecl  | assertDefinition |  simpleDefinition ;
 
 dataTypeDefinition : (DATATYPE | SUBTYPE) ID EQUAL type (BAR type)*;
 
@@ -123,14 +123,7 @@ expr
 	| event
 	;
 
-number
-   : DIGIT+
-   ;
-
-comment
-	: LINECOMMENT	//TODO: include multiline comment and return the text of comment
-	;
-
+number: DIGIT+;
 AND : 'and';
 OR  : 'or' ;
 EQ	: '==';
@@ -204,6 +197,5 @@ SUBTYPE : 'subtype';
 DIGIT: ('0' .. '9');
 ID : [a-zA-Z_][a-zA-Z0-9'_]*	;
 
-LINECOMMENT : ('--') ~('\r'|'\n')* -> channel (HIDDEN) ;
-
-WS : [ \r\n\t]+ -> channel (HIDDEN);
+LINECOMMENT : ('--') ~('\r'|'\n') ->channel (HIDDEN) ;
+WS : ( '\t' | ' ' | '\r'|'\n'| '\u000C' )+ ->channel (HIDDEN) ;
