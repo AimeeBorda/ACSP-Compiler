@@ -90,7 +90,8 @@ proc
 	    | LET simpleDefinition+ WITHIN any
 	    ;
 
-event : ID ((QUERY | DOT | PLING) any (COLLON type)?)*;
+event : ID ((QUERY | PLING) any (COLLON type)?)*;
+
 locProcess : ID LBRACKET proc RBRACKET ;
 locOutput :  ID PLING proc DOT proc ;
 parallelProc :  LPAREN NEW channelNames RPAREN LPAREN proc LSYNC set RSYNC proc RPAREN;

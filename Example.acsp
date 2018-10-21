@@ -40,7 +40,7 @@ Pattern6 =      (connect?_ -> Pattern6)  [] (disconnect -> Pattern6) [] (update 
 ---------------------------------------------
 PiA3 =  adapt3?s : Connections ->
 						if s == 1 then l!A0.ack -> PiA3
-						else if s == 0 then l!A1.ack -> PiA3
+						else if s == 0 then l!A1'.ack -> PiA3
 						else ack -> PiA3
 
 PiA6 =  adapt6 -> l!A0.ack -> PiA6
@@ -54,6 +54,6 @@ accessPtComp = let
 			R3 = (PiA3 [|{| adapt3,ack |}|] Pattern3A) \ {| adapt3,adapt6,ack|}
 			R6 = (PiA6 [|{| adapt6,ack |}|] Pattern6) \ {|adapt3,adapt6,ack|}
 			AdaptationProc = R3 [|union(EventsA,MonitorsA)|] R6
-			proc = (l[A1'] [| EventsA |] AdaptationProc)
+			proc = (new l)(l[A1'] [| EventsA |] AdaptationProc)
 		within
 			proc

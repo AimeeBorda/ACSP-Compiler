@@ -1,3 +1,4 @@
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.io.IOException;
@@ -17,14 +18,17 @@ public class ACSPTranslatorVisitor extends ACSPBaseVisitor<String> {
 
     @Override
     public String visitSpec(ACSPParser.SpecContext ctx) {
-        //TODO: need to check if transparent already included
-        return "transparent normal \n\n"+ctx.children.stream().map(c ->visit(c)).collect(Collectors.joining("\n")) + "\n\n"+ locDeclaration()+getMaps();
+        String translation = ctx.children.stream().map(c ->visit(c)).collect(Collectors.joining("\n"));
+        if(!translation.contains("transparent normal")){
+            translation = "transparent normal \n\n"+ translation;
+        }
+        return translation+ "\n\n"+ locDeclaration()+getMaps();
     }
 
     private String locDeclaration() {
         StringBuilder res = new StringBuilder();
         for(Map.Entry entry : locations.entrySet()){
-            res.append(String.format("channel %s : {0..%d}\n", entry.getKey(),((TreeSet)entry.getValue()).size()));
+            res.append(String.format("channel %s : {1..%d}\n", entry.getKey(),((TreeSet)entry.getValue()).size()));
         }
 
         return res.toString()+"\n";
@@ -36,13 +40,13 @@ public class ACSPTranslatorVisitor extends ACSPBaseVisitor<String> {
         for(Map.Entry en : locations.entrySet()){
             Iterator<String> e = ((TreeSet<String>) en.getValue()).iterator();
 
-            for (int i = 0; e.hasNext(); i++) {
-                res.append(String.format("if l == %s and id == %d then %s \nelse ",en.getKey().toString(),i,e.next()));
+            for (int i = 1; e.hasNext(); i++) {
+                res.append(String.format("if chName == %s and id == %d then %s \nelse ",en.getKey().toString(),i,e.next()));
             }
         }
         res.append( "SKIP");
 
-        return locations.size() > 0 ? "map = \\ l,id @ "+res : "";
+        return locations.size() > 0 ? "map = \\ chName,id @ "+res : "";
     }
 
     @Override
@@ -82,7 +86,7 @@ public class ACSPTranslatorVisitor extends ACSPBaseVisitor<String> {
 
     @Override
     public String visitLocProcess(ACSPParser.LocProcessContext ctx) {
-        return "let R = ("+ctx.ID()+"?id -> (map("+ctx.ID()+",id) /\\ R)) within "+visit(ctx.proc()) + "/\\ R";
+        return "let R = ("+ctx.ID()+"?id -> (map("+ctx.ID()+",id) /\\ R)) within normal("+visit(ctx.proc()) + "/\\ R)";
     }
 
     @Override
@@ -90,9 +94,10 @@ public class ACSPTranslatorVisitor extends ACSPBaseVisitor<String> {
         //TODO: need to check if process already is in list
         locations.putIfAbsent(ctx.ID().getText(),new TreeSet<>());
         TreeSet<String> processes = locations.get(ctx.ID().getText());
-        processes.add(visit(ctx.proc(0)));
+        String hoOutput = visit(ctx.proc(0));
 
-        return ctx.ID()+"!"+processes.size() + " -> "+visit(ctx.proc(1));
+        processes.add(hoOutput);
+        return ctx.ID()+"!"+processes.headSet(hoOutput).size() + " -> "+visit(ctx.proc(1));
     }
 
     @Override
@@ -159,7 +164,7 @@ public class ACSPTranslatorVisitor extends ACSPBaseVisitor<String> {
 
     @Override
     public String visitType(ACSPParser.TypeContext ctx) {
-        return ctx.children.stream().map(c ->visit(c)).collect(Collectors.joining(" "));
+        return ctx.children.stream().map(c ->visit(c)).collect(Collectors.joining(""));
     }
 
 //    @Override
@@ -169,7 +174,7 @@ public class ACSPTranslatorVisitor extends ACSPBaseVisitor<String> {
 
     @Override
     public String visitProc(ACSPParser.ProcContext ctx) {
-        return ctx.children.stream().map(c ->visit(c)).collect(Collectors.joining(" "));
+        return ctx.children.stream().map(c ->visit(c)).collect(Collectors.joining(""));
     }
 
 //    @Override
@@ -195,7 +200,7 @@ public class ACSPTranslatorVisitor extends ACSPBaseVisitor<String> {
 
     @Override
     public String visitBoolExp(ACSPParser.BoolExpContext ctx) {
-        return ctx.children.stream().map(c ->visit(c)).collect(Collectors.joining(" "));
+        return ctx.children.stream().map(c ->visit(c)).collect(Collectors.joining(""));
     }
 
 
@@ -206,7 +211,7 @@ public class ACSPTranslatorVisitor extends ACSPBaseVisitor<String> {
 
     @Override
     public String visitExpr(ACSPParser.ExprContext ctx) {
-        return ctx.children.stream().map(c ->visit(c)).collect(Collectors.joining(" "));
+        return ctx.children.stream().map(c ->visit(c)).collect(Collectors.joining(""));
     }
 //
 //    @Override
@@ -237,4 +242,16 @@ public class ACSPTranslatorVisitor extends ACSPBaseVisitor<String> {
 //
 //        return "";
 //    }
+
+    @Override
+    public String visitEvent(ACSPParser.EventContext ctx) {
+        return ctx.children.stream().map(c ->visit(c)).collect(Collectors.joining(""));
+    }
+
+    @Override
+    public String visitSetComprehension(ACSPParser.SetComprehensionContext ctx) {
+        return ctx.children.stream().map(c ->visit(c)).collect(Collectors.joining(""));
+    }
+
+
 }
