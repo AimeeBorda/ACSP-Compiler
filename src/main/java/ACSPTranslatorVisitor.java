@@ -1,16 +1,14 @@
-import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
-import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.RuleNode;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-import java.io.IOException;
-import java.lang.reflect.Array;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
-//TODO: preserve Comments
+
 public class ACSPTranslatorVisitor extends ACSPBaseVisitor<String> {
 
     private final TokenStream commonTokenStream;
@@ -93,7 +91,7 @@ public class ACSPTranslatorVisitor extends ACSPBaseVisitor<String> {
     @Override
     public String visitLocProcess(ACSPParser.LocProcessContext ctx) {
         return
-        "let R = ("+ctx.ID()+"?id -> (map("+ctx.ID()+",id) /\\ R)) within normal("+visit(ctx.proc()) + "/\\ R)";
+        "let R = "+ctx.ID()+"?id -> (map("+ctx.ID()+",id) /\\ R) \n within ("+visit(ctx.proc()) + "/\\ R)";
     }
 
     @Override
@@ -127,8 +125,8 @@ public class ACSPTranslatorVisitor extends ACSPBaseVisitor<String> {
         String res = "";
         if(node.getSymbol().getTokenIndex() > 0) {
             Token previous = commonTokenStream.get(node.getSymbol().getTokenIndex() - 1);
-            res = previous.getType() ==ACSPLexer.WS?previous.getText() :"";
-            res += previous.getType() ==ACSPLexer.LINECOMMENT?previous.getText() :"";
+            res += previous.getType() ==ACSPLexer.WS?previous.getText() :"";
+            //res += previous.getType() ==ACSPLexer.LINECOMMENT?"BAJGJASDFASJDFA":"";
         }
         return res+node.getSymbol().getText();
     }

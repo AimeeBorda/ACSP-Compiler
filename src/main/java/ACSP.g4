@@ -35,7 +35,6 @@ any
 	| expr
 	| event
 	;
-
 checkConditionBody
 	: DEADLOCK FREE modelCheckType?
 	| DIVERGENCE FREE modelCheckType?
@@ -197,5 +196,5 @@ SUBTYPE : 'subtype';
 DIGIT: ('0' .. '9');
 ID : [a-zA-Z_][a-zA-Z0-9'_]*	;
 
-LINECOMMENT : ('--') ~('\r'|'\n') ->channel (HIDDEN) ;
+LINECOMMENT : ('--') ~('\r'|'\n')* -> channel (HIDDEN) ;
 WS : ( '\t' | ' ' | '\r'|'\n'| '\u000C' )+ ->channel (HIDDEN) ;
