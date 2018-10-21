@@ -291,6 +291,18 @@ public class ACSPBaseListener implements ACSPListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterLocNames(ACSPParser.LocNamesContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitLocNames(ACSPParser.LocNamesContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterBoolExp(ACSPParser.BoolExpContext ctx) { }
 	/**
 	 * {@inheritDoc}

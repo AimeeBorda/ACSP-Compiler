@@ -237,6 +237,16 @@ public interface ACSPListener extends ParseTreeListener {
 	 */
 	void exitParallelProc(ACSPParser.ParallelProcContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link ACSPParser#locNames}.
+	 * @param ctx the parse tree
+	 */
+	void enterLocNames(ACSPParser.LocNamesContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ACSPParser#locNames}.
+	 * @param ctx the parse tree
+	 */
+	void exitLocNames(ACSPParser.LocNamesContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link ACSPParser#boolExp}.
 	 * @param ctx the parse tree
 	 */

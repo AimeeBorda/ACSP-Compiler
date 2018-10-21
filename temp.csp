@@ -1,59 +1,9 @@
-datatype Connection = Secure | Open | HVAC
+transparent normal 
 
-transparent normal
+P =normal((let R = l?id -> (map(l,id) /\ R) 
+ within (SKIP/\ R)[|union({},{| l|})|] l!0 -> SKIP) \ {| l|})
 
-Processes = {0..1}
-MaxConnections = 3
-Connections = {0 .. MaxConnections}
+channel  l : {0..0}
 
-channel connect : Bool.Connection
-channel disconnect
-channel update
-
-EventsA = {|connect,disconnect,update|}
-MonitorsA = {}
-
-channel adapt3 : Connections
-channel adapt6
-channel ack
-A0 = disconnect -> connect!True!HVAC -> A0'
-A0' = (connect?_?_:{HVAC,Secure} -> A0')
-		[] (update -> A0')
-
-A1 = (connect?_:Bool!Secure -> A1)
-		[] (update -> A1)
-		[] (connect!False!Open -> A1)
-		[] (connect!False!HVAC ->A1')
-A1' = (connect?_:Bool?_:Connection -> A1') [] (update -> A1')
-Pattern3A =   let P(n) =
-				   (n == 0 & connect!True!Secure -> adapt3!n+1 -> ack -> P(n+1))
-				[] (n < MaxConnections and n > 0 & connect!True!Secure -> P(n+1))
-				[] (n > 1 & connect!False!Secure -> P(n-1))
-				[] (n == 1 & connect!False!Secure -> adapt3!0 -> ack -> P(n-1))
-				[] (disconnect -> P(n))
-				[] (update -> P(n))
-				[] (connect?_:Bool?_:{HVAC,Open} -> P(n))
-				within P(0)
-
-Pattern6 =      (connect?_ -> Pattern6)  [] (disconnect -> Pattern6) [] (update -> adapt6 -> ack -> Pattern6)
-PiA3 =  adapt3?s : Connections ->
-						if s == 1 then l!0 -> ack -> PiA3
-						else if s == 0 then l!1 -> ack -> PiA3
-						else ack -> PiA3
-
-PiA6 =  adapt6 -> l!0 -> ack -> PiA6
-accessPtComp = let
-			R3 = (PiA3 [|{| adapt3,ack |}|] Pattern3A) \ {| adapt3,adapt6,ack|}
-			R6 = (PiA6 [|{| adapt6,ack |}|] Pattern6) \ {|adapt3,adapt6,ack|}
-			AdaptationProc = R3 [|union(EventsA,MonitorsA)|] R6
-			proc =normal((let R = l?id -> (map(l,id) /\ R) 
- within (A1'/\ R)[|union( EventsA,{| l|})|] AdaptationProc) \ {| l|})
-		within
-			proc
-assert accessPtComp :[deterministic]
-
-channel  l : {0..2}
-
-map = \ chName,id @ if chName ==  l and id == 0 then A0 
-else if chName ==  l and id == 1 then A1' 
+map = \ chName,id @ if chName ==  l and id == 0 then STOP 
 else SKIP

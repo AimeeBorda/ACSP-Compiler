@@ -5,7 +5,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
+//TODO: types over process definition.
+//TODO:
 public class ACSPTypeChecker extends ACSPBaseVisitor<ACSPTypeChecker.Gamma> {
 
     List<String> errors = new ArrayList<>();
@@ -22,12 +23,13 @@ public class ACSPTypeChecker extends ACSPBaseVisitor<ACSPTypeChecker.Gamma> {
 
     @Override
     public Gamma visitLocProcess(ACSPParser.LocProcessContext ctx) {
-        Gamma res = ctx.children.stream().map(c -> visit(c)).filter(Gamma::notEmpty).reduce((r, t) -> r.merge(t)).orElse(empty);
+        Gamma res = ctx.children.stream().map(c -> visit(c)).reduce((r, t) -> r.merge(t)).orElse(empty);
 
         if(res != null && res.isEmpty()){
             String text = ctx.ID().getSymbol().getText();
-            res.addIn(text);
-            return res;
+            Gamma r = new Gamma();
+            r.addIn(text);
+            return res.merge(r);
         }
 
         return res;
@@ -38,60 +40,60 @@ public class ACSPTypeChecker extends ACSPBaseVisitor<ACSPTypeChecker.Gamma> {
         return empty;
     }
 
-    @Override
-    public Gamma visitSimpleDefinition(ACSPParser.SimpleDefinitionContext ctx) {
-        return ctx.children.stream().map(c -> visit(c)).filter(Gamma::notEmpty).reduce((r, t) -> r.merge(t)).orElse(empty);
-    }
-
-    @Override
-    public Gamma visitAssertDefinition(ACSPParser.AssertDefinitionContext ctx) {
-        return ctx.children.stream().map(c -> visit(c)).filter(Gamma::notEmpty).reduce((r, t) -> r.merge(t)).orElse(empty);
-    }
-
-    @Override
-    public Gamma visitRefinedBy(ACSPParser.RefinedByContext ctx) {
-        return ctx.children.stream().map(c -> visit(c)).filter(Gamma::notEmpty).reduce((r, t) -> r.merge(t)).orElse(empty);
-    }
-
-    @Override
-    public Gamma visitDefinitionLeft(ACSPParser.DefinitionLeftContext ctx) {
-        return ctx.children.stream().map(c -> visit(c)).filter(Gamma::notEmpty).reduce((r, t) -> r.merge(t)).orElse(empty);
-    }
+//    @Override
+//    public Gamma visitSimpleDefinition(ACSPParser.SimpleDefinitionContext ctx) {
+//        return ctx.children.stream().map(c -> visit(c)).filter(Gamma::notEmpty).reduce((r, t) -> r.merge(t)).orElse(empty);
+//    }
+//
+//    @Override
+//    public Gamma visitAssertDefinition(ACSPParser.AssertDefinitionContext ctx) {
+//        return ctx.children.stream().map(c -> visit(c)).filter(Gamma::notEmpty).reduce((r, t) -> r.merge(t)).orElse(empty);
+//    }
+//
+//    @Override
+//    public Gamma visitRefinedBy(ACSPParser.RefinedByContext ctx) {
+//        return ctx.children.stream().map(c -> visit(c)).filter(Gamma::notEmpty).reduce((r, t) -> r.merge(t)).orElse(empty);
+//    }
+//
+//    @Override
+//    public Gamma visitDefinitionLeft(ACSPParser.DefinitionLeftContext ctx) {
+//        return ctx.children.stream().map(c -> visit(c)).filter(Gamma::notEmpty).reduce((r, t) -> r.merge(t)).orElse(empty);
+//    }
 
     @Override
     public Gamma visitTerminal(TerminalNode node) {
         return empty;
     }
 
-    @Override
-    public Gamma visitType(ACSPParser.TypeContext ctx) {
-        return ctx.children.stream().map(c -> visit(c)).filter(Gamma::notEmpty).reduce((r, t) -> r.merge(t)).orElse(empty);
-    }
-
-    @Override
-    public Gamma visitSimple(ACSPParser.SimpleContext ctx) {
-        return ctx.children.stream().map(c -> visit(c)).filter(Gamma::notEmpty).reduce((r, t) -> r.merge(t)).orElse(empty);
-    }
-
-    @Override
-    public Gamma visitBoolExp(ACSPParser.BoolExpContext ctx) {
-        return ctx.children.stream().map(c -> visit(c)).filter(Gamma::notEmpty).reduce((r, t) -> r.merge(t)).orElse(empty);
-    }
-
-    @Override
-    public Gamma visitBoolOrAmb(ACSPParser.BoolOrAmbContext ctx) {
-        return ctx.children.stream().map(c -> visit(c)).filter(Gamma::notEmpty).reduce((r, t) -> r.merge(t)).orElse(empty);
-    }
-
-    @Override
-    public Gamma visitExpr(ACSPParser.ExprContext ctx) {
-        return ctx.children.stream().map(c -> visit(c)).filter(Gamma::notEmpty).reduce((r, t) -> r.merge(t)).orElse(empty);
-    }
-
-    @Override
-    public Gamma visitNumber(ACSPParser.NumberContext ctx) {
-        return ctx.children.stream().map(c -> visit(c)).filter(Gamma::notEmpty).reduce((r, t) -> r.merge(t)).orElse(empty);
-    }
+//    @Override
+//    public Gamma visitType(ACSPParser.TypeContext ctx) {
+//        return ctx.children.stream().map(c -> visit(c)).filter(Gamma::notEmpty).reduce((r, t) -> r.merge(t)).orElse(empty);
+//    }
+//
+//    @Override
+//    public Gamma visitSimple(ACSPParser.SimpleContext ctx) {
+//        return ctx.children.stream().map(c -> visit(c)).filter(Gamma::notEmpty).reduce((r, t) -> r.merge(t)).orElse(empty);
+//    }
+//
+//    @Override
+//    public Gamma visitBoolExp(ACSPParser.BoolExpContext ctx) {
+//        return ctx.children.stream().map(c -> visit(c)).filter(Gamma::notEmpty).reduce((r, t) -> r.merge(t)).orElse(empty);
+//    }
+//
+//    @Override
+//    public Gamma visitBoolOrAmb(ACSPParser.BoolOrAmbContext ctx) {
+//        return ctx.children.stream().map(c -> visit(c)).filter(Gamma::notEmpty).reduce((r, t) -> r.merge(t)).orElse(empty);
+//    }
+//
+//    @Override
+//    public Gamma visitExpr(ACSPParser.ExprContext ctx) {
+//        return ctx.children.stream().map(c -> visit(c)).filter(Gamma::notEmpty).reduce((r, t) -> r.merge(t)).orElse(empty);
+//    }
+//
+//    @Override
+//    public Gamma visitNumber(ACSPParser.NumberContext ctx) {
+//        return ctx.children.stream().map(c -> visit(c)).filter(Gamma::notEmpty).reduce((r, t) -> r.merge(t)).orElse(empty);
+//    }
 
     @Override
     public Gamma visitLocOutput(ACSPParser.LocOutputContext ctx) {
@@ -100,9 +102,9 @@ public class ACSPTypeChecker extends ACSPBaseVisitor<ACSPTypeChecker.Gamma> {
 
         if(proc != null && cont != null && proc.isEmpty()){
             String text = ctx.ID().getSymbol().getText();
-            cont.addIn(text);
-
-           return cont;
+            Gamma c = new Gamma();
+            c.addOut(text);
+            return cont.merge(c);
         } else {
             errors.add("A process being communicated over " + ctx.ID() +" was not well-typed at \n"+ ctx.getText());
             return null;
@@ -111,10 +113,20 @@ public class ACSPTypeChecker extends ACSPBaseVisitor<ACSPTypeChecker.Gamma> {
     }
 
     @Override
+    public Gamma visitLocNames(ACSPParser.LocNamesContext ctx) {
+        Gamma g = new Gamma();
+        ctx.ID().stream().forEach(l ->{
+            g.addOut(l.getText());
+            g.addIn(l.getText());
+        });
+        return g;
+    }
+
+    @Override
     public Gamma visitParallelProc(ACSPParser.ParallelProcContext ctx) {
         Gamma left = visit(ctx.proc(0));
         Gamma right = visit(ctx.proc(1));
-        Gamma L = visit(ctx.channelNames());
+        Gamma L = visit(ctx.locNames());
         Gamma gamma =  left.merge(right);
 
         gamma.in.removeAll(L.in);
@@ -148,70 +160,70 @@ public class ACSPTypeChecker extends ACSPBaseVisitor<ACSPTypeChecker.Gamma> {
         }
     }
 
-    @Override
-    public Gamma visitSpec(ACSPParser.SpecContext ctx) {
-        return ctx.children.stream().map(c -> visit(c)).filter(Gamma::notEmpty).reduce((r, t) -> r.merge(t)).orElse(empty);
-    }
-
-    @Override
-    public Gamma visitDefinition(ACSPParser.DefinitionContext ctx) {
-        return super.visitDefinition(ctx);
-    }
-
-    @Override
-    public Gamma visitChannelDecl(ACSPParser.ChannelDeclContext ctx) {
-        return ctx.children.stream().map(c -> visit(c)).filter(Gamma::notEmpty).reduce((r, t) -> r.merge(t)).orElse(empty);
-    }
-
-    @Override
-    public Gamma visitChannelColonType(ACSPParser.ChannelColonTypeContext ctx) {
-        return ctx.children.stream().map(c -> visit(c)).filter(Gamma::notEmpty).reduce((r, t) -> r.merge(t)).orElse(empty);
-    }
-
-    @Override
-    public Gamma visitAny(ACSPParser.AnyContext ctx) {
-        return ctx.children.stream().map(c -> visit(c)).filter(Gamma::notEmpty).reduce((r,t) -> r.merge(t)).orElse(empty);
-    }
-
-    @Override
-    public Gamma visitCheckConditionBody(ACSPParser.CheckConditionBodyContext ctx) {
-        return ctx.children.stream().map(c -> visit(c)).filter(Gamma::notEmpty).reduce((r, t) -> r.merge(t)).orElse(empty);
-    }
-
-    @Override
-    public Gamma visitModelCheckType(ACSPParser.ModelCheckTypeContext ctx) {
-        return ctx.children.stream().map(c -> visit(c)).filter(Gamma::notEmpty).reduce((r, t) -> r.merge(t)).orElse(empty);
-    }
-
-    @Override
-    public Gamma visitSet(ACSPParser.SetContext ctx) {
-        return ctx.children.stream().map(c -> visit(c)).filter(Gamma::notEmpty).reduce((r, t) -> r.merge(t)).orElse(empty);
-    }
-
-    @Override
-    public Gamma visitProc(ACSPParser.ProcContext ctx) {
-        return ctx.children.stream().map(c ->visit(c)).filter(Gamma::notEmpty).reduce((r,t) -> r.merge(t)).orElse(empty);
-    }
-
-    @Override
-    public Gamma visitDataTypeDefinition(ACSPParser.DataTypeDefinitionContext ctx) {
-        return ctx.children.stream().map(c -> visit(c)).filter(Gamma::notEmpty).reduce((r, t) -> r.merge(t)).orElse(empty);
-    }
-
-    @Override
-    public Gamma visitSetComprehension(ACSPParser.SetComprehensionContext ctx) {
-        return ctx.children.stream().map(c -> visit(c)).filter(Gamma::notEmpty).reduce((r, t) -> r.merge(t)).orElse(empty);
-    }
-
-    @Override
-    public Gamma visitEvent(ACSPParser.EventContext ctx) {
-        return ctx.children.stream().map(c -> visit(c)).filter(Gamma::notEmpty).reduce((r, t) -> r.merge(t)).orElse(empty);
-    }
-
-    @Override
-    public Gamma visitFuncImport(ACSPParser.FuncImportContext ctx) {
-        return ctx.children.stream().map(c -> visit(c)).filter(Gamma::notEmpty).reduce((r, t) -> r.merge(t)).orElse(empty);
-    }
+//    @Override
+//    public Gamma visitSpec(ACSPParser.SpecContext ctx) {
+//        return ctx.children.stream().map(c -> visit(c)).filter(Gamma::notEmpty).reduce((r, t) -> r.merge(t)).orElse(empty);
+//    }
+//
+//    @Override
+//    public Gamma visitDefinition(ACSPParser.DefinitionContext ctx) {
+//        return super.visitDefinition(ctx);
+//    }
+//
+//    @Override
+//    public Gamma visitChannelDecl(ACSPParser.ChannelDeclContext ctx) {
+//        return ctx.children.stream().map(c -> visit(c)).filter(Gamma::notEmpty).reduce((r, t) -> r.merge(t)).orElse(empty);
+//    }
+//
+//    @Override
+//    public Gamma visitChannelColonType(ACSPParser.ChannelColonTypeContext ctx) {
+//        return ctx.children.stream().map(c -> visit(c)).filter(Gamma::notEmpty).reduce((r, t) -> r.merge(t)).orElse(empty);
+//    }
+//
+//    @Override
+//    public Gamma visitAny(ACSPParser.AnyContext ctx) {
+//        return ctx.children.stream().map(c -> visit(c)).filter(Gamma::notEmpty).reduce((r,t) -> r.merge(t)).orElse(empty);
+//    }
+//
+//    @Override
+//    public Gamma visitCheckConditionBody(ACSPParser.CheckConditionBodyContext ctx) {
+//        return ctx.children.stream().map(c -> visit(c)).filter(Gamma::notEmpty).reduce((r, t) -> r.merge(t)).orElse(empty);
+//    }
+//
+//    @Override
+//    public Gamma visitModelCheckType(ACSPParser.ModelCheckTypeContext ctx) {
+//        return ctx.children.stream().map(c -> visit(c)).filter(Gamma::notEmpty).reduce((r, t) -> r.merge(t)).orElse(empty);
+//    }
+//
+//    @Override
+//    public Gamma visitSet(ACSPParser.SetContext ctx) {
+//        return ctx.children.stream().map(c -> visit(c)).filter(Gamma::notEmpty).reduce((r, t) -> r.merge(t)).orElse(empty);
+//    }
+//
+//    @Override
+//    public Gamma visitProc(ACSPParser.ProcContext ctx) {
+//        return ctx.children.stream().map(c ->visit(c)).filter(Gamma::notEmpty).reduce((r,t) -> r.merge(t)).orElse(empty);
+//    }
+//
+//    @Override
+//    public Gamma visitDataTypeDefinition(ACSPParser.DataTypeDefinitionContext ctx) {
+//        return ctx.children.stream().map(c -> visit(c)).filter(Gamma::notEmpty).reduce((r, t) -> r.merge(t)).orElse(empty);
+//    }
+//
+//    @Override
+//    public Gamma visitSetComprehension(ACSPParser.SetComprehensionContext ctx) {
+//        return ctx.children.stream().map(c -> visit(c)).filter(Gamma::notEmpty).reduce((r, t) -> r.merge(t)).orElse(empty);
+//    }
+//
+//    @Override
+//    public Gamma visitEvent(ACSPParser.EventContext ctx) {
+//        return ctx.children.stream().map(c -> visit(c)).filter(Gamma::notEmpty).reduce((r, t) -> r.merge(t)).orElse(empty);
+//    }
+//
+//    @Override
+//    public Gamma visitFuncImport(ACSPParser.FuncImportContext ctx) {
+//        return ctx.children.stream().map(c -> visit(c)).filter(Gamma::notEmpty).reduce((r, t) -> r.merge(t)).orElse(empty);
+//    }
 
     @Override
     protected Gamma aggregateResult(Gamma aggregate, Gamma nextResult) {
@@ -225,6 +237,9 @@ public class ACSPTypeChecker extends ACSPBaseVisitor<ACSPTypeChecker.Gamma> {
 
         public void addIn(String text){
             in.add(text);
+        }
+        public void addOut(String text){
+            out.add(text);
         }
 
         public boolean isEmpty(){

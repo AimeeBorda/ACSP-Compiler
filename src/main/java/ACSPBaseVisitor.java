@@ -177,6 +177,13 @@ public class ACSPBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements A
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
+	@Override public T visitLocNames(ACSPParser.LocNamesContext ctx) { return visitChildren(ctx); }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation returns the result of calling
+	 * {@link #visitChildren} on {@code ctx}.</p>
+	 */
 	@Override public T visitBoolExp(ACSPParser.BoolExpContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}

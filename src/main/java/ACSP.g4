@@ -95,8 +95,9 @@ event : ID ((QUERY | PLING) any (COLLON type)?)*;
 
 locProcess : ID LBRACKET proc RBRACKET ;
 locOutput :  ID PLING proc DOT proc ;
-parallelProc :  LPAREN NEW channelNames RPAREN LPAREN proc LSYNC set RSYNC proc RPAREN;
+parallelProc :  LPAREN NEW locNames RPAREN LPAREN proc LSYNC set RSYNC proc RPAREN;
 
+locNames: ID(COMMA ID)*;
 
 boolExp
 	: NOT boolOrAmb

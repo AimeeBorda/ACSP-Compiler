@@ -148,6 +148,12 @@ public interface ACSPVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitParallelProc(ACSPParser.ParallelProcContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link ACSPParser#locNames}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLocNames(ACSPParser.LocNamesContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link ACSPParser#boolExp}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

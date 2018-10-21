@@ -28,7 +28,7 @@ public class ACSPTranslator extends ACSPBaseVisitor<String> {
     private String locDeclaration() {
         StringBuilder res = new StringBuilder();
         for(Map.Entry entry : locations.entrySet()){
-            res.append(String.format("channel %s : {0..%d}\n", entry.getKey(),((TreeSet)entry.getValue()).size()));
+            res.append(String.format("channel %s : {0..%d}\n", entry.getKey(),((TreeSet)entry.getValue()).size() -1));
         }
 
         return res.toString()+"\n";
@@ -68,7 +68,7 @@ public class ACSPTranslator extends ACSPBaseVisitor<String> {
 
     @Override
     public String visitParallelProc(ACSPParser.ParallelProcContext ctx) {
-        String L = visit(ctx.channelNames());
+        String L = visit(ctx.locNames());
         String M = visit(ctx.proc(0));
         String N = visit(ctx.proc(1));
         String E = visit(ctx.set());
