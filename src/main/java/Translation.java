@@ -1,88 +1,65 @@
+import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.ParseTree;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.List;
-import java.util.Optional;
 
 public class Translation {
-    private ACSPParser acspProcess;
+
+    private ACSPTranslator translator;
+    private ACSPTypeChecker typeChecker;
+    private final String input;
+
+    public void translate() throws IOException {
+        translate("temp.csp");
+    }
 
     public Translation(String input) throws IOException {
-        this.acspProcess = getParseTree(input);
+        this.input = input;
+    }
+
+    private ACSPParser getParser() throws IOException {
+        return new ACSPParser(new CommonTokenStream(new ACSPLexer(CharStreams.fromFileName(input))));
     }
 
     public void translate(String output) throws IOException {
-//        Optional<List<String>> errorMessages = typeCheckProcess();
+        typeCheckProcess();
 
-//        if(errorMessages.isPresent()){
-//            showErrorMessages(errorMessages.get());
-//        }else {
-            String cspProcess = translateProcess();
-            startFDR(cspProcess, output);
-//        }
-    }
-
-    public void translate() throws IOException {
-        translate(null);
-    }
-
-    private void startFDR(String cspProcess, String output) throws IOException {
-        if(output == null){
-            output = "temp.csp";
+        if(isWellTyped()){
+            translateProcess();
+            writeToFile(output);
+            openFDR(output);
+        }else {
+            showErrorMessages();
         }
-
-
-        writeToFile(cspProcess,output);
-        openFDR(output);
     }
 
-    private ACSPParser getParseTree(String input) throws IOException {
-        ACSPLexer lexer = new ACSPLexer(CharStreams.fromFileName(input));
-        CommonTokenStream commonTokenStream = new CommonTokenStream(lexer);
-        ACSPParser parser = new ACSPParser(new CommonTokenStream(lexer));
-
-//        ACSPParser.SpecContext acspProcess = parser.spec();
-
-        return parser;
+    private  void translateProcess() throws IOException {
+        translator = new ACSPTranslator(getParser());
     }
 
-    private  void showErrorMessages(List<String> errorMessages){
-        errorMessages.stream().forEach(System.err::println);
-    }
-
-    private  String translateProcess(){
-        ACSPTranslatorVisitor translator = new ACSPTranslatorVisitor(acspProcess.getTokenStream());
-        return translator.visit(acspProcess.spec());
-
+    private  void writeToFile(String fileName) throws FileNotFoundException {
+        System.out.println(translator.cspProcess);
+        PrintWriter out = new PrintWriter(fileName);
+        out.println(translator.cspProcess);
+        out.flush();
     }
 
     private void openFDR(String file) throws IOException {
         new ProcessBuilder("/bin/bash", "-c", "open "+file).start();
     }
 
-    private  Optional<List<String>> typeCheckProcess(){
-        ACSPTypeChecker typeChecker = new ACSPTypeChecker();
-        ACSPTypeChecker.InOut env = typeChecker.visit(acspProcess.spec());
-        if(isWellTyped(env)){
-            return Optional.empty();
-        } else{
-            return Optional.of(typeChecker.getErrors());
-        }
+    private  void typeCheckProcess() throws IOException {
+        typeChecker = new ACSPTypeChecker(getParser());
     }
 
-    private boolean isWellTyped(ACSPTypeChecker.InOut env){
-        return env!=null && env.isEmpty();
+    private boolean isWellTyped(){
+        return typeChecker.isWellTyped();
     }
 
-
-    private  void writeToFile(String output, String fileName) throws FileNotFoundException {
-        System.out.println("output:" + output);
-        PrintWriter out = new PrintWriter(fileName);
-        out.println(output);
-        out.flush();
+    private  void showErrorMessages(){
+        typeChecker.errors.stream().forEach(System.err::println);
     }
 }
