@@ -2,7 +2,9 @@ grammar ACSP;
 
 spec : definition*;
 
-definition : dataTypeDefinition | channelDecl  | assertDefinition |  simpleDefinition ;
+definition : dataTypeDefinition | channelDecl  | assertDefinition | funcImport |  simpleDefinition;
+
+funcImport : (TRANSPARENT | EXTERNAL) ID;
 
 dataTypeDefinition : (DATATYPE | SUBTYPE) ID EQUAL type (BAR type)*;
 
@@ -82,11 +84,11 @@ proc
      	| proc SEMICOL proc
      	| LPAREN proc RPAREN
      	| ID LPAREN any(COMMA any)* RPAREN
-     	| ID
 	    | locProcess
 	    | locOutput
 	    | parallelProc
 	    | LET simpleDefinition+ WITHIN any
+	    | ID
 	    ;
 
 event : ID ((QUERY | PLING) any (COLLON type)?)*;
@@ -192,7 +194,8 @@ DBLQUOTE : '"';
 ACSP : 'acsp';
 BAR : '|';
 SUBTYPE : 'subtype';
-
+TRANSPARENT: 'transparent';
+EXTERNAL : 'external';
 DIGIT: ('0' .. '9');
 ID : [a-zA-Z_][a-zA-Z0-9'_]*	;
 

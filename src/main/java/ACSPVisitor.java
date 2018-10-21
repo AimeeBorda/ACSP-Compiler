@@ -22,6 +22,12 @@ public interface ACSPVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitDefinition(ACSPParser.DefinitionContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link ACSPParser#funcImport}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitFuncImport(ACSPParser.FuncImportContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link ACSPParser#dataTypeDefinition}.
 	 * @param ctx the parse tree
 	 * @return the visitor result

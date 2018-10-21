@@ -1,9 +1,21 @@
+datatype Connection = Secure | Open | HVAC
+
+transparent normal
+
+Processes = {0..1}
+MaxConnections = 3
+Connections = {0 .. MaxConnections}
+
+channel connect : Bool.Connection		-- agents' movement
+channel disconnect
+channel update
+
 EventsA = {|connect,disconnect,update|}
 MonitorsA = {}
 
 channel adapt3 : Connections
 channel adapt6
-
+channel ack
 ---------------------------------------------
 --		Processes for Access Point
 ---------------------------------------------
@@ -52,6 +64,7 @@ accessPtComp = let
 			R3 = (PiA3 [|{| adapt3,ack |}|] Pattern3A) \ {| adapt3,adapt6,ack|}
 			R6 = (PiA6 [|{| adapt6,ack |}|] Pattern6) \ {|adapt3,adapt6,ack|}
 			AdaptationProc = R3 [|union(EventsA,MonitorsA)|] R6
-			proc = (new l)(l[A1'] [| EventsA |] AdaptationProc)
+			proc = (new l)( l[A1'] [| EventsA |] AdaptationProc)
 		within
 			proc
+assert accessPtComp :[deterministic]

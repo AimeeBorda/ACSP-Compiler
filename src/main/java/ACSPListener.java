@@ -27,6 +27,16 @@ public interface ACSPListener extends ParseTreeListener {
 	 */
 	void exitDefinition(ACSPParser.DefinitionContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link ACSPParser#funcImport}.
+	 * @param ctx the parse tree
+	 */
+	void enterFuncImport(ACSPParser.FuncImportContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ACSPParser#funcImport}.
+	 * @param ctx the parse tree
+	 */
+	void exitFuncImport(ACSPParser.FuncImportContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link ACSPParser#dataTypeDefinition}.
 	 * @param ctx the parse tree
 	 */

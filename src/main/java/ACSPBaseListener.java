@@ -39,6 +39,18 @@ public class ACSPBaseListener implements ACSPListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterFuncImport(ACSPParser.FuncImportContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitFuncImport(ACSPParser.FuncImportContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterDataTypeDefinition(ACSPParser.DataTypeDefinitionContext ctx) { }
 	/**
 	 * {@inheritDoc}
