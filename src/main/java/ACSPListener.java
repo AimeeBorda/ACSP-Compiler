@@ -27,6 +27,16 @@ public interface ACSPListener extends ParseTreeListener {
 	 */
 	void exitDefinition(ACSPParser.DefinitionContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link ACSPParser#dataTypeDefinition}.
+	 * @param ctx the parse tree
+	 */
+	void enterDataTypeDefinition(ACSPParser.DataTypeDefinitionContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ACSPParser#dataTypeDefinition}.
+	 * @param ctx the parse tree
+	 */
+	void exitDataTypeDefinition(ACSPParser.DataTypeDefinitionContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link ACSPParser#channelDecl}.
 	 * @param ctx the parse tree
 	 */
@@ -97,16 +107,6 @@ public interface ACSPListener extends ParseTreeListener {
 	 */
 	void exitDefinitionLeft(ACSPParser.DefinitionLeftContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link ACSPParser#defnCallLeft}.
-	 * @param ctx the parse tree
-	 */
-	void enterDefnCallLeft(ACSPParser.DefnCallLeftContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link ACSPParser#defnCallLeft}.
-	 * @param ctx the parse tree
-	 */
-	void exitDefnCallLeft(ACSPParser.DefnCallLeftContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link ACSPParser#any}.
 	 * @param ctx the parse tree
 	 */
@@ -167,6 +167,16 @@ public interface ACSPListener extends ParseTreeListener {
 	 */
 	void exitSet(ACSPParser.SetContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link ACSPParser#setComprehension}.
+	 * @param ctx the parse tree
+	 */
+	void enterSetComprehension(ACSPParser.SetComprehensionContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ACSPParser#setComprehension}.
+	 * @param ctx the parse tree
+	 */
+	void exitSetComprehension(ACSPParser.SetComprehensionContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link ACSPParser#proc}.
 	 * @param ctx the parse tree
 	 */
@@ -176,6 +186,16 @@ public interface ACSPListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitProc(ACSPParser.ProcContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ACSPParser#event}.
+	 * @param ctx the parse tree
+	 */
+	void enterEvent(ACSPParser.EventContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ACSPParser#event}.
+	 * @param ctx the parse tree
+	 */
+	void exitEvent(ACSPParser.EventContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link ACSPParser#locProcess}.
 	 * @param ctx the parse tree

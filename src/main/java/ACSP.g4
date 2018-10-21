@@ -2,11 +2,13 @@ grammar ACSP;
 
 spec : definition*;
 
-definition : channelDecl | simpleDefinition | assertDefinition | comment ;
+definition : dataTypeDefinition | channelDecl  | assertDefinition | comment | simpleDefinition ;
+
+dataTypeDefinition : (DATATYPE | SUBTYPE) ID EQUAL type (BAR type)*;
 
 channelDecl : CHANNEL channelNames (channelColonType)?;
 
-channelNames : ID(COMMA ID)*;										
+channelNames : ID(COMMA ID)*;
 
 channelColonType : COLLON  type	;
 
@@ -23,18 +25,15 @@ refinedBy :
     ;
 
 definitionLeft
-	: defnCallLeft
-	| defnCallLeft LPAREN any* RPAREN
-	;
-
-defnCallLeft
 	: ID
- 	;
+	| ID LPAREN any(COMMA any)* RPAREN
+	;
 
 any
 	: proc
 	| boolExp
 	| expr
+	| event
 	;
 
 checkConditionBody
@@ -60,13 +59,18 @@ simple
 	;
 
 set
-	: LBRACE (any(COMMA any)*|(any DOT DOT any)?) RBRACE
+	: (LBRACE (any(COMMA any)*|(any DOT DOT any)?) RBRACE)
+	| (LBBRACE (any(COMMA any)*|(any DOT DOT any)?) RBBRACE)
+	| definitionLeft
+	| LBRACE any BAR setComprehension(COMMA setComprehension)* RBRACE
 	;
+
+setComprehension : any RARROW type;
 
 proc
 	:Skip
      	| Stop
-     	| ID ARROW proc
+     	| event ARROW proc
      	| proc ECHOICE proc
      	| proc ICHOICE proc
      	| proc INTL proc
@@ -78,6 +82,7 @@ proc
      	| proc INTR proc
      	| proc SEMICOL proc
      	| LPAREN proc RPAREN
+     	| ID LPAREN any(COMMA any)* RPAREN
      	| ID
 	    | locProcess
 	    | locOutput
@@ -85,6 +90,7 @@ proc
 	    | LET simpleDefinition+ WITHIN any
 	    ;
 
+event : ID ((QUERY | DOT | PLING) any (COLLON type)?)*;
 locProcess : ID LBRACKET proc RBRACKET ;
 locOutput :  ID PLING proc DOT proc ;
 parallelProc :  LPAREN NEW channelNames RPAREN LPAREN proc LSYNC set RSYNC proc RPAREN;
@@ -98,6 +104,7 @@ boolExp
 	| FALSE
 	| ID
 	| number
+	| LBRACE boolExp RBRACE
 	;
 
 boolOrAmb
@@ -111,6 +118,8 @@ expr
 	| LPAREN expr RPAREN
 	| number
 	| ID
+	| set
+	| event
 	;
 
 number
@@ -157,12 +166,16 @@ ICHOICE :	'|~|';
 COMMA	:	',';
 COLLON	:	':';
 SEMICOL	:	';';
+DATATYPE : 'datatype';
 ARROW	:	'->';
+RARROW	:	'<-';
 QUERY	:	'?';
 PLING	:	'!';
 CHANNEL	:	'channel';
 DOT	:	'.';
 LBRACE	: '{';
+LBBRACE : '{|';
+RBBRACE : '|}';
 RBRACE	: '}';
 EQUAL	: '=';
 BACKSLASH : '\\';
@@ -184,9 +197,11 @@ WITHIN : 'within';
 INCLUDE : 'include';
 DBLQUOTE : '"';
 ACSP : 'acsp';
+BAR : '|';
+SUBTYPE : 'subtype';
 
 DIGIT: ('0' .. '9');
-ID : [a-zA-Z][a-zA-Z0-9'_]*	;
+ID : [a-zA-Z_][a-zA-Z0-9'_]*	;
 
 LINECOMMENT : ('--') ~('\r'|'\n')* -> channel (HIDDEN) ;
 

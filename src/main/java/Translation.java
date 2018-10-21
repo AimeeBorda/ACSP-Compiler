@@ -19,12 +19,12 @@ public class Translation {
     public void translate(String output) throws IOException {
         Optional<List<String>> errorMessages = typeCheckProcess();
 
-        if(errorMessages.isPresent()){
-            showErrorMessages(errorMessages.get());
-        }else {
+//        if(errorMessages.isPresent()){
+//            showErrorMessages(errorMessages.get());
+//        }else {
             String cspProcess = translateProcess();
             startFDR(cspProcess, output);
-        }
+//        }
     }
 
     public void translate() throws IOException {

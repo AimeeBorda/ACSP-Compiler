@@ -22,6 +22,12 @@ public interface ACSPVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitDefinition(ACSPParser.DefinitionContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link ACSPParser#dataTypeDefinition}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitDataTypeDefinition(ACSPParser.DataTypeDefinitionContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link ACSPParser#channelDecl}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -64,12 +70,6 @@ public interface ACSPVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitDefinitionLeft(ACSPParser.DefinitionLeftContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link ACSPParser#defnCallLeft}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitDefnCallLeft(ACSPParser.DefnCallLeftContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link ACSPParser#any}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -106,11 +106,23 @@ public interface ACSPVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitSet(ACSPParser.SetContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link ACSPParser#setComprehension}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitSetComprehension(ACSPParser.SetComprehensionContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link ACSPParser#proc}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitProc(ACSPParser.ProcContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ACSPParser#event}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitEvent(ACSPParser.EventContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link ACSPParser#locProcess}.
 	 * @param ctx the parse tree

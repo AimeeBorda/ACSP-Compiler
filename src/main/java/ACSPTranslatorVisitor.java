@@ -2,28 +2,29 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.io.IOException;
 import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
+//TODO: preserve WS + Comments
 public class ACSPTranslatorVisitor extends ACSPBaseVisitor<String> {
 
-    private HashMap<String, ArrayList<String>> locations;
+    private HashMap<String, TreeSet<String>> locations;
 
     public ACSPTranslatorVisitor(){
         this.locations = new HashMap<>();;
     }
 
+
     @Override
     public String visitSpec(ACSPParser.SpecContext ctx) {
-        return "transparent normal \n\n"+super.visitSpec(ctx) + "\n\n"+ locDeclaration()+getMaps();
+        //TODO: need to check if transparent already included
+        return "transparent normal \n\n"+ctx.children.stream().map(c ->visit(c)).collect(Collectors.joining("\n")) + "\n\n"+ locDeclaration()+getMaps();
     }
 
     private String locDeclaration() {
         StringBuilder res = new StringBuilder();
         for(Map.Entry entry : locations.entrySet()){
-            res.append(String.format("channel %s : {0..%d}\n", entry.getKey(),((ArrayList)entry.getValue()).size()));
+            res.append(String.format("channel %s : {0..%d}\n", entry.getKey(),((TreeSet)entry.getValue()).size()));
         }
 
         return res.toString()+"\n";
@@ -33,10 +34,10 @@ public class ACSPTranslatorVisitor extends ACSPBaseVisitor<String> {
     private String getMaps() {
         StringBuilder res = new StringBuilder();
         for(Map.Entry en : locations.entrySet()){
-            ArrayList<String>e = (ArrayList<String>) en.getValue();
-            for (int i = 0; i < e.size(); i++) {
+            Iterator<String> e = ((TreeSet<String>) en.getValue()).iterator();
 
-                res.append(String.format("if l == %s and id == %d then %s \nelse ",en.getKey().toString(),i,e.get(i)));
+            for (int i = 0; e.hasNext(); i++) {
+                res.append(String.format("if l == %s and id == %d then %s \nelse ",en.getKey().toString(),i,e.next()));
             }
         }
         res.append( "SKIP");
@@ -86,8 +87,9 @@ public class ACSPTranslatorVisitor extends ACSPBaseVisitor<String> {
 
     @Override
     public String visitLocOutput(ACSPParser.LocOutputContext ctx) {
-        locations.putIfAbsent(ctx.ID().getText(),new ArrayList<>());
-        ArrayList<String> processes = locations.get(ctx.ID().getText());
+        //TODO: need to check if process already is in list
+        locations.putIfAbsent(ctx.ID().getText(),new TreeSet<>());
+        TreeSet<String> processes = locations.get(ctx.ID().getText());
         processes.add(visit(ctx.proc(0)));
 
         return ctx.ID()+"!"+processes.size() + " -> "+visit(ctx.proc(1));

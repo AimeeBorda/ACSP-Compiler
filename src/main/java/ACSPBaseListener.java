@@ -39,6 +39,18 @@ public class ACSPBaseListener implements ACSPListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterDataTypeDefinition(ACSPParser.DataTypeDefinitionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitDataTypeDefinition(ACSPParser.DataTypeDefinitionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterChannelDecl(ACSPParser.ChannelDeclContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -123,18 +135,6 @@ public class ACSPBaseListener implements ACSPListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterDefnCallLeft(ACSPParser.DefnCallLeftContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitDefnCallLeft(ACSPParser.DefnCallLeftContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterAny(ACSPParser.AnyContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -207,6 +207,18 @@ public class ACSPBaseListener implements ACSPListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterSetComprehension(ACSPParser.SetComprehensionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitSetComprehension(ACSPParser.SetComprehensionContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterProc(ACSPParser.ProcContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -214,6 +226,18 @@ public class ACSPBaseListener implements ACSPListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitProc(ACSPParser.ProcContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterEvent(ACSPParser.EventContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitEvent(ACSPParser.EventContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
