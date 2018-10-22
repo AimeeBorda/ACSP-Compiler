@@ -73,7 +73,7 @@ public class ACSPTranslator extends ACSPBaseVisitor<String> {
         String N = visit(ctx.proc(1));
         String E = visit(ctx.set());
         String A = "{|"+L+"|}";
-        return "normal((" +M +"[|union("+E +","+A +")|]"+N +") \\ " + A+")";
+        return " normal((" +M +"[|union("+E +","+A +")|]"+N +") \\ " + A+")";
     }
 
     @Override
@@ -95,4 +95,5 @@ public class ACSPTranslator extends ACSPBaseVisitor<String> {
     //TODO: Advanced Operators
     //TODO: include
     //TODO: comments
+    //TODO: lambda expressions
 }

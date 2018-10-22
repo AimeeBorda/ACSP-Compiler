@@ -1,9 +1,34 @@
 transparent normal 
 
-P =normal((let R = l?id -> (map(l,id) /\ R) 
- within (SKIP/\ R)[|union({},{| l|})|] l!0 -> SKIP) \ {| l|})
 
-channel  l : {0..0}
+EventsH = {|connect.True.HVAC, connect.False.HVAC |}
+Monitors3H = {|connect.True.Open,connect.False.Open,disconnect,update|}
+Monitors6 = {|update|}
+AdaptH = {|adapt,ack|}
 
-map = \ chName,id @ if chName ==  l and id == 0 then STOP 
+channel adapt : Connections.Bool
+H0 = connect!True!HVAC -> STOP
+H1 = connect!False!HVAC -> STOP
+Pattern3(n,b) =      (n == 0 & connect!True!Open -> adapt!1!b -> connect!False!HVAC -> ack -> Pattern3(n+1,False))
+				[] (n > 0 and n < MaxConnections & connect!True!Open -> Pattern3(n+1,b))
+				[] (n == 1 & connect!False!Open -> adapt!n-1!b -> ack -> Pattern3(n-1,b))
+				[] (n > 1 & connect!False!Open -> Pattern3(n-1,b))
+				[] (disconnect -> adapt!0!b -> ack -> Pattern3(0,b))
+				[] (connect?b':Bool!HVAC -> Pattern3(n,b'))
+				[] (update -> Pattern3(n,b))
+
+Pattern6H =      (connect?_!HVAC -> Pattern6H)  [] (update -> adapt6 -> ack -> Pattern6H)
+PiHvac = l!0 -> ack -> PiHvac
+hvacComp = let
+			R3H = (PiHvac [| {|adapt,ack |}|] Pattern3(0,True)) \ {|adapt,ack|}
+			R6 = (PiA6 [|{| adapt6,ack |}|] Pattern6H) \ {|adapt6,ack|}
+			AdptManager = R6 [|inter(Monitors6,Monitors3H)|] R3H
+		within normal((let R = l?id -> (map(l,id) /\ R) 
+ within (H0/\ R)[|union( EventsH,{| l|})|] AdptManager) \ {| l|})
+
+assert PiHvac :[deterministic]
+
+channel    l : {0..0}
+
+map = \ chName,id @ if chName ==    l and id == 0 then H0 
 else SKIP

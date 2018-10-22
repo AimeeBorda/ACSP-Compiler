@@ -36,6 +36,8 @@ any
 	| boolExp
 	| expr
 	| event
+	| type
+
 	;
 checkConditionBody
 	: DEADLOCK FREE modelCheckType?
@@ -89,12 +91,13 @@ proc
 	    | parallelProc
 	    | LET simpleDefinition+ WITHIN any
 	    | ID
+	    | proc LSYNC set RSYNC proc RPAREN
 	    ;
 
 event : ID ((QUERY | PLING) any (COLLON type)?)*;
 
 locProcess : ID LBRACKET proc RBRACKET ;
-locOutput :  ID PLING proc DOT proc ;
+locOutput :  ID PLING LT proc GT DOT proc ;
 parallelProc :  LPAREN NEW locNames RPAREN LPAREN proc LSYNC set RSYNC proc RPAREN;
 
 locNames: ID(COMMA ID)*;
