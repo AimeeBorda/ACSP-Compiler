@@ -6,7 +6,7 @@ definition : dataTypeDefinition | channelDecl  | assertDefinition | funcImport |
 
 funcImport : (TRANSPARENT | EXTERNAL) ID;
 
-dataTypeDefinition : (DATATYPE | SUBTYPE) ID EQUAL type (BAR type)*;
+dataTypeDefinition : (DATATYPE | SUBTYPE | NAMETYPE) ID EQUAL type (BAR type)*;
 
 channelDecl : CHANNEL channelNames (channelColonType)?;
 
@@ -43,6 +43,7 @@ checkConditionBody
 	: DEADLOCK FREE modelCheckType?
 	| DIVERGENCE FREE modelCheckType?
 	| DETERMINISTIC modelCheckType?
+	| POR
 	;
 
 modelCheckType
@@ -79,7 +80,7 @@ proc
      	| proc INTL proc
      	| IF boolExp THEN proc ELSE proc
      	| boolExp GUARD proc
-     	| proc BACKSLASH set
+     	| proc (BACKSLASH | PROJECT) set
      	| proc LSYNC set RSYNC proc
      	| proc TIMEOUT proc
      	| proc INTR proc
@@ -162,6 +163,7 @@ RSYNC : '|]' ;
 INTL :	'|||';
 ECHOICE :	'[]';
 ICHOICE :	'|~|';
+PROJECT: '|\\';
 COMMA	:	',';
 COLLON	:	':';
 SEMICOL	:	';';
@@ -200,7 +202,10 @@ BAR : '|';
 SUBTYPE : 'subtype';
 TRANSPARENT: 'transparent';
 EXTERNAL : 'external';
+NAMETYPE : 'nametype';
 DIGIT: ('0' .. '9');
+POR : 'partial order reduce';
+
 ID : [a-zA-Z_][a-zA-Z0-9'_]*	;
 
 LINECOMMENT : ('--') ~('\r'|'\n')* -> channel (HIDDEN) ;
