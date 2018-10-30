@@ -1,15 +1,23 @@
 transparent normal 
 
+datatype Connection = Secure | Open | HVAC
 
 EventsH = {|connect.True.HVAC, connect.False.HVAC |}
 Monitors3H = {|connect.True.Open,connect.False.Open,disconnect,update|}
 Monitors6 = {|update|}
 AdaptH = {|adapt,ack|}
+MaxConnections = 3
+Connections = {0 .. MaxConnections}
 
 channel adapt : Connections.Bool
+channel connect : Bool.Connection
+channel disconnect
+channel update
+channel adapt6
+channel ack
 H0 = connect!True!HVAC -> STOP
 H1 = connect!False!HVAC -> STOP
-Pattern3(n,b) =      (n == 0 & connect!True!Open -> adapt!1!b -> connect!False!HVAC -> ack -> Pattern3(n+1,False))
+Pattern3(n,b) =      (n == 0 & connect!True!Open -> adapt!1!b -> ack -> Pattern3(n+1,False))
 				[] (n > 0 and n < MaxConnections & connect!True!Open -> Pattern3(n+1,b))
 				[] (n == 1 & connect!False!Open -> adapt!n-1!b -> ack -> Pattern3(n-1,b))
 				[] (n > 1 & connect!False!Open -> Pattern3(n-1,b))
@@ -18,17 +26,41 @@ Pattern3(n,b) =      (n == 0 & connect!True!Open -> adapt!1!b -> connect!False!H
 				[] (update -> Pattern3(n,b))
 
 Pattern6H =      (connect?_!HVAC -> Pattern6H)  [] (update -> adapt6 -> ack -> Pattern6H)
-PiHvac = l!0 -> ack -> PiHvac
+PiHvac =  adapt?v : Connections? h : Bool ->
+						if v > 0 then l!0 -> ack -> PiHvac
+						else if v == 0 then l!0 -> ack -> PiHvac
+						else ack -> PiHvac
+PiA6 =  adapt6 -> l!0 -> ack -> PiA6
 hvacComp = let
 			R3H = (PiHvac [| {|adapt,ack |}|] Pattern3(0,True)) \ {|adapt,ack|}
 			R6 = (PiA6 [|{| adapt6,ack |}|] Pattern6H) \ {|adapt6,ack|}
 			AdptManager = R6 [|inter(Monitors6,Monitors3H)|] R3H
 		within normal((let R = l?id -> (map(l,id) /\ R) 
  within (H0/\ R)[|union( EventsH,{| l|})|] AdptManager) \ {| l|})
+Requirement3 = let
+					T(n) = (connect!False!Secure -> T(n))
+							[] (connect!True!Secure-> T(0))
+							[] (connect?_:Bool!HVAC -> T(n))
+							[] (update -> T(n))
+							[] (disconnect -> T(n))
+							[] (n == 0 & connect!True!Open -> (	(connect!False!HVAC -> T(n+1))
+																[] (connect!False!Open -> T(0))
+																[] (connect!True!Secure -> T(n))
+																[] (update -> T(n))
+							))
+							[] (n > 1 & connect!False!Open -> T(n-1))
+							[] (n == 1 & connect!False!Open -> ((connect!True!HVAC -> T(n-1)) [] T(n-1)))
+							[] (n < MaxConnections and n > 0 & connect!True!Open -> T(n+1))
+					within T(0)
 
-assert PiHvac :[deterministic]
+assert hvacComp :[deadlock free]
+assert hvacComp  :[deterministic]
+assert hvacComp  :[livelock free]
 
-channel    l : {0..0}
+assert Requirement3 [T= hvacComp |\ EventsH
 
-map = \ chName,id @ if chName ==    l and id == 0 then H0 
+channel  l : {0..1}
+
+map = \ chName,id @ if chName ==  l and id == 0 then H0 
+else if chName ==  l and id == 1 then H1 
 else SKIP

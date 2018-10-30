@@ -18,7 +18,7 @@ simpleDefinition : definitionLeft EQUAL any;
 
 assertDefinition
 	: ASSERT definitionLeft COLLON LBRACKET checkConditionBody RBRACKET
-	| ASSERT definitionLeft refinedBy definitionLeft;
+	| ASSERT proc refinedBy proc;
 
 refinedBy :
     TRACEREFINE
@@ -41,6 +41,7 @@ any
 	;
 checkConditionBody
 	: DEADLOCK FREE modelCheckType?
+	| LIVELOCK FREE modelCheckType?
 	| DIVERGENCE FREE modelCheckType?
 	| DETERMINISTIC modelCheckType?
 	| POR
@@ -90,7 +91,7 @@ proc
 	    | locProcess
 	    | locOutput
 	    | parallelProc
-	    | LET simpleDefinition+ WITHIN any
+	    | letProc
 	    | ID
 	    | proc LSYNC set RSYNC proc RPAREN
 	    ;
@@ -100,6 +101,7 @@ event : ID ((QUERY | PLING) any (COLLON type)?)*;
 locProcess : ID LBRACKET proc RBRACKET ;
 locOutput :  ID PLING LT proc GT DOT proc ;
 parallelProc :  LPAREN NEW locNames RPAREN LPAREN proc LSYNC set RSYNC proc RPAREN;
+letProc : LET simpleDefinition+ WITHIN any;
 
 locNames: ID(COMMA ID)*;
 
@@ -185,6 +187,7 @@ INTR	: '/\\';
 ASSERT : 'assert';
 DEADLOCK : 'deadlock';
 DETERMINISTIC : 'deterministic';
+LIVELOCK : 'livelock';
 DIVERGENCE : 'divergence';
 FAILUREDIVE : ' [FD]';
 FAILURE : ' [F]';

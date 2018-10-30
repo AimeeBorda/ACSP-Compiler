@@ -1,5 +1,4 @@
 import org.antlr.v4.runtime.tree.TerminalNode;
-import sun.invoke.empty.Empty;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -50,7 +49,7 @@ public class ACSPTypeChecker extends ACSPBaseVisitor<ACSPTypeChecker.Gamma> {
 
     @Override
     public Gamma visitAssertDefinition(ACSPParser.AssertDefinitionContext ctx) {
-        for(ACSPParser.DefinitionLeftContext proc : ctx.definitionLeft()){
+        for(ACSPParser.ProcContext proc : ctx.proc()){
             if(!visit(proc).isEmpty()){
                 errors.add("error in assertion "+proc.ID().getText()+" is not well typed");
             }
@@ -141,6 +140,22 @@ public class ACSPTypeChecker extends ACSPBaseVisitor<ACSPTypeChecker.Gamma> {
         }
 
         return res;
+    }
+
+    @Override
+    public Gamma visitLetProc(ACSPParser.LetProcContext ctx) {
+        ctx.simpleDefinition().stream().forEach(c -> visit(c));
+        Gamma withinStat = visit(ctx.any());
+
+        removeLetProc(ctx.simpleDefinition());
+
+        return withinStat;
+    }
+
+    private void removeLetProc(List<ACSPParser.SimpleDefinitionContext> ctx){
+        for(ACSPParser.SimpleDefinitionContext c : ctx){
+            locMap.remove(c.definitionLeft().ID().getText());
+        }
     }
 
     @Override
