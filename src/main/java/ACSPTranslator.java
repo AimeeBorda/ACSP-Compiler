@@ -2,16 +2,13 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.TreeSet;
+import java.util.*;
 
 
 public class ACSPTranslator extends ACSPBaseVisitor<String> {
 
     private TokenStream commonTokenStream;
-    private HashMap<String, TreeSet<String>> locations;
+    private HashMap<String, LinkedHashSet<String>> locations;
     public String cspProcess;
 
     public ACSPTranslator(ACSPParser parser){
@@ -28,7 +25,7 @@ public class ACSPTranslator extends ACSPBaseVisitor<String> {
     private String locDeclaration() {
         StringBuilder res = new StringBuilder();
         for(Map.Entry entry : locations.entrySet()){
-            res.append(String.format("channel %s : {0..%d}\n", entry.getKey(),((TreeSet)entry.getValue()).size() -1));
+            res.append(String.format("channel %s : {0..%d}\n", entry.getKey(),((LinkedHashSet)entry.getValue()).size() -1));
         }
 
         return res.toString()+"\n";
@@ -38,7 +35,7 @@ public class ACSPTranslator extends ACSPBaseVisitor<String> {
     private String getMaps() {
         StringBuilder res = new StringBuilder();
         for(Map.Entry en : locations.entrySet()){
-            Iterator<String> e = ((TreeSet<String>) en.getValue()).iterator();
+            Iterator<String> e = ((LinkedHashSet<String>) en.getValue()).iterator();
 
             for (int i = 0; e.hasNext(); i++) {
                 res.append(String.format("if chName == %s and id == %d then %s \nelse ",en.getKey().toString(),i,e.next()));
@@ -58,12 +55,13 @@ public class ACSPTranslator extends ACSPBaseVisitor<String> {
     @Override
     public String visitLocOutput(ACSPParser.LocOutputContext ctx) {
         String loc = visit(ctx.ID());
-        locations.putIfAbsent(loc, new TreeSet<>());
-        TreeSet<String> processes = locations.get(loc);
+        locations.putIfAbsent(loc, new LinkedHashSet<>());
+        LinkedHashSet<String> processes = locations.get(loc);
         String hoOutput = visit(ctx.proc(0));
 
         processes.add(hoOutput);
-        return " "+ctx.ID()+"!"+processes.headSet(hoOutput).size() + " -> "+visit(ctx.proc(1));
+
+        return " "+ctx.ID()+"!"+new ArrayList<String>(processes).indexOf(hoOutput) + " -> "+visit(ctx.proc(1));
     }
 
     @Override

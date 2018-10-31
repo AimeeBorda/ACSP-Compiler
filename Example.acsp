@@ -1,77 +1,144 @@
+
+---------------------------------------------
+--		Components
+---------------------------------------------
+transparent normal	
+
 datatype Connection = Secure | Open | HVAC
 
-EventsH = {|connect.True.HVAC, connect.False.HVAC |}
-Monitors3H = {|connect.True.Open,connect.False.Open,disconnect,update|}
-Monitors6 = {|update|}
-AdaptH = {|adapt,ack|}
+Processes = {0..3}
 MaxConnections = 3
 Connections = {0 .. MaxConnections}
 
-channel adapt : Connections.Bool
+
+---------------------------------------------
+--		Events
+---------------------------------------------
+
 channel connect : Bool.Connection		-- agents' movement
-channel disconnect
+channel disconnect 
 channel update
-channel adapt6
+
 channel ack
----------------------------------------------
---		Processes for HVAC
----------------------------------------------
-H0 = connect!True!HVAC -> STOP
-H1 = connect!False!HVAC -> STOP
+channel adapt6
+
+
+
+EventsA = {|connect,disconnect,update|}
+MonitorsA = {}
+
+channel adapt3 : Connections
+
 
 ---------------------------------------------
---		Pattern for HVAC
+--		Processes for Access Point
 ---------------------------------------------
-Pattern3(n,b) =      (n == 0 & connect!True!Open -> adapt!1!b -> ack -> Pattern3(n+1,False))
-				[] (n > 0 and n < MaxConnections & connect!True!Open -> Pattern3(n+1,b))
-				[] (n == 1 & connect!False!Open -> adapt!n-1!b -> ack -> Pattern3(n-1,b))
-				[] (n > 1 & connect!False!Open -> Pattern3(n-1,b))
-				[] (disconnect -> adapt!0!b -> ack -> Pattern3(0,b))
-				[] (connect?b':Bool!HVAC -> Pattern3(n,b'))
-				[] (update -> Pattern3(n,b))
-			--	[] (connect?_!Secure -> Pattern3(n,b))
 
-Pattern6H =      (connect?_!HVAC -> Pattern6H)  [] (update -> adapt6 -> ack -> Pattern6H)
+A0 = connect!True!HVAC -> RUN({connect.x.y | x<- Bool, y <- {Secure,Open}})
+A1 = connect!False!HVAC -> RUN({connect.x.y | x<- Bool, y <- {Secure,Open}})
+A2 = disconnect -> connect!True!HVAC -> RUN({connect.x.Secure | x<- Bool})
+A3 = RUN({connect.x.y | x<- Bool, y <- {Secure,Open}})
+
+---------------------------------------------
+--		Pattern for Access Point
+---------------------------------------------	
+Pattern3A =   let P(n) = 
+				   (n == 0 & connect!True!Secure -> adapt3!n+1 -> ack -> P(n+1))
+				[] (n < MaxConnections and n > 0 & connect!True!Secure -> P(n+1))
+				[] (n > 1 & connect!False!Secure -> P(n-1))
+				[] (n == 1 & connect!False!Secure -> adapt3!0 -> ack -> P(n-1))
+				[] (disconnect -> P(n))
+				[] (update -> P(n))
+				[] (connect?_:Bool?_:{HVAC,Open} -> P(n))
+				within P(0)			
+	
+Pattern3B =   let P(n) = 
+				   (n == 0 & connect!True!Open -> adapt3!n+1 -> ack -> P(n+1))
+				[] (n < MaxConnections and n > 0 & connect!True!Open -> P(n+1))
+				[] (n > 1 & connect!False!Open -> P(n-1))
+				[] (n == 1 & connect!False!Open -> adapt3!0 -> ack -> P(n-1))
+				[] (disconnect -> P(0))
+				[] (update -> P(n))
+				[] (connect?_:Bool?_:{HVAC,Secure} -> P(n))
+				within P(0)
+
+Pattern6 =      (connect?_ -> Pattern6)  [] (disconnect -> Pattern6) [] (update -> adapt6 -> ack -> Pattern6)
+			
 
 ---------------------------------------------
 --		Adaptation Function
 ---------------------------------------------
-PiHvac =  adapt?v : Connections? h : Bool ->
-						if v > 0 then l!<H1>.ack -> PiHvac
-						else if v == 0 then l!<H0>.ack -> PiHvac
-						else ack -> PiHvac
-PiA6 =  adapt6 -> l!<H0>.ack -> PiA6
+Pi3A =  adapt3?n : Connections ->  
+						if n == 1 then l!<A2>.ack -> Pi3A
+						else if n == 0 then l!<A3>.ack -> Pi3A
+						else ack -> Pi3A
+
+Pi3B =  adapt3?n : Connections ->  
+						if n == 1 then l!<A1>.ack -> Pi3B
+						else if n == 0 then l!<A0>.ack -> Pi3B
+						else ack -> Pi3B
+
+Pi6 =  adapt6 -> l!<A0>.ack -> Pi6
+
 ---------------------------------------------
 --		Composition
 ---------------------------------------------
-hvacComp = let
-			R3H = (PiHvac [| {|adapt,ack |}|] Pattern3(0,True)) \ {|adapt,ack|}
-			R6 = (PiA6 [|{| adapt6,ack |}|] Pattern6H) \ {|adapt6,ack|}
-			AdptManager = R6 [|inter(Monitors6,Monitors3H)|] R3H
-		within
-			(new l)(l[H0] [| EventsH |] AdptManager)
+accessPtComp = let
+			R3A = (Pi3A [|{| adapt3,ack |}|] Pattern3A) \ {| adapt3,ack|}
+			R3B = (Pi3B [|{| adapt3,ack |}|] Pattern3B) \ {| adapt3,ack|}
+			R6 = (Pi6 [|{| adapt6,ack |}|] Pattern6) \ {|adapt6,ack|}
+			AdaptationProc = (R3A [| EventsA |] R6) [|EventsA|] R3B
+			proc = (new l)(l[A0] [| EventsA |] AdaptationProc)
+		within 
+			proc
+
 
 ---------------------------------------------
---		Assertions
+--		Requirements Assertions
 ---------------------------------------------
 Requirement3 = let
-					T(n) = (connect!False!Secure -> T(n))
-							[] (connect!True!Secure-> T(0))
-							[] (connect?_:Bool!HVAC -> T(n))
+					T(m,n) = (n  == 0  & connect!True!Secure -> disconnect -> connect!True!HVAC-> T(0,n+1))
+							[] (n > 0 and n < MaxConnections & connect!True!Secure -> T(m,n+1))
+							[] (n > 0 & connect!False!Secure -> T(m,n-1))
+							[] (m  == 0  & connect!True!Open -> connect!False!HVAC -> T(m+1,n))
+							[] (m  == 0  & connect!False!Open  -> T(m,n))
+							[] (m > 0 and m < MaxConnections & connect!True!Open -> T(m+1,n))
+							[] (m > 1 & connect!False!Open -> T(m-1,n))
+							[] (m == 1 & connect!False!Open -> connect!True!HVAC -> T(m-1,n))
+							[] (update -> T(m,n))							
+						within connect!True!HVAC ->T(0,0)
+
+
+Requirement6 =  (connect?_?_ -> Requirement6) [] (update -> disconnect -> Requirement6) [] (disconnect->Requirement6)
+				
+Requirement3A = let
+					T(n) = (n  == 0  & connect!True!Secure -> disconnect ->  T(n+1))
+							[] (n > 0 and n < MaxConnections & connect!True!Secure -> T(n+1))
+							[] (n > 0 & connect!False!Secure -> T(n-1))
+							[] (n == 0 & connect?_!Open -> T(n))
 							[] (update -> T(n))
-							[] (disconnect -> T(n))
-							[] (n == 0 & connect!True!Open -> (	(connect!False!HVAC -> T(n+1))
-																[] (connect!False!Open -> T(0))
-																[] (connect!True!Secure -> T(n))
-																[] (update -> T(n))
-							))
+							[] (connect?_!HVAC -> T(n))
+							--[] (disconnect -> T(n))
+						within T(0)
+
+
+Requirement3B = let
+					T(n) = (n  == 0  & connect!True!Open -> connect!False!HVAC -> T(n+1))
+							[](n  == 0  & connect!False!Open  -> T(n))
+							[] (n > 0 and n < MaxConnections & connect!True!Open -> T(n+1))
 							[] (n > 1 & connect!False!Open -> T(n-1))
-							[] (n == 1 & connect!False!Open -> ((connect!True!HVAC -> T(n-1)) [] T(n-1)))
-							[] (n < MaxConnections and n > 0 & connect!True!Open -> T(n+1))
-					within T(0)
+							[] (n == 1 & connect!False!Open -> connect!True!HVAC -> T(n-1))
+							[] (update -> T(n))
+							[] (disconnect -> connect!True!HVAC-> T(0))
+							[] (connect?_!Secure -> T(n))
+						within connect!True!HVAC -> T(0)
 
-assert hvacComp :[deadlock free]
-assert hvacComp  :[deterministic]
-assert hvacComp  :[livelock free]
+assert Requirement6 [T= accessPtComp
+assert Requirement3A [T= accessPtComp
+assert Requirement3B [T= accessPtComp
 
-assert Requirement3 [T= hvacComp |\ EventsH
+assert accessPtComp :[deadlock free]
+assert accessPtComp :[deterministic]
+assert accessPtComp :[livelock free]
+
+assert Requirement3 [T=  Requirement3B [|{|connect,disconnect,update|}|]Requirement3A 
