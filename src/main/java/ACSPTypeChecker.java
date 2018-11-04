@@ -1,5 +1,8 @@
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -8,13 +11,18 @@ import java.util.stream.Collectors;
 
 public class ACSPTypeChecker extends ACSPBaseVisitor<ACSPTypeChecker.Gamma> {
 
-    List<String> errors = new ArrayList<>();
+    List<String> errors;
     final Gamma empty = new Gamma();
-    HashMap<String,Gamma> locMap = new HashMap<>();
-    Gamma root;
+    HashMap<String,Gamma> locMap;
 
     public ACSPTypeChecker(ACSPParser parser) {
-        this.root = visit(parser.spec());
+        this(parser, new HashMap<>(), new ArrayList<>());
+    }
+
+    public ACSPTypeChecker(ACSPParser parser, HashMap<String, Gamma> locMaps, List<String> errors) {
+        this.locMap = locMaps;
+        this.errors = errors;
+        visit(parser.spec());
     }
 
     public boolean isWellTyped() {
@@ -51,7 +59,7 @@ public class ACSPTypeChecker extends ACSPBaseVisitor<ACSPTypeChecker.Gamma> {
     public Gamma visitAssertDefinition(ACSPParser.AssertDefinitionContext ctx) {
         for(ACSPParser.ProcContext proc : ctx.proc()){
             if(!visit(proc).isEmpty()){
-                errors.add("error in assertion "+proc.ID().getText()+" is not well typed");
+                errors.add("error in assertion "+ctx.toString()+" is not well typed");
             }
         }
         return ctx.children.stream().map(c -> visit(c)).reduce((r, t) -> r = r.merge(t)).orElse(empty);
@@ -96,40 +104,34 @@ public class ACSPTypeChecker extends ACSPBaseVisitor<ACSPTypeChecker.Gamma> {
         Gamma right = visit(ctx.proc(1));
         Gamma L = visit(ctx.locNames());
         Gamma gamma =  left.merge(right);
-        boolean cond4 = gamma.in.containsAll(L.in) && gamma.out.containsAll(L.out);
+        if(!(gamma.in.containsAll(L.in) && gamma.out.containsAll(L.out))){
+            L.in.removeAll(gamma.in);
+            L.out.removeAll(gamma.out);
+            L.in.addAll(L.out);
+            errors.add(L.in.toString() +" are not used");
+            return empty;
+        }
+
         gamma.in.removeAll(L.in);
         gamma.out.removeAll(L.out);
 
-        boolean cond1= left.in.stream().filter(right.out::contains).allMatch(L.in::contains);
-        boolean cond2= left.out.stream().filter(right.in::contains).allMatch(L.in::contains);
-        boolean cond3 = !(left.in.stream().anyMatch(right.in::contains));
-
-        if(cond1 && cond2 && cond3 && cond4)
-            return gamma;
-        else{
-
-            if(!cond1){
-                String names = left.in.stream().filter(right.out::contains).filter(l -> !L.in.contains(l)).collect(Collectors.joining());
-                errors.add(names +" are in left in and right out but not in L (" + L.in.toString() +")");
-            }
-
-
-            if(!cond2){
-                String names = left.out.stream().filter(right.in::contains).filter(l -> !L.in.contains(l)).collect(Collectors.joining());
-                errors.add(names +" are in left out and right in but not in L (" + L.in.toString() +")");
-            }
-
-            if(!cond3){
-                String names = left.in.stream().filter(right.in::contains).collect(Collectors.joining());
-                errors.add(names +" are in left in and right in");
-            }
-
-            if(!cond4){
-                errors.add("some locations are not used");
-            }
-
+        if(!left.in.stream().filter(right.out::contains).allMatch(L.in::contains)){
+            String names = left.in.stream().filter(right.out::contains).filter(l -> !L.in.contains(l)).collect(Collectors.joining());
+            errors.add(names +" are in left in and right out but not in L (" + L.in.toString() +")");
             return empty;
         }
+        if(!left.out.stream().filter(right.in::contains).allMatch(L.in::contains)){
+            String names = left.out.stream().filter(right.in::contains).filter(l -> !L.in.contains(l)).collect(Collectors.joining());
+            errors.add(names +" are in left out and right in but not in L (" + L.in.toString() +")");
+            return empty;
+        }
+        if((left.in.stream().anyMatch(right.in::contains))){
+            String names = left.in.stream().filter(right.in::contains).collect(Collectors.joining());
+            errors.add(names +" are in left in and right in");
+            return empty;
+        }
+
+        return gamma;
     }
 
     @Override
@@ -165,6 +167,18 @@ public class ACSPTypeChecker extends ACSPBaseVisitor<ACSPTypeChecker.Gamma> {
 
     @Override
     protected Gamma defaultResult() {
+        return empty;
+    }
+
+    @Override
+    public Gamma visitIncludeFile(ACSPParser.IncludeFileContext ctx) {
+        try {
+            String fileName = ctx.ID().getText().trim() +".acsp";
+            new ACSPTypeChecker(new ACSPParser(new CommonTokenStream(new ACSPLexer(CharStreams.fromFileName(fileName)))), locMap,errors);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         return empty;
     }
 

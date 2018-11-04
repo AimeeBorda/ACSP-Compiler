@@ -2,9 +2,11 @@ grammar ACSP;
 
 spec : definition*;
 
-definition : dataTypeDefinition | channelDecl  | assertDefinition | funcImport |  simpleDefinition;
+definition : dataTypeDefinition | channelDecl  | assertDefinition | funcImport | includeFile |  simpleDefinition;
 
-funcImport : (TRANSPARENT | EXTERNAL) ID;
+includeFile : INCLUDE DBLQUOTE ID DOT ACSP DBLQUOTE;
+
+funcImport : (TRANSPARENT | EXTERNAL) ID ;
 
 dataTypeDefinition : (DATATYPE | SUBTYPE | NAMETYPE) ID EQUAL type (BAR type)*;
 
@@ -70,7 +72,7 @@ set
 	| LBRACE any BAR setComprehension(COMMA setComprehension)* RBRACE
 	;
 
-setComprehension : any RARROW type;
+setComprehension : any RARROW type | boolExp;
 
 proc
 	:Skip
@@ -93,7 +95,6 @@ proc
 	    | parallelProc
 	    | letProc
 	    | ID
-	    | proc LSYNC set RSYNC proc RPAREN
 	    ;
 
 event : ID ((QUERY | PLING) any (COLLON type)?)*;

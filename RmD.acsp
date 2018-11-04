@@ -1,0 +1,50 @@
+---------------------------------------------
+--		Composition
+---------------------------------------------
+RmD = let
+			eventsR2 = union(EventsD,Monitors2)
+			eventsR5 = union(EventsD,Monitors5)
+
+			events = union(eventsR2,eventsR5)
+			R2 = (Pattern2 [|{|adapt,ack|}|] Pi2) \ {|adapt,ack|}
+			R5 = (Pattern5D [|{|adaptE,ack|}|] Pi5D) \ {|adaptE,ack|}
+
+			FirstApproach = R2 [|inter(eventsR2,eventsR5)|] R5
+
+			AdptManager = BehaviourD [|inter(EventsD,events) |] FirstApproach
+			proc = (new rd)(rd[D0] [| EventsD|] AdptManager)
+		within
+			normal(proc)
+---------------------------------------------
+--		Events for EB
+---------------------------------------------
+EventsB = {goto.EB.EA,goto.EB.ED,goto.EA.EB}
+Monitors2B = {goto.ED.Corr,emergency}
+
+---------------------------------------------
+--		Processes for EB
+---------------------------------------------
+B0 = (goto!EB?_:{EA,ED} -> B0) [] (goto!EA!EB -> B0)
+B1 = (goto!EB?_:{EA,ED} -> B1)
+
+---------------------------------------------
+--		Behaviour for EB
+---------------------------------------------
+BehaviourB = let B(n) =  (n > 0 & goto!EB?_:{EA,ED} -> B(n-1))
+					[] (n <= MaxAgentsEA & goto!EA!EB -> B(n+1))
+				within B(0)
+
+---------------------------------------------
+--		Requirement for EB
+---------------------------------------------
+Pattern2B = let P(n) =
+		   	   (n >= 0 & goto!EB!EA -> if n == MaxAgentsPair then adapt!n-1 -> ack -> P(n-1) else P(n-1))
+		   	 	[] (n <= MaxAgents & goto!EA!EB -> if n == MaxAgentsPair-1 then adapt!n+1 -> ack -> P(n+1) else P(n+1))
+				[] (n >= 0 & goto!ED!Corr -> if n == MaxAgentsPair then adapt!n-1 -> ack -> P(n-1) else P(n-1))
+				[] (goto!EB!ED -> P(n))
+				[] (emergency -> RUN(union(EventsB,Monitors2B)))
+				within P(0)
+Pi2B =  adapt?v  ->  if v == MaxAgentsPair then rb!<B1>.ack -> Pi2B else rb!<B0>.ack -> Pi2B
+
+PatternEmergencyB = emergency -> adaptE -> ack -> PatternEmergencyB [] (goto?_: {x | goto.x <- EventsB} -> PatternEmergencyB)
+PiEmergencyB =  adaptE  ->  rb!<B0>.ack -> PiEmergencyB

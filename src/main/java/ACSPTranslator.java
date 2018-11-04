@@ -1,7 +1,10 @@
+import org.antlr.v4.runtime.CharStreams;
+import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenStream;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
+import java.io.IOException;
 import java.util.*;
 
 
@@ -12,14 +15,20 @@ public class ACSPTranslator extends ACSPBaseVisitor<String> {
     public String cspProcess;
 
     public ACSPTranslator(ACSPParser parser){
-        this.locations = new HashMap<>();
-        this.commonTokenStream = parser.getTokenStream();
+        this(parser, new HashMap<>());
 
-        cspProcess = visit(parser.spec());
         if(!cspProcess.contains("transparent normal")){
             cspProcess = "transparent normal \n\n" + cspProcess;
         }
         cspProcess += "\n\n"+ locDeclaration()+getMaps();
+    }
+
+    public ACSPTranslator(ACSPParser parser,HashMap<String, LinkedHashSet<String>> locations){
+        this.locations =locations;
+        this.commonTokenStream = parser.getTokenStream();
+
+        cspProcess = visit(parser.spec());
+
     }
 
     private String locDeclaration() {
@@ -54,7 +63,8 @@ public class ACSPTranslator extends ACSPBaseVisitor<String> {
 
     @Override
     public String visitLocOutput(ACSPParser.LocOutputContext ctx) {
-        String loc = visit(ctx.ID());
+        String loc = visit(ctx.ID()).trim();
+
         locations.putIfAbsent(loc, new LinkedHashSet<>());
         LinkedHashSet<String> processes = locations.get(loc);
         String hoOutput = visit(ctx.proc(0));
@@ -89,9 +99,22 @@ public class ACSPTranslator extends ACSPBaseVisitor<String> {
         return (aggregate == null ? "" : aggregate)+ (nextResult == null?"":nextResult);
     }
 
+    @Override
+    public String visitIncludeFile(ACSPParser.IncludeFileContext ctx) {
+        String fileName = ctx.ID().getText().trim()+".acsp";
+        try {
+            ACSPTranslator translator = new ACSPTranslator(new ACSPParser(new CommonTokenStream(new ACSPLexer(CharStreams.fromFileName(fileName)))), this.locations);
+
+            return "\n -- File " + fileName +"\n"+translator.cspProcess +"\n";
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "";
+        }
+    }
+
+
     //TODO: Replicated Operators
     //TODO: Advanced Operators
-    //TODO: include
     //TODO: comments
     //TODO: lambda expressions
 }
