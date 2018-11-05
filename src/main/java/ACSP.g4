@@ -4,7 +4,7 @@ spec : definition*;
 
 definition : dataTypeDefinition | channelDecl  | assertDefinition | funcImport | includeFile |  simpleDefinition;
 
-includeFile : INCLUDE DBLQUOTE ID DOT ACSP DBLQUOTE;
+includeFile : INCLUDE DBLQUOTE ID (DIV ID)* DOT ACSP DBLQUOTE;
 
 funcImport : (TRANSPARENT | EXTERNAL) ID ;
 

@@ -173,13 +173,17 @@ public class ACSPTypeChecker extends ACSPBaseVisitor<ACSPTypeChecker.Gamma> {
     @Override
     public Gamma visitIncludeFile(ACSPParser.IncludeFileContext ctx) {
         try {
-            String fileName = ctx.ID().getText().trim() +".acsp";
+            String fileName = getFileName(ctx);
             new ACSPTypeChecker(new ACSPParser(new CommonTokenStream(new ACSPLexer(CharStreams.fromFileName(fileName)))), locMap,errors);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         return empty;
+    }
+
+    public static String getFileName(ACSPParser.IncludeFileContext ctx){
+        return ctx.ID().stream().map(c -> c.getText().trim()).collect(Collectors.joining("/")) +".acsp";
     }
 
     public  class Gamma {

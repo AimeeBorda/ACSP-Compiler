@@ -101,7 +101,7 @@ public class ACSPTranslator extends ACSPBaseVisitor<String> {
 
     @Override
     public String visitIncludeFile(ACSPParser.IncludeFileContext ctx) {
-        String fileName = ctx.ID().getText().trim()+".acsp";
+        String fileName = ACSPTypeChecker.getFileName(ctx);
         try {
             ACSPTranslator translator = new ACSPTranslator(new ACSPParser(new CommonTokenStream(new ACSPLexer(CharStreams.fromFileName(fileName)))), this.locations);
 
