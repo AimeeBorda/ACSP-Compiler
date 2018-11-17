@@ -101,7 +101,7 @@ event : ID ((QUERY | PLING) any (COLLON type)?)*;
 
 locProcess : ID LBRACKET proc RBRACKET ;
 locOutput :  ID PLING LT proc GT DOT proc ;
-parallelProc :  LPAREN NEW locNames RPAREN LPAREN proc LSYNC set RSYNC proc RPAREN;
+parallelProc :  LPAREN NEW locNames RPAREN LPAREN proc (LSYNC set RSYNC proc | INTL) RPAREN;
 letProc : LET simpleDefinition+ WITHIN any;
 
 locNames: ID(COMMA ID)*;

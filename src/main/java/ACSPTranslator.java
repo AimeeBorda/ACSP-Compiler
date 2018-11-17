@@ -79,9 +79,14 @@ public class ACSPTranslator extends ACSPBaseVisitor<String> {
         String L = visit(ctx.locNames());
         String M = visit(ctx.proc(0));
         String N = visit(ctx.proc(1));
-        String E = visit(ctx.set());
         String A = "{|"+L+"|}";
-        return " normal((" +M +"[|union("+E +","+A +")|]"+N +") \\ " + A+")";
+        String E = "";
+        if(ctx.set() != null) {
+            E = "union("+ visit(ctx.set())+","+A +")";
+        }else{
+            E = A;
+        }
+        return " normal((" +M +"[|"+E+"|]"+N +") \\ " + A+")";
     }
 
     @Override
