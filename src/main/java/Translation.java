@@ -1,4 +1,3 @@
-import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
@@ -48,7 +47,7 @@ public class Translation {
     }
 
     private void openFDR(String file) throws IOException {
-//        new ProcessBuilder("/bin/bash", "-c", "open "+file).start();
+        new ProcessBuilder("/bin/bash", "-c", "open "+file).start();
     }
 
     private  void typeCheckProcess() throws IOException {
