@@ -2,9 +2,11 @@ grammar ACSP;
 
 spec : definition*;
 
-definition : dataTypeDefinition | channelDecl  | assertDefinition | funcImport |  simpleDefinition;
+definition : dataTypeDefinition | channelDecl  | assertDefinition | funcImport | includeFile |  simpleDefinition;
 
-funcImport : (TRANSPARENT | EXTERNAL) ID;
+includeFile : INCLUDE DBLQUOTE ID (DIV ID)* DOT ACSP DBLQUOTE;
+
+funcImport : (TRANSPARENT | EXTERNAL) ID ;
 
 dataTypeDefinition : (DATATYPE | SUBTYPE | NAMETYPE) ID EQUAL type (BAR type)*;
 
@@ -18,7 +20,7 @@ simpleDefinition : definitionLeft EQUAL any;
 
 assertDefinition
 	: ASSERT definitionLeft COLLON LBRACKET checkConditionBody RBRACKET
-	| ASSERT definitionLeft refinedBy definitionLeft;
+	| ASSERT proc refinedBy proc;
 
 refinedBy :
     TRACEREFINE
@@ -41,6 +43,7 @@ any
 	;
 checkConditionBody
 	: DEADLOCK FREE modelCheckType?
+	| LIVELOCK FREE modelCheckType?
 	| DIVERGENCE FREE modelCheckType?
 	| DETERMINISTIC modelCheckType?
 	| POR
@@ -69,7 +72,7 @@ set
 	| LBRACE any BAR setComprehension(COMMA setComprehension)* RBRACE
 	;
 
-setComprehension : any RARROW type;
+setComprehension : any RARROW type | boolExp;
 
 proc
 	:Skip
@@ -90,16 +93,16 @@ proc
 	    | locProcess
 	    | locOutput
 	    | parallelProc
-	    | LET simpleDefinition+ WITHIN any
+	    | letProc
 	    | ID
-	    | proc LSYNC set RSYNC proc RPAREN
 	    ;
 
 event : ID ((QUERY | PLING) any (COLLON type)?)*;
 
 locProcess : ID LBRACKET proc RBRACKET ;
 locOutput :  ID PLING LT proc GT DOT proc ;
-parallelProc :  LPAREN NEW locNames RPAREN LPAREN proc LSYNC set RSYNC proc RPAREN;
+parallelProc :  LPAREN NEW locNames RPAREN LPAREN proc (LSYNC set RSYNC proc | INTL) RPAREN;
+letProc : LET simpleDefinition+ WITHIN any;
 
 locNames: ID(COMMA ID)*;
 
@@ -185,6 +188,7 @@ INTR	: '/\\';
 ASSERT : 'assert';
 DEADLOCK : 'deadlock';
 DETERMINISTIC : 'deterministic';
+LIVELOCK : 'livelock';
 DIVERGENCE : 'divergence';
 FAILUREDIVE : ' [FD]';
 FAILURE : ' [F]';

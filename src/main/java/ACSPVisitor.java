@@ -1,4 +1,4 @@
-// Generated from /Users/aimeeborda/ACSP-Compiler/src/main/java/ACSP.g4 by ANTLR 4.7
+// Generated from /Users/aimee/IdeaProjects/untitled/src/main/java/ACSP.g4 by ANTLR 4.7
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 /**
@@ -21,6 +21,12 @@ public interface ACSPVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitDefinition(ACSPParser.DefinitionContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ACSPParser#includeFile}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitIncludeFile(ACSPParser.IncludeFileContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link ACSPParser#funcImport}.
 	 * @param ctx the parse tree
@@ -147,6 +153,12 @@ public interface ACSPVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitParallelProc(ACSPParser.ParallelProcContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ACSPParser#letProc}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLetProc(ACSPParser.LetProcContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link ACSPParser#locNames}.
 	 * @param ctx the parse tree
