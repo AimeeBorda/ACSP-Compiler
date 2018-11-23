@@ -50,7 +50,8 @@ public class Translation {
     }
 
     private  void typeCheckProcess() throws IOException {
-        typeChecker = new ACSPTypeChecker(getParser());
+        ACSPPreProcessor acspPreProcessor = new ACSPPreProcessor(getParser());
+        typeChecker = new ACSPTypeChecker(getParser(),acspPreProcessor.envMap);
     }
 
     private boolean isWellTyped(){

@@ -56,14 +56,11 @@ modelCheckType
 	;
 
 type
-	: simple
+	: ID
 	| type DOT type
 	| set
 	;
 
-simple
-	: ID
-	;
 
 set
 	: (LBRACE (any(COMMA any)*|(any DOT DOT any)?) RBRACE)
@@ -88,16 +85,14 @@ proc:     Skip
      	| proc INTR proc
      	| proc SEMICOL proc
      	| LPAREN proc RPAREN
-     	| ID LPAREN any(COMMA any)* RPAREN
 	    | locProcess
 	    | locOutput
 	    | parallelProc
 	    | letProc
-	    | ID
+	    | definitionLeft
 	    ;
 
 event : ID ((QUERY | PLING | DOLLAR) any (COLLON type)?)*;
-
 locProcess : ID LBRACKET proc RBRACKET ;
 locOutput :  ID PLING LT proc GT DOT proc ;
 parallelProc :  LPAREN NEW locNames RPAREN LPAREN proc (LSYNC set RSYNC | INTL) proc RPAREN;
@@ -106,7 +101,7 @@ letProc : LET simpleDefinition+ WITHIN any;
 locNames: ID(COMMA ID)*;
 
 boolExp
-	: NOT boolOrAmb
+	: NOT boolExp
 	| expr (LT | GT | LTEQ | GTEQ | EQ | NEQ) expr
 	| boolExp  (AND | OR) boolExp
 	| TRUE
@@ -116,10 +111,7 @@ boolExp
 	| LBRACE boolExp RBRACE
 	;
 
-boolOrAmb
-	: boolExp
-	| simple
-	;
+
 
 expr
 	: MINUS expr

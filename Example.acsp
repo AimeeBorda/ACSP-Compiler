@@ -1,11 +1,6 @@
-
-P = (new l)(l[SKIP] ||| l!<SKIP>.SKIP)
-Q = (new l)(l[SKIP] ||| l!<STOP>.SKIP)
-
-assert P [T= Q
-
-
-R = (new l)(l[SKIP] ||| T)
-T = l[SKIP] ||| l!<STOP>.SKIP
-
+R = (new l)(B ||| P)
+P = B
+B = l[SKIP]
+T = l!<STOP>.SKIP
+Y = l!<SKIP>.SKIP
 assert R:[deterministic]

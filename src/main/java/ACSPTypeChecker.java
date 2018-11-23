@@ -9,18 +9,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ACSPTypeChecker extends ACSPBaseVisitor<ACSPTypeChecker.Gamma> {
+public class ACSPTypeChecker extends ACSPBaseVisitor<Environment> {
 
     //TODO: Free Variables in Let not to be used in the prefix
     List<String> errors;
-    final Gamma empty = new Gamma();
-    HashMap<String,Gamma> locMap;
+    HashMap<String,Environment> locMap;
 
-    public ACSPTypeChecker(ACSPParser parser) {
-        this(parser, new HashMap<>(), new ArrayList<>());
+
+    public ACSPTypeChecker(ACSPParser parser, HashMap<String, Environment> locMap) {
+        this(parser, locMap, new ArrayList<>());
     }
 
-    public ACSPTypeChecker(ACSPParser parser, HashMap<String, Gamma> locMaps, List<String> errors) {
+    public ACSPTypeChecker(ACSPParser parser, HashMap<String, Environment> locMaps, List<String> errors) {
         this.locMap = locMaps;
         this.errors = errors;
         visit(parser.spec());
@@ -31,119 +31,98 @@ public class ACSPTypeChecker extends ACSPBaseVisitor<ACSPTypeChecker.Gamma> {
     }
 
     @Override
-    public Gamma visitLocProcess(ACSPParser.LocProcessContext ctx) {
-        Gamma res = ctx.children.stream().map(c -> visit(c)).reduce((r, t) -> r=  r.merge(t)).orElse(empty);
+    public Environment visitLocProcess(ACSPParser.LocProcessContext ctx) {
+        Environment res = ctx.children.stream().map(c -> visit(c)).reduce((r, t) -> r=  r.merge(t)).orElse(defaultResult());
 
         if(res != null && res.isEmpty()){
-            return res.addIn(ctx.ID().getSymbol().getText());
+            return res.in(ctx.ID().getSymbol().getText());
+        }else{
+            errors.add("location "+ctx.ID().getText() +" is not well-typed");
+            return defaultResult();
         }
-
-        return res;
     }
 
     @Override
-    public Gamma visitSimpleDefinition(ACSPParser.SimpleDefinitionContext ctx) {
+    public Environment visitSimpleDefinition(ACSPParser.SimpleDefinitionContext ctx) {
         String key = ctx.definitionLeft().ID().getText();
-        Gamma any = visit(ctx.any());
+        Environment any = visit(ctx.any());
 
-        locMap.put(key,any);
+        locMap.compute(key, (k, v) -> (v == null) ? any : v.merge(any));
 
         return any;
     }
 
     @Override
-    public Gamma visitAssertDefinition(ACSPParser.AssertDefinitionContext ctx) {
-        for(ACSPParser.ProcContext proc : ctx.proc()){
-            if(!visit(proc).isEmpty()){
-                errors.add("error in assertion "+ctx.toString()+" is not well typed");
-            }
+    public Environment visitAssertDefinition(ACSPParser.AssertDefinitionContext ctx) {
+        if(ctx.children.stream().map(c ->visit(c)).anyMatch(e -> !e.isEmpty())){
+            errors.add("error in assertion "+ctx.getText()+" is not well typed");
         }
-        return ctx.children.stream().map(c -> visit(c)).reduce((r, t) -> r = r.merge(t)).orElse(empty);
+
+        return ctx.children.stream().map(c -> visit(c)).reduce((r, t) -> r = r.merge(t)).orElse(defaultResult());
     }
 
     @Override
-    public Gamma visitTerminal(TerminalNode node) {
-        if(locMap.containsKey(node.getText())) {
-            return locMap.get(node.getText()).merge(empty);
-        }else{
-            return empty;
-        }
+    public Environment visitTerminal(TerminalNode node) {
+        return locMap.getOrDefault(node.getText(),defaultResult());
     }
 
     @Override
-    public Gamma visitLocOutput(ACSPParser.LocOutputContext ctx) {
-        Gamma proc = visit(ctx.getChild(0));
-        Gamma cont = visit(ctx.getChild(1));
+    public Environment visitLocOutput(ACSPParser.LocOutputContext ctx) {
+        Environment proc = visit(ctx.getChild(0));
+        Environment cont = visit(ctx.getChild(1));
 
         if(proc != null && cont != null && proc.isEmpty()){
-            return cont.addOut(ctx.ID().getSymbol().getText());
+            return cont.out(ctx.ID().getText());
         } else {
             errors.add("A process being communicated over " + ctx.ID() +" was not well-typed at \n"+ ctx.getText());
-            return null;
+            return defaultResult();
         }
 
     }
 
     @Override
-    public Gamma visitLocNames(ACSPParser.LocNamesContext ctx) {
-        Gamma g = new Gamma();
-        ctx.ID().stream().forEach(l ->{
-            g.out.add(l.getText());
-            g.in.add(l.getText());
+    public Environment visitLocNames(ACSPParser.LocNamesContext ctx) {
+        Environment env =  defaultResult();
+        ctx.ID().stream().map(TerminalNode::getText).forEach (l ->{
+            env.out(l); env.in(l);
         });
-        return g;
+        return env;
     }
 
     @Override
-    public Gamma visitParallelProc(ACSPParser.ParallelProcContext ctx) {
-        Gamma left = visit(ctx.proc(0));
-        Gamma right = visit(ctx.proc(1));
-        Gamma L = visit(ctx.locNames());
-        Gamma gamma =  left.merge(right);
-        if(!(gamma.in.containsAll(L.in) && gamma.out.containsAll(L.out))){
-            L.in.removeAll(gamma.in);
-            L.out.removeAll(gamma.out);
-            L.in.addAll(L.out);
-            errors.add(L.in.toString() +" are not used");
-            return empty;
-        }
+    public Environment visitParallelProc(ACSPParser.ParallelProcContext ctx) {
+        Environment left = visit(ctx.proc(0));
+        Environment right = visit(ctx.proc(1));
+        Environment L = visit(ctx.locNames());
+        Environment gamma =  left.merge(right);
 
-        gamma.in.removeAll(L.in);
-        gamma.out.removeAll(L.out);
+        gamma.removeAllIn(L.locations());
+        gamma.removeAllOut(L.prefixes());
 
-        if(!left.in.stream().filter(right.out::contains).allMatch(L.in::contains)){
-            String names = left.in.stream().filter(right.out::contains).filter(l -> !L.in.contains(l)).collect(Collectors.joining());
-            errors.add(names +" are in left in and right out but not in L (" + L.in.toString() +")");
-            return empty;
+        if(!left.locations().stream().filter(right.prefixes()::contains).allMatch(L.locations()::contains)){
+            String names = left.locations().stream().filter(right.prefixes()::contains).filter(l -> !L.locations().contains(l)).collect(Collectors.joining());
+            errors.add(names +" are in left in and right out but not in L (" + L.locations().toString() +")");
+            return defaultResult();
         }
-        if(!left.out.stream().filter(right.in::contains).allMatch(L.in::contains)){
-            String names = left.out.stream().filter(right.in::contains).filter(l -> !L.in.contains(l)).collect(Collectors.joining());
-            errors.add(names +" are in left out and right in but not in L (" + L.in.toString() +")");
-            return empty;
+        if(!left.prefixes().stream().filter(right.locations()::contains).allMatch(L.locations()::contains)){
+            String names = left.prefixes().stream().filter(right.locations()::contains).filter(l -> !L.locations().contains(l)).collect(Collectors.joining());
+            errors.add(names +" are in left out and right in but not in L (" + L.locations().toString() +")");
+            return defaultResult();
         }
-        if((left.in.stream().anyMatch(right.in::contains))){
-            String names = left.in.stream().filter(right.in::contains).collect(Collectors.joining());
+        if((left.locations().stream().anyMatch(right.locations()::contains))){
+            String names = left.locations().stream().filter(right.prefixes()::contains).collect(Collectors.joining());
             errors.add(names +" are in left in and right in");
-            return empty;
+            return defaultResult();
         }
 
         return gamma;
     }
 
-    @Override
-    public Gamma visitProc(ACSPParser.ProcContext ctx) {
-        Gamma res = ctx.children.stream().map(c ->visit(c)).reduce((r,t) -> r = r.merge(t)).orElse(empty);
-        if(ctx.ID() != null){
-            res.merge(locMap.get(ctx.ID().getText()));
-        }
-
-        return res;
-    }
 
     @Override
-    public Gamma visitLetProc(ACSPParser.LetProcContext ctx) {
+    public Environment visitLetProc(ACSPParser.LetProcContext ctx) {
         ctx.simpleDefinition().stream().forEach(c -> visit(c));
-        Gamma withinStat = visit(ctx.any());
+        Environment withinStat = visit(ctx.any());
 
         removeLetProc(ctx.simpleDefinition());
 
@@ -157,17 +136,17 @@ public class ACSPTypeChecker extends ACSPBaseVisitor<ACSPTypeChecker.Gamma> {
     }
 
     @Override
-    protected Gamma aggregateResult(Gamma aggregate, Gamma nextResult) {
-        return (aggregate == null ? empty :aggregate).merge(nextResult);
+    protected Environment aggregateResult(Environment aggregate, Environment nextResult) {
+        return (aggregate == null ? defaultResult() : aggregate).merge(nextResult);
     }
 
     @Override
-    protected Gamma defaultResult() {
-        return empty;
+    protected Environment defaultResult() {
+        return new Environment(locMap);
     }
 
     @Override
-    public Gamma visitIncludeFile(ACSPParser.IncludeFileContext ctx) {
+    public Environment visitIncludeFile(ACSPParser.IncludeFileContext ctx) {
         try {
             String fileName = getFileName(ctx);
             new ACSPTypeChecker(new ACSPParser(new CommonTokenStream(new ACSPLexer(CharStreams.fromFileName(fileName)))), locMap,errors);
@@ -175,47 +154,10 @@ public class ACSPTypeChecker extends ACSPBaseVisitor<ACSPTypeChecker.Gamma> {
             e.printStackTrace();
         }
 
-        return empty;
+        return defaultResult();
     }
 
     public static String getFileName(ACSPParser.IncludeFileContext ctx){
         return ctx.ID().stream().map(c -> c.getText().trim()).collect(Collectors.joining("/")) +".acsp";
-    }
-
-    public  class Gamma {
-        HashSet<String> in = new HashSet<>();
-        HashSet<String> out = new HashSet<>();
-
-        public Gamma addIn(String text){
-            Gamma g = new Gamma();
-            g.in.add(text);
-            return merge(g);
-        }
-        public Gamma addOut(String text){
-            Gamma g = new Gamma();
-            g.out.add(text);
-            return merge(g);
-        }
-
-        public boolean isEmpty(){
-            return in.isEmpty() && out.isEmpty();
-        }
-
-        public Gamma merge(Gamma other){
-            if(other == null)
-                other = empty;
-            Gamma newEnv = new Gamma();
-            newEnv.in.addAll(in);
-            newEnv.in.addAll(other.in);
-
-            newEnv.out.addAll(out);
-            newEnv.out.addAll(other.out);
-
-            return newEnv;
-        }
-
-        public boolean notEmpty(){
-            return !isEmpty();
-        }
     }
 }

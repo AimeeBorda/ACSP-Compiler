@@ -1,4 +1,4 @@
-// Generated from /Users/aimeeborda/ACSP-Compiler/src/main/java/ACSP.g4 by ANTLR 4.7
+// Generated from /Users/aimee/IdeaProjects/untitled/src/main/java/ACSP.g4 by ANTLR 4.7
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
@@ -207,18 +207,6 @@ public class ACSPBaseListener implements ACSPListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
-	@Override public void enterSimple(ACSPParser.SimpleContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitSimple(ACSPParser.SimpleContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
 	@Override public void enterSet(ACSPParser.SetContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -334,18 +322,6 @@ public class ACSPBaseListener implements ACSPListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitBoolExp(ACSPParser.BoolExpContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void enterBoolOrAmb(ACSPParser.BoolOrAmbContext ctx) { }
-	/**
-	 * {@inheritDoc}
-	 *
-	 * <p>The default implementation does nothing.</p>
-	 */
-	@Override public void exitBoolOrAmb(ACSPParser.BoolOrAmbContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

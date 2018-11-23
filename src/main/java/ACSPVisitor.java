@@ -1,4 +1,4 @@
-// Generated from /Users/aimeeborda/ACSP-Compiler/src/main/java/ACSP.g4 by ANTLR 4.7
+// Generated from /Users/aimee/IdeaProjects/untitled/src/main/java/ACSP.g4 by ANTLR 4.7
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 /**
@@ -106,12 +106,6 @@ public interface ACSPVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitType(ACSPParser.TypeContext ctx);
 	/**
-	 * Visit a parse tree produced by {@link ACSPParser#simple}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitSimple(ACSPParser.SimpleContext ctx);
-	/**
 	 * Visit a parse tree produced by {@link ACSPParser#set}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -171,12 +165,6 @@ public interface ACSPVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitBoolExp(ACSPParser.BoolExpContext ctx);
-	/**
-	 * Visit a parse tree produced by {@link ACSPParser#boolOrAmb}.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	T visitBoolOrAmb(ACSPParser.BoolOrAmbContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link ACSPParser#expr}.
 	 * @param ctx the parse tree

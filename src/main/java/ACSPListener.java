@@ -1,4 +1,4 @@
-// Generated from /Users/aimeeborda/ACSP-Compiler/src/main/java/ACSP.g4 by ANTLR 4.7
+// Generated from /Users/aimee/IdeaProjects/untitled/src/main/java/ACSP.g4 by ANTLR 4.7
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
@@ -167,16 +167,6 @@ public interface ACSPListener extends ParseTreeListener {
 	 */
 	void exitType(ACSPParser.TypeContext ctx);
 	/**
-	 * Enter a parse tree produced by {@link ACSPParser#simple}.
-	 * @param ctx the parse tree
-	 */
-	void enterSimple(ACSPParser.SimpleContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link ACSPParser#simple}.
-	 * @param ctx the parse tree
-	 */
-	void exitSimple(ACSPParser.SimpleContext ctx);
-	/**
 	 * Enter a parse tree produced by {@link ACSPParser#set}.
 	 * @param ctx the parse tree
 	 */
@@ -276,16 +266,6 @@ public interface ACSPListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitBoolExp(ACSPParser.BoolExpContext ctx);
-	/**
-	 * Enter a parse tree produced by {@link ACSPParser#boolOrAmb}.
-	 * @param ctx the parse tree
-	 */
-	void enterBoolOrAmb(ACSPParser.BoolOrAmbContext ctx);
-	/**
-	 * Exit a parse tree produced by {@link ACSPParser#boolOrAmb}.
-	 * @param ctx the parse tree
-	 */
-	void exitBoolOrAmb(ACSPParser.BoolOrAmbContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link ACSPParser#expr}.
 	 * @param ctx the parse tree
