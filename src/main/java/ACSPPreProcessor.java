@@ -9,18 +9,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class ACSPTypeChecker extends ACSPBaseVisitor<ACSPTypeChecker.Gamma> {
+public class ACSPPreProcessor extends ACSPBaseVisitor<ACSPPreProcessor.Gamma> {
 
-    //TODO: Free Variables in Let not to be used in the prefix
+    /* TODO: Generate the In map, Out map, Call Dependency, M */
     List<String> errors;
     final Gamma empty = new Gamma();
     HashMap<String,Gamma> locMap;
 
-    public ACSPTypeChecker(ACSPParser parser) {
+    public ACSPPreProcessor(ACSPParser parser) {
         this(parser, new HashMap<>(), new ArrayList<>());
     }
 
-    public ACSPTypeChecker(ACSPParser parser, HashMap<String, Gamma> locMaps, List<String> errors) {
+    public ACSPPreProcessor(ACSPParser parser, HashMap<String, Gamma> locMaps, List<String> errors) {
         this.locMap = locMaps;
         this.errors = errors;
         visit(parser.spec());
@@ -170,7 +170,7 @@ public class ACSPTypeChecker extends ACSPBaseVisitor<ACSPTypeChecker.Gamma> {
     public Gamma visitIncludeFile(ACSPParser.IncludeFileContext ctx) {
         try {
             String fileName = getFileName(ctx);
-            new ACSPTypeChecker(new ACSPParser(new CommonTokenStream(new ACSPLexer(CharStreams.fromFileName(fileName)))), locMap,errors);
+            new ACSPPreProcessor(new ACSPParser(new CommonTokenStream(new ACSPLexer(CharStreams.fromFileName(fileName)))), locMap,errors);
         } catch (IOException e) {
             e.printStackTrace();
         }

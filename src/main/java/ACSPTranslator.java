@@ -28,7 +28,6 @@ public class ACSPTranslator extends ACSPBaseVisitor<String> {
         this.commonTokenStream = parser.getTokenStream();
 
         cspProcess = visit(parser.spec());
-
     }
 
     private String locDeclaration() {

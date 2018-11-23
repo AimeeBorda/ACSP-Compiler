@@ -2,20 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="53a9a71f-bbf0-4ac0-8c5b-275c2c36ead5" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/ExhibitionArea.acsp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/RmD.acsp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/ACSPPreProcessor.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Example.acsp" beforeDir="false" afterPath="$PROJECT_DIR$/AccessPoint.acsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ACSP.g4" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ACSP.g4" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ACSPBaseListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ACSPBaseListener.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ACSPBaseVisitor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ACSPBaseVisitor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ACSPListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ACSPListener.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ACSPParser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ACSPParser.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ACSPTranslator.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ACSPTranslator.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/ACSPTypeChecker.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ACSPTypeChecker.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ACSPVisitor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ACSPVisitor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Translation.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Translation.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/temp.csp" beforeDir="false" afterPath="$PROJECT_DIR$/temp.csp" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
@@ -32,50 +22,43 @@
     <session id="1917429361">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="5" />
           <entry key="project.open.time.1" value="1" />
-          <entry key="project.open.time.50" value="1" />
-          <entry key="project.open.time.69" value="1" />
-          <entry key="project.open.time.74" value="1" />
-          <entry key="project.open.time.75" value="1" />
-          <entry key="project.open.time.85" value="1" />
-          <entry key="project.open.time.89" value="1" />
-          <entry key="project.opened" value="7" />
+          <entry key="project.opened" value="1" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="acsp" value="8" />
-          <entry key="class" value="10" />
-          <entry key="csp" value="7" />
-          <entry key="g4" value="18" />
-          <entry key="java" value="58" />
+          <entry key="acsp" value="4" />
+          <entry key="class" value="9" />
+          <entry key="csp" value="5" />
+          <entry key="g4" value="14" />
+          <entry key="java" value="48" />
           <entry key="txt" value="1" />
           <entry key="xml" value="3" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="ANTLR v4 grammar file" value="18" />
-          <entry key="CLASS" value="10" />
-          <entry key="JAVA" value="58" />
-          <entry key="PLAIN_TEXT" value="16" />
+          <entry key="ANTLR v4 grammar file" value="14" />
+          <entry key="CLASS" value="9" />
+          <entry key="JAVA" value="48" />
+          <entry key="PLAIN_TEXT" value="10" />
           <entry key="XML" value="3" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="acsp" value="185" />
-          <entry key="g4" value="686" />
-          <entry key="java" value="5676" />
+          <entry key="acsp" value="29" />
+          <entry key="g4" value="541" />
+          <entry key="java" value="4564" />
           <entry key="xml" value="19" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="ANTLR v4 grammar file" value="686" />
-          <entry key="JAVA" value="5676" />
-          <entry key="PLAIN_TEXT" value="185" />
+          <entry key="ANTLR v4 grammar file" value="541" />
+          <entry key="JAVA" value="4564" />
+          <entry key="PLAIN_TEXT" value="29" />
           <entry key="XML" value="19" />
         </counts>
       </usages-collector>
@@ -83,53 +66,54 @@
     <session id="-2012743013">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="12" />
+          <entry key="project.closed" value="16" />
           <entry key="project.open.time.10" value="1" />
           <entry key="project.open.time.11" value="1" />
-          <entry key="project.open.time.13" value="1" />
+          <entry key="project.open.time.13" value="2" />
           <entry key="project.open.time.14" value="1" />
-          <entry key="project.open.time.15" value="3" />
-          <entry key="project.open.time.16" value="2" />
-          <entry key="project.open.time.17" value="2" />
+          <entry key="project.open.time.15" value="4" />
+          <entry key="project.open.time.16" value="3" />
+          <entry key="project.open.time.17" value="3" />
           <entry key="project.open.time.18" value="1" />
+          <entry key="project.open.time.20" value="1" />
           <entry key="project.open.time.25" value="1" />
-          <entry key="project.opened" value="13" />
+          <entry key="project.opened" value="18" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="acsp" value="11" />
+          <entry key="acsp" value="15" />
           <entry key="class" value="17" />
-          <entry key="csp" value="7" />
-          <entry key="g4" value="8" />
-          <entry key="java" value="68" />
+          <entry key="csp" value="8" />
+          <entry key="g4" value="10" />
+          <entry key="java" value="76" />
           <entry key="tokens" value="2" />
           <entry key="xml" value="3" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="ANTLR v4 grammar file" value="7" />
+          <entry key="ANTLR v4 grammar file" value="9" />
           <entry key="CLASS" value="17" />
-          <entry key="JAVA" value="68" />
-          <entry key="PLAIN_TEXT" value="21" />
+          <entry key="JAVA" value="76" />
+          <entry key="PLAIN_TEXT" value="26" />
           <entry key="XML" value="3" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="acsp" value="697" />
+          <entry key="acsp" value="887" />
           <entry key="csp" value="18" />
-          <entry key="g4" value="1338" />
-          <entry key="java" value="8006" />
+          <entry key="g4" value="1343" />
+          <entry key="java" value="8161" />
           <entry key="xml" value="15" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="ANTLR v4 grammar file" value="1338" />
-          <entry key="JAVA" value="8006" />
-          <entry key="PLAIN_TEXT" value="715" />
+          <entry key="ANTLR v4 grammar file" value="1343" />
+          <entry key="JAVA" value="8161" />
+          <entry key="PLAIN_TEXT" value="905" />
           <entry key="XML" value="15" />
         </counts>
       </usages-collector>
@@ -140,78 +124,64 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/ACSPTypeChecker.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="60">
+              <caret line="13" column="62" selection-start-line="13" selection-start-column="62" selection-end-line="13" selection-end-column="62" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/ACSPTranslator.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="975">
+              <caret line="72" column="46" selection-start-line="72" selection-start-column="46" selection-end-line="72" selection-end-column="46" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/main/java/ACSPPreProcessor.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="60">
+              <caret line="13" column="13" selection-start-line="13" selection-start-column="13" selection-end-line="13" selection-end-column="13" />
+              <folding>
+                <element signature="e#585#586#0" expanded="true" />
+                <element signature="e#649#650#0" expanded="true" />
+                <element signature="e#885#886#0" expanded="true" />
+                <element signature="e#923#924#0" expanded="true" />
+                <element signature="e#5495#5496#0" expanded="true" />
+                <element signature="e#5523#5524#0" expanded="true" />
+                <element signature="e#6545#6546#0" expanded="true" />
+                <element signature="e#6605#6606#0" expanded="true" />
+                <element signature="e#6975#6976#0" expanded="true" />
+                <element signature="e#7016#7017#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/ACSP.g4">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="210">
-              <caret line="14" column="29" lean-forward="true" selection-start-line="14" selection-start-column="29" selection-end-line="14" selection-end-column="29" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/main/java/ACSPTranslator.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="405">
-              <caret line="27" column="57" lean-forward="true" selection-start-line="27" selection-start-column="57" selection-end-line="27" selection-end-column="57" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/temp.csp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="660">
-              <caret line="137" column="36" lean-forward="true" selection-start-line="137" selection-start-column="36" selection-end-line="137" selection-end-column="36" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/ACSPTypeChecker.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret lean-forward="true" />
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="e#564#565#0" expanded="true" />
-                <element signature="e#600#601#0" expanded="true" />
-                <element signature="e#548#549#0" expanded="true" />
-                <element signature="e#586#587#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/Translation.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="344">
-              <caret line="40" column="18" selection-start-line="40" selection-start-column="18" selection-end-line="40" selection-end-column="18" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/ExhibitionArea.acsp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="255">
-              <caret line="51" column="61" lean-forward="true" selection-start-line="51" selection-start-column="61" selection-end-line="51" selection-end-column="61" />
+            <state relative-caret-position="1560">
+              <caret line="104" selection-start-line="104" selection-end-line="104" />
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/RmD.acsp">
+          <provider selected="true" editor-type-id="text-editor" />
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Example.acsp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="651">
-              <caret line="50" lean-forward="true" selection-start-line="50" selection-end-line="50" />
+            <state relative-caret-position="75">
+              <caret line="5" selection-start-line="5" selection-end-line="10" selection-end-column="24" />
             </state>
           </provider>
         </entry>
@@ -227,36 +197,36 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
+      <find>simpleDe</find>
+      <find>visitp</find>
+      <find>translato</find>
+      <find>ID</find>
+      <find>type</find>
+      <find>event</find>
+      <find>_</find>
+      <find>&quot; &quot;</find>
+      <find>termi</find>
+      <find>ws</find>
+      <find>symbol</find>
+      <find>termin</find>
+      <find>WS</find>
+      <find>joinin</find>
+      <find>term</find>
+      <find>termina</find>
+      <find>normal</find>
+      <find>checkcon</find>
+      <find>parser</find>
+      <find>spec</find>
+      <find>simple</find>
+      <find>terminal</find>
+      <find>typeCheck(</find>
       <find>channelN</find>
       <find>proc</find>
       <find>addIn</find>
       <find>addO</find>
       <find>l!</find>
       <find>isWell</find>
-      <find>let</find>
-      <find>is not</find>
-      <find>simpleDefin</find>
-      <find>liveloc</find>
-      <find>simpleDef</find>
-      <find>TreeSet</find>
-      <find>inc</find>
-      <find>loc</find>
-      <find>notR</find>
-      <find>not</find>
-      <find>ra</find>
-      <find>locations</find>
-      <find>r</find>
-      <find>locP</find>
-      <find>not us</find>
-      <find>assert</find>
-      <find>fdr</find>
-      <find>func</find>
-      <find>root</find>
-      <find>INC</find>
-      <find>locMap</find>
-      <find>include</find>
-      <find>ile</find>
-      <find>isWe</find>
+      <find>stop</find>
     </findStrings>
     <replaceStrings>
       <replace />
@@ -279,13 +249,12 @@
         <option value="$PROJECT_DIR$/temp.csp" />
         <option value="$PROJECT_DIR$/src/main/java/ACSPParser.java" />
         <option value="$PROJECT_DIR$/src/main/java/ACSPTranslatorVisitor.java" />
-        <option value="$PROJECT_DIR$/Example.acsp" />
         <option value="$PROJECT_DIR$/src/main/java/Translation.java" />
-        <option value="$PROJECT_DIR$/ExhibitionArea.acsp" />
-        <option value="$PROJECT_DIR$/RmD.acsp" />
         <option value="$PROJECT_DIR$/src/main/java/ACSP.g4" />
-        <option value="$PROJECT_DIR$/src/main/java/ACSPTypeChecker.java" />
+        <option value="$PROJECT_DIR$/Example.acsp" />
         <option value="$PROJECT_DIR$/src/main/java/ACSPTranslator.java" />
+        <option value="$PROJECT_DIR$/src/main/java/ACSPPreProcessor.java" />
+        <option value="$PROJECT_DIR$/src/main/java/ACSPTypeChecker.java" />
       </list>
     </option>
   </component>
@@ -320,8 +289,8 @@
   </component>
   <component name="ProjectFrameBounds">
     <option name="y" value="23" />
-    <option name="width" value="2560" />
-    <option name="height" value="1337" />
+    <option name="width" value="1280" />
+    <option name="height" value="712" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="2" id="Add" />
@@ -331,37 +300,42 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
-      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
             <path>
-              <item name="untitled" type="b2602c69:ProjectViewProjectNode" />
-              <item name="untitled" type="462c0819:PsiDirectoryNode" />
+              <item name="ACSP-Compiler" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ACSP-Compiler" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
-              <item name="untitled" type="b2602c69:ProjectViewProjectNode" />
-              <item name="untitled" type="462c0819:PsiDirectoryNode" />
+              <item name="ACSP-Compiler" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ACSP-Compiler" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
-              <item name="untitled" type="b2602c69:ProjectViewProjectNode" />
-              <item name="untitled" type="462c0819:PsiDirectoryNode" />
+              <item name="ACSP-Compiler" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ACSP-Compiler" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="main" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
-              <item name="untitled" type="b2602c69:ProjectViewProjectNode" />
-              <item name="untitled" type="462c0819:PsiDirectoryNode" />
+              <item name="ACSP-Compiler" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ACSP-Compiler" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
               <item name="main" type="462c0819:PsiDirectoryNode" />
               <item name="java" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ACSP-Compiler" type="b2602c69:ProjectViewProjectNode" />
+              <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
+      <pane id="PackagesPane" />
+      <pane id="AndroidView" />
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -374,7 +348,7 @@
     <property name="SearchEverywhereHistoryKey" value="example.&#9;FILE&#9;file:///Users/aimeeborda/ACSP-Compiler/Example.acsp" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1541340849379" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1542960576137" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
@@ -384,6 +358,9 @@
     <property name="settings.editor.selected.configurable" value="preferences.keymap" />
   </component>
   <component name="RecentsManager">
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src/main/java" />
       <recent name="$PROJECT_DIR$/src/main" />
@@ -406,7 +383,7 @@
     <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="Main" />
       <module name="Translator" />
-      <option name="PROGRAM_PARAMETERS" value="ExhibitionArea.acsp" />
+      <option name="PROGRAM_PARAMETERS" value="Example.acsp" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -482,12 +459,11 @@
       <workItem from="1540149802751" duration="928000" />
       <workItem from="1540189287882" duration="2503000" />
       <workItem from="1540238089122" duration="1923000" />
-      <workItem from="1540916258584" duration="2005000" />
-      <workItem from="1541006821970" duration="1276000" />
-      <workItem from="1541184361775" duration="1515000" />
-      <workItem from="1541247054860" duration="242000" />
-      <workItem from="1541273234992" duration="869000" />
-      <workItem from="1541337915871" duration="1588000" />
+      <workItem from="1542711094523" duration="1400000" />
+      <workItem from="1542812257036" duration="2445000" />
+      <workItem from="1542920176094" duration="1546000" />
+      <workItem from="1542922459072" duration="740000" />
+      <workItem from="1542959720083" duration="589000" />
     </task>
     <servers />
   </component>
@@ -497,7 +473,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="65378000" />
+    <option name="totallyTimeSpent" value="64603000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -509,9 +485,10 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="23" width="2560" height="1337" extended-state="0" />
+    <frame x="0" y="23" width="1280" height="712" extended-state="0" />
+    <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.4979592" visible="true" weight="0.23073868" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.4979592" weight="0.2358643" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.24959612" />
       <window_info id="Designer" order="2" />
       <window_info id="Image Layers" order="3" />
@@ -520,15 +497,15 @@
       <window_info id="Capture Tool" order="6" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49563146" weight="0.38232931" />
-      <window_info anchor="bottom" id="Debug" order="3" sideWeight="0.49960285" weight="0.4" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49676898" weight="0.4048387" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32741934" />
       <window_info anchor="bottom" id="Terminal" order="7" weight="0.8547945" />
       <window_info anchor="bottom" id="Tool Output" order="8" weight="0.4" />
-      <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.50436854" side_tool="true" weight="0.7799197" />
-      <window_info anchor="bottom" id="Messages" order="10" sideWeight="0.49960285" weight="0.32289156" />
+      <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.503231" side_tool="true" weight="0.4048387" />
+      <window_info anchor="bottom" id="Messages" order="10" weight="0.32419354" />
       <window_info anchor="bottom" id="Database Changes" order="11" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="12" show_stripe_button="false" />
       <window_info anchor="bottom" id="ANTLR Preview" order="13" />
@@ -718,7 +695,13 @@
         </state>
       </provider>
     </entry>
-    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/src.zip!/java/util/ArrayList.java" />
+    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk1.8.0_60.jdk/Contents/Home/src.zip!/java/util/ArrayList.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="1373" selection-start-line="1373" selection-end-line="1373" />
+        </state>
+      </provider>
+    </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/org/antlr/antlr4-runtime/4.7.1/antlr4-runtime-4.7.1.jar!/org/antlr/v4/runtime/tree/TerminalNodeImpl.class">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="98">
@@ -733,17 +716,55 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ACSPParser.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="11520">
+          <caret line="768" selection-start-line="768" selection-end-line="768" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/ACSPBaseVisitor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1530">
+          <caret line="102" column="60" selection-start-line="102" selection-start-column="60" selection-end-line="102" selection-end-column="60" />
+        </state>
+      </provider>
+    </entry>
     <entry file="jar://$MAVEN_REPOSITORY$/org/antlr/antlr4-runtime/4.7.1/antlr4-runtime-4.7.1.jar!/org/antlr/v4/runtime/ParserRuleContext.class">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="98">
+        <state relative-caret-position="1365">
           <caret line="110" selection-start-line="110" selection-end-line="110" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ACSPParser.java">
+    <entry file="file://$PROJECT_DIR$/ExhibitionArea.acsp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="12135">
-          <caret line="904" selection-start-line="904" selection-end-line="904" />
+        <state relative-caret-position="-1107">
+          <caret line="32" column="4" selection-start-line="32" selection-end-line="32" selection-end-column="4" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/Main.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="30">
+          <caret line="7" column="13" selection-start-line="7" selection-start-column="13" selection-end-line="7" selection-end-column="13" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/Translation.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="51">
+          <caret line="13" column="23" selection-start-line="13" selection-start-column="19" selection-end-line="13" selection-end-column="23" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/temp.csp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="257">
+          <caret line="232" column="40" selection-start-line="232" selection-start-column="38" selection-end-line="232" selection-end-column="40" />
         </state>
       </provider>
     </entry>
@@ -756,84 +777,58 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/AccessPoint.acsp">
       <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret lean-forward="true" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ACSPBaseVisitor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1165">
-          <caret line="95" column="60" selection-start-line="95" selection-start-column="60" selection-end-line="95" selection-end-column="60" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/Main.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="60">
-          <caret line="9" column="57" lean-forward="true" selection-start-line="9" selection-start-column="57" selection-end-line="9" selection-end-column="57" />
+        <state relative-caret-position="261">
+          <caret line="90" column="62" lean-forward="true" selection-start-line="90" selection-start-column="19" selection-end-line="90" selection-end-column="62" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ACSP.g4">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="14" column="29" lean-forward="true" selection-start-line="14" selection-start-column="29" selection-end-line="14" selection-end-column="29" />
+        <state relative-caret-position="1560">
+          <caret line="104" selection-start-line="104" selection-end-line="104" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/RmD.acsp">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Example.acsp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="651">
-          <caret line="50" lean-forward="true" selection-start-line="50" selection-end-line="50" />
+        <state relative-caret-position="75">
+          <caret line="5" selection-start-line="5" selection-end-line="10" selection-end-column="24" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/ExhibitionArea.acsp">
+    <entry file="file://$PROJECT_DIR$/src/main/java/ACSPTranslator.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="51" column="61" lean-forward="true" selection-start-line="51" selection-start-column="61" selection-end-line="51" selection-end-column="61" />
+        <state relative-caret-position="975">
+          <caret line="72" column="46" selection-start-line="72" selection-start-column="46" selection-end-line="72" selection-end-column="46" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/temp.csp">
+    <entry file="file://$PROJECT_DIR$/src/main/java/ACSPPreProcessor.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="660">
-          <caret line="137" column="36" lean-forward="true" selection-start-line="137" selection-start-column="36" selection-end-line="137" selection-end-column="36" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/Translation.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="344">
-          <caret line="40" column="18" selection-start-line="40" selection-start-column="18" selection-end-line="40" selection-end-column="18" />
+        <state relative-caret-position="60">
+          <caret line="13" column="13" selection-start-line="13" selection-start-column="13" selection-end-line="13" selection-end-column="13" />
           <folding>
-            <element signature="imports" expanded="true" />
+            <element signature="e#585#586#0" expanded="true" />
+            <element signature="e#649#650#0" expanded="true" />
+            <element signature="e#885#886#0" expanded="true" />
+            <element signature="e#923#924#0" expanded="true" />
+            <element signature="e#5495#5496#0" expanded="true" />
+            <element signature="e#5523#5524#0" expanded="true" />
+            <element signature="e#6545#6546#0" expanded="true" />
+            <element signature="e#6605#6606#0" expanded="true" />
+            <element signature="e#6975#6976#0" expanded="true" />
+            <element signature="e#7016#7017#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ACSPTypeChecker.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret lean-forward="true" />
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#564#565#0" expanded="true" />
-            <element signature="e#600#601#0" expanded="true" />
-            <element signature="e#548#549#0" expanded="true" />
-            <element signature="e#586#587#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ACSPTranslator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="405">
-          <caret line="27" column="57" lean-forward="true" selection-start-line="27" selection-start-column="57" selection-end-line="27" selection-end-column="57" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+        <state relative-caret-position="60">
+          <caret line="13" column="62" selection-start-line="13" selection-start-column="62" selection-end-line="13" selection-end-column="62" />
         </state>
       </provider>
     </entry>
@@ -866,7 +861,6 @@
       </state>
       <state key="GlobalLibrariesConfigurable.UI">
         <settings>
-          <last-edited>org.antlr:antlr4-runtime:4.7.1</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
@@ -878,7 +872,7 @@
       </state>
       <state key="JdkListConfigurable.UI">
         <settings>
-          <last-edited>11</last-edited>
+          <last-edited>1.8</last-edited>
           <splitter-proportions>
             <option name="proportions">
               <list>
