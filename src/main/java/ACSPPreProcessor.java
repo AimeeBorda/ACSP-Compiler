@@ -1,12 +1,8 @@
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.TerminalNode;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.stream.Collectors;
 
 public class ACSPPreProcessor extends ACSPBaseVisitor<Environment> {
@@ -38,16 +34,6 @@ public class ACSPPreProcessor extends ACSPBaseVisitor<Environment> {
         return any;
     }
 
-
-//    @Override
-//    public Environment visitTerminal(TerminalNode node) {
-//        if(locMap.containsKey(node.getText())) {
-//            return locMap.get(node.getText()).merge(empty);
-//        }else{
-//            return empty;
-//        }
-//    }
-
     @Override
     public Environment visitLocOutput(ACSPParser.LocOutputContext ctx) {
         Environment proc = visit(ctx.getChild(0));
@@ -73,8 +59,18 @@ public class ACSPPreProcessor extends ACSPBaseVisitor<Environment> {
     @Override
     public Environment visitParallelProc(ACSPParser.ParallelProcContext ctx) {
         return visit(ctx.proc(0)).merge(visit(ctx.proc(1)));
+    }
 
-//        return env.diff(visit(ctx.locNames()));
+    @Override
+    public Environment visitLetProc(ACSPParser.LetProcContext ctx) {
+        ctx.simpleDefinition().stream().forEach(c -> visit(c));
+        Environment withinStat = visit(ctx.any());
+
+        for(ACSPParser.SimpleDefinitionContext c : ctx.simpleDefinition()){
+            envMap.remove(c.definitionLeft().ID().getText());
+        }
+
+        return withinStat;
     }
 
     @Override
@@ -82,30 +78,6 @@ public class ACSPPreProcessor extends ACSPBaseVisitor<Environment> {
         Environment res = ctx.children.stream().map(c ->visit(c)).reduce((r,t) -> r = r.merge(t)).orElse(defaultResult());
         return res.call(ctx.ID().getText().trim());
     }
-
-//
-//    @Override
-//    public Environment visitProc(ACSPParser.ProcContext ctx) {
-//        return ctx.children.stream().map(c ->visit(c)).reduce((r,t) -> r = r.merge(t)).orElse(empty);
-//
-//    }
-
-//    @Override
-//    public Environment visitLetProc(ACSPParser.LetProcContext ctx) {
-//        ctx.simpleDefinition().stream().forEach(c -> visit(c));
-//        Environment withinStat = visit(ctx.any());
-//
-//        removeLetProc(ctx.simpleDefinition());
-//
-//        return withinStat;
-//    }
-
-//    private void removeLetProc(List<ACSPParser.SimpleDefinitionContext> ctx){
-//        Environment env = ctx.
-//        for(ACSPParser.SimpleDefinitionContext c : ctx){
-//            locMap.remove(c.definitionLeft().ID().getText());
-//        }
-//    }
 
     @Override
     protected Environment aggregateResult(Environment aggregate, Environment nextResult) {

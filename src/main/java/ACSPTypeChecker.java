@@ -5,7 +5,6 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -124,15 +123,11 @@ public class ACSPTypeChecker extends ACSPBaseVisitor<Environment> {
         ctx.simpleDefinition().stream().forEach(c -> visit(c));
         Environment withinStat = visit(ctx.any());
 
-        removeLetProc(ctx.simpleDefinition());
-
-        return withinStat;
-    }
-
-    private void removeLetProc(List<ACSPParser.SimpleDefinitionContext> ctx){
-        for(ACSPParser.SimpleDefinitionContext c : ctx){
+        for(ACSPParser.SimpleDefinitionContext c : ctx.simpleDefinition()){
             locMap.remove(c.definitionLeft().ID().getText());
         }
+
+        return withinStat;
     }
 
     @Override

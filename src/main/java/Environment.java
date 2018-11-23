@@ -70,11 +70,10 @@ public class Environment {
         return locations().isEmpty() && prefixes().isEmpty();
     }
 
-
-    public HashSet<String> locations(){
+    public HashSet<String> getCallDependency(){
         HashSet<String> s = new HashSet<>(callDependency);
 
-        HashSet<String> res = new HashSet<>(in);
+        HashSet<String> res = new HashSet<>(callDependency);
         while(!s.isEmpty()){
             ArrayList<String> iterator = new ArrayList<>(s);
             s.clear();
@@ -82,7 +81,7 @@ public class Environment {
                 if(locMap.containsKey(next)){
                     Environment env = locMap.get(next);
                     s.addAll(env.callDependency);
-                    res.addAll(env.in);
+                    res.addAll(env.callDependency);
                 }
             }
         }
@@ -90,20 +89,21 @@ public class Environment {
         return res;
     }
 
-    public HashSet<String> prefixes(){
-        HashSet<String> s = new HashSet<>(callDependency);
+    public HashSet<String> locations(){
+        HashSet<String> res = new HashSet<>(in);
+        for(String next : getCallDependency()){
+            Environment env = locMap.get(next);
+            res.addAll(env.in);
+        }
 
+        return res;
+    }
+
+    public HashSet<String> prefixes(){
         HashSet<String> res = new HashSet<>(out);
-        while(!s.isEmpty()){
-            ArrayList<String> iterator = new ArrayList<>(s);
-            s.clear();
-            for(String next : iterator){
-                if(locMap.containsKey(next)){
-                    Environment env = locMap.get(next);
-                    s.addAll(env.callDependency);
-                    res.addAll(env.out);
-                }
-            }
+        for(String next : getCallDependency()){
+            Environment env = locMap.get(next);
+            res.addAll(env.out);
         }
 
         return res;
