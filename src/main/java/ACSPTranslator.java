@@ -71,7 +71,7 @@ public class ACSPTranslator extends ACSPBaseVisitor<String> {
 
         processes.add(hoOutput);
 
-        return " "+ctx.ID()+"!"+new ArrayList<String>(processes).indexOf(hoOutput) + " -> "+visit(ctx.proc(1));
+        return " "+ctx.ID()+"!"+new ArrayList<>(processes).indexOf(hoOutput) + " -> "+visit(ctx.proc(1));
     }
 
     @Override

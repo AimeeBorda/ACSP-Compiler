@@ -1,0 +1,4 @@
+A = (new a) (l[SKIP] [|{}|] B)
+B = (new a) (l[SKIP] [{}||] A)
+
+assert A :[deterministic]

@@ -1,3 +1,59 @@
+
+datatype Room = EA | EB | ED | Corr
+
+Processes = {0..1}
+MaxAgents = 2
+MaxAgentsEA = MaxAgents*2
+MaxAgentsPair = MaxAgents
+
+
+notR(rm) = {x | x<- Room, x != rm}
+
+---------------------------------------------
+--		Events
+---------------------------------------------
+channel adapt : {0..MaxAgentsEA}
+channel adaptE
+channel emergency 				-- local state (True over MaxAgents, False under MaxAgents)
+channel goto : Room.Room			-- agents' movement
+
+channel ack
+
+---------------------------------------------
+--		Event for EB
+---------------------------------------------
+EventsD = {goto.EB.ED,goto.ED.Corr}
+Monitors2 = {emergency}
+Monitors5 = {emergency}
+
+---------------------------------------------
+--		Processes for ED
+---------------------------------------------
+D0 = (goto!ED!Corr -> D0) [] (goto!EB!ED -> D0)
+D1 = goto!ED!Corr -> D1
+
+---------------------------------------------
+--		Behaviour for ED
+---------------------------------------------
+BehaviourD = let D(n) =  (n > 0 & goto!ED!Corr -> D(n-1))
+					[] (n <= MaxAgentsEA & goto!EB!ED -> D(n+1))
+				within D(0)
+
+---------------------------------------------
+--		Requirements for ED
+---------------------------------------------
+Pattern2 = let P(n) =
+			(n > 0 & goto!ED!Corr -> if n==MaxAgents then adapt!n-1 -> ack -> P(n-1) else P(n-1))
+				[] (n <=MaxAgentsEA & goto!EB!ED -> if n == MaxAgents - 1 then adapt!n+1 -> ack -> P(n+1) else P(n+1))
+				[] (emergency -> RUN(union(EventsD,Monitors2)))
+		within P(0)
+Pi2 =  adapt?v  ->  if v == MaxAgents then rd!<D1>.ack -> Pi2 else rd!<D0>.ack -> Pi2
+
+
+Pattern5D = (emergency -> adaptE -> ack -> Pattern5D) [] (goto?_: {x | goto.x <- EventsD} -> Pattern5D)
+Pi5D =  adaptE  ->  rd!<D0>.ack -> Pi5D
+
+
 ---------------------------------------------
 --		Composition
 ---------------------------------------------
@@ -11,40 +67,25 @@ RmD = let
 
 			FirstApproach = R2 [|inter(eventsR2,eventsR5)|] R5
 
-			AdptManager = BehaviourD [|inter(EventsD,events) |] FirstApproach
-			proc = (new rd)(rd[D0] [| EventsD|] AdptManager)
+			AdptManager = BehaviourD [|inter(EventsD,events) |] R2
 		within
-			normal(proc)
----------------------------------------------
---		Events for EB
----------------------------------------------
-EventsB = {goto.EB.EA,goto.EB.ED,goto.EA.EB}
-Monitors2B = {goto.ED.Corr,emergency}
+			(new rd)(rd[D0] [| EventsD |] AdptManager)
 
 ---------------------------------------------
---		Processes for EB
+--	 Assertions for Room D
 ---------------------------------------------
-B0 = (goto!EB?_:{EA,ED} -> B0) [] (goto!EA!EB -> B0)
-B1 = (goto!EB?_:{EA,ED} -> B1)
+
+assert RmD :[deadlock free]
+assert RmD :[deterministic]
+assert RmD :[livelock free]
 
 ---------------------------------------------
---		Behaviour for EB
+--	 Assertions only applicable for First Approach
 ---------------------------------------------
-BehaviourB = let B(n) =  (n > 0 & goto!EB?_:{EA,ED} -> B(n-1))
-					[] (n <= MaxAgentsEA & goto!EA!EB -> B(n+1))
-				within B(0)
+assert Requirement2 [T= RmD [|{|emergency|}|] STOP
 
----------------------------------------------
---		Requirement for EB
----------------------------------------------
-Pattern2B = let P(n) =
-		   	   (n >= 0 & goto!EB!EA -> if n == MaxAgentsPair then adapt!n-1 -> ack -> P(n-1) else P(n-1))
-		   	 	[] (n <= MaxAgents & goto!EA!EB -> if n == MaxAgentsPair-1 then adapt!n+1 -> ack -> P(n+1) else P(n+1))
-				[] (n >= 0 & goto!ED!Corr -> if n == MaxAgentsPair then adapt!n-1 -> ack -> P(n-1) else P(n-1))
-				[] (goto!EB!ED -> P(n))
-				[] (emergency -> RUN(union(EventsB,Monitors2B)))
-				within P(0)
-Pi2B =  adapt?v  ->  if v == MaxAgentsPair then rb!<B1>.ack -> Pi2B else rb!<B0>.ack -> Pi2B
-
-PatternEmergencyB = emergency -> adaptE -> ack -> PatternEmergencyB [] (goto?_: {x | goto.x <- EventsB} -> PatternEmergencyB)
-PiEmergencyB =  adaptE  ->  rb!<B0>.ack -> PiEmergencyB
+---------- at most MaxAgents people in room D ----------
+Requirement2 = let T(n) =   (n < MaxAgents & goto?_:notR(ED)!ED  -> T(n+1))
+								[] (n > 0  & goto!ED?_:notR(ED) -> T(n-1))
+								[] (goto?_:notR(ED)?_:notR(ED) -> T(n))
+				within T(0)

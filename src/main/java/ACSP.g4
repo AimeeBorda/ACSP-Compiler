@@ -97,7 +97,7 @@ proc
 	    | ID
 	    ;
 
-event : ID ((QUERY | PLING) any (COLLON type)?)*;
+event : ID ((QUERY | PLING | DOLLAR) any (COLLON type)?)*;
 
 locProcess : ID LBRACKET proc RBRACKET ;
 locOutput :  ID PLING LT proc GT DOT proc ;
@@ -148,6 +148,7 @@ MINUS	: '-';
 NEW : 'new';
 DIV		: '/';
 MOD	: '%';
+DOLLAR : '$';
 IF : 'if' ;
 THEN : 'then' ;
 ELSE : 'else' ;
