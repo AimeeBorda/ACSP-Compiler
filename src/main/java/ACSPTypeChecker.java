@@ -41,11 +41,6 @@ public class ACSPTypeChecker extends ACSPBaseVisitor<ACSPTypeChecker.Gamma> {
     }
 
     @Override
-    public Gamma visitChannelNames(ACSPParser.ChannelNamesContext ctx) {
-        return empty;
-    }
-
-    @Override
     public Gamma visitSimpleDefinition(ACSPParser.SimpleDefinitionContext ctx) {
         String key = ctx.definitionLeft().ID().getText();
         Gamma any = visit(ctx.any());

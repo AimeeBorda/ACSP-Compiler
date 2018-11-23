@@ -74,8 +74,7 @@ set
 
 setComprehension : any RARROW type | boolExp;
 
-proc
-	:Skip
+proc:     Skip
      	| Stop
      	| event ARROW proc
      	| proc ECHOICE proc
@@ -101,7 +100,7 @@ event : ID ((QUERY | PLING) any (COLLON type)?)*;
 
 locProcess : ID LBRACKET proc RBRACKET ;
 locOutput :  ID PLING LT proc GT DOT proc ;
-parallelProc :  LPAREN NEW locNames RPAREN LPAREN proc (LSYNC set RSYNC proc | INTL) RPAREN;
+parallelProc :  LPAREN NEW locNames RPAREN LPAREN proc (LSYNC set RSYNC | INTL) proc RPAREN;
 letProc : LET simpleDefinition+ WITHIN any;
 
 locNames: ID(COMMA ID)*;

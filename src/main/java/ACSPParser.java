@@ -1,4 +1,4 @@
-// Generated from /Users/aimee/IdeaProjects/untitled/src/main/java/ACSP.g4 by ANTLR 4.7
+// Generated from /Users/aimeeborda/ACSP-Compiler/src/main/java/ACSP.g4 by ANTLR 4.7
 import org.antlr.v4.runtime.atn.*;
 import org.antlr.v4.runtime.dfa.DFA;
 import org.antlr.v4.runtime.*;
@@ -2315,7 +2315,7 @@ public class ACSPParser extends Parser {
 			match(LPAREN);
 			setState(363);
 			proc(0);
-			setState(370);
+			setState(369);
 			_errHandler.sync(this);
 			switch (_input.LA(1)) {
 			case LSYNC:
@@ -2326,19 +2326,19 @@ public class ACSPParser extends Parser {
 				set();
 				setState(366);
 				match(RSYNC);
-				setState(367);
-				proc(0);
 				}
 				break;
 			case INTL:
 				{
-				setState(369);
+				setState(368);
 				match(INTL);
 				}
 				break;
 			default:
 				throw new NoViableAltException(this);
 			}
+			setState(371);
+			proc(0);
 			setState(372);
 			match(RPAREN);
 			}
@@ -3030,7 +3030,7 @@ public class ACSPParser extends Parser {
 		"\f\25\16\25\u014e\13\25\3\26\3\26\3\26\3\26\3\26\5\26\u0155\n\26\7\26"+
 		"\u0157\n\26\f\26\16\26\u015a\13\26\3\27\3\27\3\27\3\27\3\27\3\30\3\30"+
 		"\3\30\3\30\3\30\3\30\3\30\3\30\3\31\3\31\3\31\3\31\3\31\3\31\3\31\3\31"+
-		"\3\31\3\31\3\31\3\31\5\31\u0175\n\31\3\31\3\31\3\32\3\32\6\32\u017b\n"+
+		"\3\31\3\31\3\31\5\31\u0174\n\31\3\31\3\31\3\31\3\32\3\32\6\32\u017b\n"+
 		"\32\r\32\16\32\u017c\3\32\3\32\3\32\3\33\3\33\3\33\7\33\u0185\n\33\f\33"+
 		"\16\33\u0188\13\33\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3\34\3"+
 		"\34\3\34\3\34\3\34\3\34\5\34\u0199\n\34\3\34\3\34\3\34\7\34\u019e\n\34"+
@@ -3138,9 +3138,9 @@ public class ACSPParser extends Parser {
 		"\7\7\2\2\u0163\u0164\5(\25\2\u0164\u0165\7\b\2\2\u0165\u0166\7.\2\2\u0166"+
 		"\u0167\5(\25\2\u0167/\3\2\2\2\u0168\u0169\7\33\2\2\u0169\u016a\7\17\2"+
 		"\2\u016a\u016b\5\64\33\2\u016b\u016c\7\34\2\2\u016c\u016d\7\33\2\2\u016d"+
-		"\u0174\5(\25\2\u016e\u016f\7\37\2\2\u016f\u0170\5$\23\2\u0170\u0171\7"+
-		" \2\2\u0171\u0172\5(\25\2\u0172\u0175\3\2\2\2\u0173\u0175\7!\2\2\u0174"+
-		"\u016e\3\2\2\2\u0174\u0173\3\2\2\2\u0175\u0176\3\2\2\2\u0176\u0177\7\34"+
+		"\u0173\5(\25\2\u016e\u016f\7\37\2\2\u016f\u0170\5$\23\2\u0170\u0171\7"+
+		" \2\2\u0171\u0174\3\2\2\2\u0172\u0174\7!\2\2\u0173\u016e\3\2\2\2\u0173"+
+		"\u0172\3\2\2\2\u0174\u0175\3\2\2\2\u0175\u0176\5(\25\2\u0176\u0177\7\34"+
 		"\2\2\u0177\61\3\2\2\2\u0178\u017a\7C\2\2\u0179\u017b\5\22\n\2\u017a\u0179"+
 		"\3\2\2\2\u017b\u017c\3\2\2\2\u017c\u017a\3\2\2\2\u017c\u017d\3\2\2\2\u017d"+
 		"\u017e\3\2\2\2\u017e\u017f\7D\2\2\u017f\u0180\5\32\16\2\u0180\63\3\2\2"+
@@ -3168,7 +3168,7 @@ public class ACSPParser extends Parser {
 		"\3\2\2\2\u01bd\u01be\3\2\2\2\u01be\u01bc\3\2\2\2\u01be\u01bf\3\2\2\2\u01bf"+
 		"=\3\2\2\2+AJSekr\u0088\u0094\u0099\u00a0\u00a5\u00aa\u00af\u00b3\u00b6"+
 		"\u00bd\u00c4\u00cf\u00d7\u00d9\u00e2\u00ea\u00ec\u00f8\u00fd\u0104\u0123"+
-		"\u012d\u014a\u014c\u0154\u0158\u0174\u017c\u0186\u0198\u019f\u01a4\u01b1"+
+		"\u012d\u014a\u014c\u0154\u0158\u0173\u017c\u0186\u0198\u019f\u01a4\u01b1"+
 		"\u01b8\u01be";
 	public static final ATN _ATN =
 		new ATNDeserializer().deserialize(_serializedATN.toCharArray());
