@@ -76,16 +76,13 @@ proc:     Skip
      	| event ARROW proc
      	| proc ECHOICE proc
      	| proc ICHOICE proc
-     	| proc INTL proc
      	| IF boolExp THEN proc ELSE proc
      	| boolExp GUARD proc
      	| proc (BACKSLASH | PROJECT) set
-     	| proc LSYNC set RSYNC proc
      	| proc TIMEOUT proc
      	| proc INTR proc
      	| proc SEMICOL proc
-     	| LPAREN proc RPAREN
-	    | locProcess
+        | locProcess
 	    | locOutput
 	    | parallelProc
 	    | letProc
@@ -95,7 +92,7 @@ proc:     Skip
 event : ID ((QUERY | PLING | DOLLAR) any (COLLON type)?)*;
 locProcess : ID LBRACKET proc RBRACKET ;
 locOutput :  ID PLING LT proc GT DOT proc ;
-parallelProc :  LPAREN NEW locNames RPAREN LPAREN proc (LSYNC set RSYNC | INTL) proc RPAREN;
+parallelProc :  (LPAREN NEW locNames RPAREN)? LPAREN proc (LSYNC set RSYNC | INTL) proc RPAREN;
 letProc : LET simpleDefinition+ WITHIN any;
 
 locNames: ID(COMMA ID)*;

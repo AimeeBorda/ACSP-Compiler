@@ -1,5 +1,7 @@
 import java.util.*;
 
+import static java.util.stream.Collectors.toList;
+
 public class Environment {
 
     private final HashMap<String, Environment> locMap;
@@ -82,17 +84,19 @@ public class Environment {
     public Stack<String> getCallGraph() {
         Stack<String> callGraph = new Stack<>();
         callGraph.addAll(callDependency);
+        Stack<String> res = new Stack<>();
 
         while (!callGraph.isEmpty()) {
             String proc = callGraph.pop();
 
             if (locMap.containsKey(proc)) {
+                res.push(proc);
                 Environment env = locMap.get(proc);
-                callGraph.addAll(env.callDependency);
+                callGraph.addAll(env.callDependency.stream().filter(c -> !res.contains(c)).collect(toList()));
             }
         }
 
-        return callGraph;
+        return res;
     }
 
 

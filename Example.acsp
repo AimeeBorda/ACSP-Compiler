@@ -1,3 +1,5 @@
--- Example 3
-D = (new l,m,n)((l[SKIP] ||| m[SKIP]) ||| (l!<SKIP>.SKIP ||| n!<SKIP>.SKIP))
-assert D :[deadlock free [F]]
+Q =  (new l)(l[SKIP] ||| R)
+R = let x = 5 within l!<S(x)>.SKIP
+S(x) = SKIP
+
+assert Q :[livelock free [FD]]

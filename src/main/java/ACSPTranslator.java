@@ -33,7 +33,7 @@ public class ACSPTranslator extends ACSPBaseVisitor<String> {
     private String locDeclaration() {
         StringBuilder res = new StringBuilder();
         for(Map.Entry entry : locations.entrySet()){
-            res.append(String.format("channel %s : {0..%d}\n", entry.getKey(),((LinkedHashSet)entry.getValue()).size() -1));
+            res.append(String.format("channel %s : {0..%d}\n", entry.getKey(),Math.max(((LinkedHashSet)entry.getValue()).size() -1,0)));
         }
 
         return res.toString()+"\n";
@@ -56,8 +56,9 @@ public class ACSPTranslator extends ACSPBaseVisitor<String> {
 
     @Override
     public String visitLocProcess(ACSPParser.LocProcessContext ctx) {
+        locations.putIfAbsent(ctx.ID().getText(), new LinkedHashSet<>());
         return
-        "let R = "+ctx.ID()+"?id -> (map("+ctx.ID()+",id) /\\ R) \n within ("+visit(ctx.proc()) + "/\\ R)";
+        "let R = "+ctx.ID().getText()+"?id -> (map("+ctx.ID()+",id) /\\ R) \n within ("+visit(ctx.proc()) + "/\\ R)";
     }
 
     @Override
@@ -75,16 +76,15 @@ public class ACSPTranslator extends ACSPBaseVisitor<String> {
 
     @Override
     public String visitParallelProc(ACSPParser.ParallelProcContext ctx) {
-        String L = visit(ctx.locNames());
+        String A = ctx.locNames() == null ? "{||}" : "{|"+ visit(ctx.locNames()) +"|}";
         String M = visit(ctx.proc(0));
         String N = visit(ctx.proc(1));
-        String A = "{|"+L+"|}";
-        String E = "";
+
+        String E = A;
         if(ctx.set() != null) {
             E = "union("+ visit(ctx.set())+","+A +")";
-        }else{
-            E = A;
         }
+
         return " normal((" +M +"[|"+E+"|]"+N +") \\ " + A+")";
     }
 

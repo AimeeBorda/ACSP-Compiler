@@ -70,8 +70,8 @@ public class ACSPTypeChecker extends ACSPBaseVisitor<Environment> {
 
     @Override
     public Environment visitLocOutput(ACSPParser.LocOutputContext ctx) {
-        Environment proc = visit(ctx.getChild(0));
-        Environment cont = visit(ctx.getChild(1));
+        Environment proc = visit(ctx.proc(0));
+        Environment cont = visit(ctx.proc(1));
 
         if(proc != null && cont != null && proc.isEmpty()){
             return cont.out(ctx.ID().getText());
@@ -95,7 +95,7 @@ public class ACSPTypeChecker extends ACSPBaseVisitor<Environment> {
     public Environment visitParallelProc(ACSPParser.ParallelProcContext ctx) {
         Environment left = visit(ctx.proc(0));
         Environment right = visit(ctx.proc(1));
-        Environment L = visit(ctx.locNames());
+        Environment L = ctx.locNames() == null ? defaultResult() : visit(ctx.locNames());
         Environment gamma =  left.merge(right);
 
         gamma.removeAllIn(L.locations());

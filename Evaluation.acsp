@@ -7,7 +7,7 @@ assert Example :[deterministic [F]]
 
 -- Example 2
 A = (new l)(l[SKIP] ||| l!<SKIP>.SKIP)
-B = (new l)(l[SKIP] ||| l!<STOP>.SKIP)
+B = (new l)(l[SKIP] ||| l!<STOP>.SKIP) ||| P
 
 assert A [T= B
 
@@ -16,3 +16,50 @@ D = (new l,m,n)((l[SKIP] ||| m[SKIP]) ||| (l!<SKIP>.SKIP ||| n!<SKIP>.SKIP))
 assert D :[deadlock free [F]]
 
 -- Example 4
+E = (new l)(l[SKIP] ||| l!<STOP>.SKIP) ||| P
+assert D :[livelock free [FD]]
+
+-- Example 5
+E = (new l)(l[SKIP] ||| SKIP)
+assert E :[livelock free [FD]]
+
+-- Example 6
+F = (new l)(l!<SKIP>.SKIP ||| SKIP)
+assert F :[livelock free [FD]]
+
+-- Example 7
+G = (new l)(l!<H>.SKIP ||| SKIP)
+H = SKIP ||| I
+I = l!<SKIP>.SKIP
+assert G :[livelock free [FD]]
+
+
+-- Example 8
+J = (new l)(l[SKIP] ||| K)
+K = (new h)(h[SKIP] ||| J)
+assert J :[livelock free [FD]]
+
+-- Example 9
+L = (new l)((l[SKIP] ||| l!<SKIP>.STOP) ||| l!<SKIP>.STOP)
+assert L :[livelock free [FD]]
+
+-- Example 10
+M = (new l)(l[SKIP] ||| (l!<SKIP>.STOP ||| l!<SKIP>.STOP))
+assert M :[livelock free [FD]]
+
+-- Example 11
+N = (new l)(l[BaseSys] ||| SKIP)
+N = (new l)(l!<BaseSys>.SKIP ||| SKIP)
+assert N :[livelock free [FD]]
+
+-- Example 12
+O = (new l)(P ||| AdaptationProc)
+P = l[SKIP] ||| P
+assert O :[livelock free [FD]]
+
+-- Example 13
+Q =  (new l)(l[SKIP] ||| R)
+R = let x = 5 within l!<S(x)>.SKIP
+S(x) = SKIP
+
+assert Q :[livelock free [FD]]

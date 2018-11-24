@@ -6,6 +6,11 @@ import java.io.*;
 
 public class Translation {
 
+    public static void main(final String[] args) throws IOException {
+        Translation t = new Translation(args[0]);
+        t.translate();
+    }
+
     private ACSPTranslator translator;
     private ACSPTypeChecker typeChecker;
     private final String input;
@@ -46,7 +51,7 @@ public class Translation {
     }
 
     private void openFDR(String file) throws IOException {
-//        new ProcessBuilder("/bin/bash", "-c", "open " + file).start();
+        new ProcessBuilder("/bin/bash", "-c", "open " + file).start();
     }
 
     private  void typeCheckProcess() throws IOException {
