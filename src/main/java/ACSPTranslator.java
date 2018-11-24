@@ -13,9 +13,10 @@ public class ACSPTranslator extends ACSPBaseVisitor<String> {
     private TokenStream commonTokenStream;
     private HashMap<String, LinkedHashSet<String>> locations;
     public String cspProcess;
+    private String dir;
 
-    public ACSPTranslator(ACSPParser parser){
-        this(parser, new HashMap<>());
+    public ACSPTranslator(ACSPParser parser,String dir){
+        this(parser, new HashMap<>(),dir);
 
         if(!cspProcess.contains("transparent normal")){
             cspProcess = "transparent normal \n\n" + cspProcess;
@@ -23,10 +24,10 @@ public class ACSPTranslator extends ACSPBaseVisitor<String> {
         cspProcess += "\n\n"+ locDeclaration()+getMaps();
     }
 
-    public ACSPTranslator(ACSPParser parser,HashMap<String, LinkedHashSet<String>> locations){
+    public ACSPTranslator(ACSPParser parser,HashMap<String, LinkedHashSet<String>> locations,String dir){
         this.locations =locations;
         this.commonTokenStream = parser.getTokenStream();
-
+        this.dir = dir;
         cspProcess = visit(parser.spec());
     }
 
@@ -109,9 +110,9 @@ public class ACSPTranslator extends ACSPBaseVisitor<String> {
 
     @Override
     public String visitIncludeFile(ACSPParser.IncludeFileContext ctx) {
-        String fileName = ACSPTypeChecker.getFileName(ctx);
+        String fileName = Translation.getFileName(ctx,dir);
         try {
-            ACSPTranslator translator = new ACSPTranslator(new ACSPParser(new CommonTokenStream(new ACSPLexer(CharStreams.fromFileName(fileName)))), this.locations);
+            ACSPTranslator translator = new ACSPTranslator(new ACSPParser(new CommonTokenStream(new ACSPLexer(CharStreams.fromFileName(fileName)))), this.locations,dir);
 
             return "\n -- File " + fileName +"\n"+translator.cspProcess +"\n";
         } catch (IOException e) {

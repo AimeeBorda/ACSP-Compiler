@@ -8,13 +8,16 @@ import java.util.stream.Collectors;
 public class ACSPPreProcessor extends ACSPBaseVisitor<Environment> {
 
     HashMap<String,Environment> envMap;
+    String dir;
 
-    public ACSPPreProcessor(ACSPParser parser) {
-        this(parser, new HashMap<>());
+    public ACSPPreProcessor(ACSPParser parser, String dir) {
+
+        this(parser, new HashMap<>(),dir);
     }
 
-    public ACSPPreProcessor(ACSPParser parser, HashMap<String, Environment> envMap) {
+    public ACSPPreProcessor(ACSPParser parser, HashMap<String, Environment> envMap,String dir) {
         this.envMap = envMap;
+        this.dir = dir;
         visit(parser.spec());
     }
 
@@ -92,18 +95,12 @@ public class ACSPPreProcessor extends ACSPBaseVisitor<Environment> {
     @Override
     public Environment visitIncludeFile(ACSPParser.IncludeFileContext ctx) {
         try {
-            String fileName = getFileName(ctx);
-            new ACSPPreProcessor(new ACSPParser(new CommonTokenStream(new ACSPLexer(CharStreams.fromFileName(fileName)))), envMap);
+            String fileName = Translation.getFileName(ctx,dir);
+            new ACSPPreProcessor(new ACSPParser(new CommonTokenStream(new ACSPLexer(CharStreams.fromFileName(fileName)))), envMap,dir);
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         return defaultResult();
     }
-
-
-    public static String getFileName(ACSPParser.IncludeFileContext ctx){
-        return ctx.ID().stream().map(c -> c.getText().trim()).collect(Collectors.joining("/")) +".acsp";
-    }
-
 }

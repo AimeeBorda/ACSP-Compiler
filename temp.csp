@@ -1,5 +1,5 @@
 
- -- File accessPoint.acsp
+ -- File /Users/aimee/IdeaProjects/untitled/Examples/ArtGallery/HVAC/accessPoint.acsp
 
 
 EventsA = {|connect,disconnect,update|}
@@ -72,7 +72,7 @@ Upstairs = let
 				EventSet = {|connect.True.HVAC, connect.False.HVAC |}
 				hvacComp = connect?_:Bool!HVAC -> hvacComp
 			within normal((hvacComp[|EventSet|]accessPtComp) )
- -- File assertions.acsp
+ -- File /Users/aimee/IdeaProjects/untitled/Examples/ArtGallery/HVAC/assertions.acsp
 
 Requirement3 = let
 					T(m,n) = (n  == 0  & connect!True!Secure -> disconnect -> connect!True!HVAC-> T(0,n+1))

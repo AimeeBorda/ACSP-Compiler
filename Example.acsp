@@ -1,4 +1,0 @@
-A = (new l)(l[SKIP] ||| l!<SKIP>.SKIP)
-B = (new l)(l[SKIP] ||| l!<STOP>.SKIP) ||| P
-
-assert A [T= B

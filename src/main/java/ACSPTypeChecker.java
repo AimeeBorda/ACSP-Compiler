@@ -10,17 +10,19 @@ import java.util.stream.Collectors;
 
 public class ACSPTypeChecker extends ACSPBaseVisitor<Environment> {
 
+    private final String dir;
     //TODO: Free Variables in Let not to be used in the prefix
     List<String> errors;
     HashMap<String,Environment> locMap;
 
 
-    public ACSPTypeChecker(ACSPParser parser, HashMap<String, Environment> locMap) {
-        this(parser, locMap, new ArrayList<>());
+    public ACSPTypeChecker(ACSPParser parser, HashMap<String, Environment> locMap, String dir) {
+        this(parser, locMap, new ArrayList<>(),dir);
     }
 
-    public ACSPTypeChecker(ACSPParser parser, HashMap<String, Environment> locMaps, List<String> errors) {
+    public ACSPTypeChecker(ACSPParser parser, HashMap<String, Environment> locMaps, List<String> errors,String dir) {
         this.locMap = locMaps;
+        this.dir = dir;
         this.errors = errors;
         visit(parser.spec());
     }
@@ -146,8 +148,8 @@ public class ACSPTypeChecker extends ACSPBaseVisitor<Environment> {
     @Override
     public Environment visitIncludeFile(ACSPParser.IncludeFileContext ctx) {
         try {
-            String fileName = getFileName(ctx);
-            new ACSPTypeChecker(new ACSPParser(new CommonTokenStream(new ACSPLexer(CharStreams.fromFileName(fileName)))), locMap,errors);
+            String fileName = Translation.getFileName(ctx,dir);
+            new ACSPTypeChecker(new ACSPParser(new CommonTokenStream(new ACSPLexer(CharStreams.fromFileName(fileName)))), locMap,errors,dir);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -155,7 +157,4 @@ public class ACSPTypeChecker extends ACSPBaseVisitor<Environment> {
         return defaultResult();
     }
 
-    public static String getFileName(ACSPParser.IncludeFileContext ctx){
-        return ctx.ID().stream().map(c -> c.getText().trim()).collect(Collectors.joining("/")) +".acsp";
-    }
 }
