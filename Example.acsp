@@ -1,5 +1,4 @@
-Q =  (new l)(l[SKIP] ||| R)
-R = let x = 5 within l!<S(x)>.SKIP
-S(x) = SKIP
+A = (new l)(l[SKIP] ||| l!<SKIP>.SKIP)
+B = (new l)(l[SKIP] ||| l!<STOP>.SKIP) ||| P
 
-assert Q :[livelock free [FD]]
+assert A [T= B

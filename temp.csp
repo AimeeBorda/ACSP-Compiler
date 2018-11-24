@@ -1,13 +1,139 @@
-transparent normal 
 
-Q = normal((let R = l?id -> (map(l,id) /\ R) 
- within (SKIP/\ R)[|{| l|}|] R) \ {| l|})
-R = let x = 5 within l!0 -> SKIP
-S(x) = SKIP
+ -- File accessPoint.acsp
 
-assert Q :[livelock free [FD]]
 
-channel l : {0..0}
+EventsA = {|connect,disconnect,update|}
+MonitorsA = {}
 
-map = \ chName,id @ if chName == l and id == 0 then S(x) 
+channel adapt3 : Connections
+
+A0 = connect!True!HVAC -> RUN({connect.x.y | x<- Bool, y <- {Secure,Open}})
+A1 = connect!False!HVAC -> RUN({connect.x.y | x<- Bool, y <- {Secure,Open}})
+A2 = disconnect -> connect!True!HVAC -> RUN({connect.x.Secure | x<- Bool})
+A3 = RUN({connect.x.y | x<- Bool, y <- {Secure,Open}})
+A4 = disconnect -> connect!True!HVAC -> RUN({connect.x.y | x<- Bool, y <- {Secure,Open}})
+Pattern3A =   let P(n) = 
+				   (n == 0 & connect!True!Secure -> adapt3!n+1 -> ack -> P(n+1))
+				[] (n < MaxConnections and n > 0 & connect!True!Secure -> P(n+1))
+				[] (n > 1 & connect!False!Secure -> P(n-1))
+				[] (n == 1 & connect!False!Secure -> adapt3!0 -> ack -> P(n-1))
+				[] (disconnect -> P(n))
+				[] (update -> P(n))
+				[] (connect?_:Bool?_:{HVAC,Open} -> P(n))
+				within P(0)			
+	
+Pattern3B =   let P(n) = 
+				   (n == 0 & connect!True!Open -> adapt3!n+1 -> ack -> P(n+1))
+				[] (n < MaxConnections and n > 0 & connect!True!Open -> P(n+1))
+				[] (n > 1 & connect!False!Open -> P(n-1))
+				[] (n == 1 & connect!False!Open -> adapt3!0 -> ack -> P(n-1))
+				[] (disconnect -> P(0))
+				[] (update -> P(n))
+				[] (connect?_:Bool?_:{HVAC,Secure} -> P(n))
+				within P(0)
+
+Pattern6 =      (connect?_ -> Pattern6)  [] (disconnect -> Pattern6) [] (update -> adapt6 -> ack -> Pattern6)
+Pi3A =  adapt3?n : Connections ->  
+						if n == 1 then ap!0 -> ack -> Pi3A
+						else if n == 0 then ap!1 -> ack -> Pi3A
+						else ack -> Pi3A
+
+Pi3B =  adapt3?n : Connections ->  
+						if n == 1 then ap!2 -> ack -> Pi3B
+						else if n == 0 then ap!3 -> ack -> Pi3B
+						else ack -> Pi3B
+
+Pi6 =  adapt6 -> ap!4 -> ack -> Pi6
+accessPtComp = let
+			R3A = normal((Pi3A[|{| adapt3,ack |}|] Pattern3A) ) \ {| adapt3,ack|}
+			R3B = normal((Pi3B[|{| adapt3,ack |}|] Pattern3B) ) \ {| adapt3,ack|}
+			R6 = normal((Pi6[|{| adapt6,ack |}|] Pattern6) ) \ {|adapt6,ack|}
+			AdaptationProc = normal(( normal((R3A[| EventsA|] R6) )[|EventsA|] R3B) )
+		within normal((let R = ap?id -> (map(ap,id) /\ R) 
+ within (A0/\ R)[| union( EventsA,{| ap|}) |] AdaptationProc)  \ {| ap|})
+
+
+transparent normal	
+
+datatype Connection = Secure | Open | HVAC
+
+Processes = {0..4}
+MaxConnections = 3
+Connections = {0 .. MaxConnections}
+
+channel connect : Bool.Connection
+channel disconnect 
+channel update
+
+channel ack 
+channel adapt6
+
+Upstairs = let 	
+				EventSet = {|connect.True.HVAC, connect.False.HVAC |}
+				hvacComp = connect?_:Bool!HVAC -> hvacComp
+			within normal((hvacComp[|EventSet|]accessPtComp) )
+ -- File assertions.acsp
+
+Requirement3 = let
+					T(m,n) = (n  == 0  & connect!True!Secure -> disconnect -> connect!True!HVAC-> T(0,n+1))
+							[] (n > 0 and n < MaxConnections & connect!True!Secure -> T(m,n+1))
+							[] (n > 0 & connect!False!Secure -> T(m,n-1))
+							[] (m  == 0  & connect!True!Open -> connect!False!HVAC -> T(m+1,n))
+							[] (m  == 0  & connect!False!Open  -> T(m,n))
+							[] (m > 0 and m < MaxConnections & connect!True!Open -> T(m+1,n))
+							[] (m > 1 & connect!False!Open -> T(m-1,n))
+							[] (m == 1 & connect!False!Open -> connect!True!HVAC -> T(m-1,n))
+							[] (update -> T(m,n))							
+						within connect!True!HVAC ->T(0,0)
+
+
+Requirement6 =  (connect?_?_ -> Requirement6) [] (update -> disconnect -> connect!True!HVAC -> Requirement6) [] (disconnect->Requirement6)
+				
+Requirement3A = let
+					T(n) = (n  == 0  & connect!True!Secure -> disconnect ->  T(n+1))
+							[] (n > 0 and n < MaxConnections & connect!True!Secure -> T(n+1))
+							[] (n > 0 & connect!False!Secure -> T(n-1))
+							[] (n == 0 & connect?_!Open -> T(n))
+							[] (update -> T(n))
+							[] (connect?_!HVAC -> T(n))
+						within T(0)
+
+
+Requirement3B = let
+					T(n) = (n  == 0  & connect!True!Open -> connect!False!HVAC -> T(n+1))
+							[](n  == 0  & connect!False!Open  -> T(n))
+							[] (n > 0 and n < MaxConnections & connect!True!Open -> T(n+1))
+							[] (n > 1 & connect!False!Open -> T(n-1))
+							[] (n == 1 & connect!False!Open -> connect!True!HVAC -> T(n-1))
+							[] (update -> T(n))
+							[] (disconnect -> connect!True!HVAC-> T(0))
+							[] (connect?_!Secure -> T(n))
+						within connect!True!HVAC -> T(0)
+
+assert Requirement6 [T= accessPtComp
+assert Requirement3A [T= accessPtComp
+assert Requirement3B [T= accessPtComp
+
+assert accessPtComp :[deadlock free]
+assert accessPtComp :[deterministic]
+assert accessPtComp :[livelock free]
+
+assert Requirement6 [T= Upstairs
+assert Requirement3A [T= Upstairs
+assert Requirement3B [T= Upstairs
+
+assert Upstairs :[deadlock free]
+assert Upstairs :[deterministic]
+assert Upstairs :[livelock free]
+
+assert Requirement3 [T= normal((Requirement3B[|{|connect,disconnect,update|}|]Requirement3A) )
+
+
+channel ap : {0..4}
+
+map = \ chName,id @ if chName == ap and id == 0 then A2 
+else if chName == ap and id == 1 then A3 
+else if chName == ap and id == 2 then A1 
+else if chName == ap and id == 3 then A0 
+else if chName == ap and id == 4 then A4 
 else SKIP

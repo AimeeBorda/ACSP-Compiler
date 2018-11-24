@@ -82,6 +82,7 @@ proc:     Skip
      	| proc TIMEOUT proc
      	| proc INTR proc
      	| proc SEMICOL proc
+     	| LPAREN proc RPAREN
         | locProcess
 	    | locOutput
 	    | parallelProc
@@ -105,7 +106,7 @@ boolExp
 	| FALSE
 	| ID
 	| number
-	| LBRACE boolExp RBRACE
+	| LPAREN boolExp RPAREN
 	;
 
 

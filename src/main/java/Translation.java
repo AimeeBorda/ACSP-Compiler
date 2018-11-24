@@ -1,8 +1,9 @@
-import org.antlr.v4.runtime.CharStream;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 
-import java.io.*;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 public class Translation {
 
@@ -19,7 +20,7 @@ public class Translation {
         translate("temp.csp");
     }
 
-    public Translation(String input) throws IOException {
+    public Translation(String input) {
         this.input = input;
     }
 

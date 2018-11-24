@@ -76,16 +76,20 @@ public class ACSPTranslator extends ACSPBaseVisitor<String> {
 
     @Override
     public String visitParallelProc(ACSPParser.ParallelProcContext ctx) {
-        String A = ctx.locNames() == null ? "{||}" : "{|"+ visit(ctx.locNames()) +"|}";
+        String A = ctx.locNames() == null ? "" : "{|"+ visit(ctx.locNames()) +"|}";
         String M = visit(ctx.proc(0));
         String N = visit(ctx.proc(1));
 
         String E = A;
-        if(ctx.set() != null) {
-            E = "union("+ visit(ctx.set())+","+A +")";
+        if(ctx.set() != null && !A.isEmpty()) {
+            E = "[| union("+ visit(ctx.set())+","+A +") |]";
+        }else if(A.isEmpty() && ctx.set() != null){
+            E = "[|"+visit(ctx.set())+"|]";
+        } else if(ctx.set() == null && A.isEmpty()){
+            E = "|||";
         }
 
-        return " normal((" +M +"[|"+E+"|]"+N +") \\ " + A+")";
+        return " normal((" +M + E + N +") " + (A.isEmpty()? "" : " \\ " + A)+")";
     }
 
     @Override

@@ -1,0 +1,86 @@
+RoomAB = let 
+			monitorA = Union({Monitors4,Monitors5})
+			monitorB = Union({Monitors5})
+			monitorD = Union({Monitors2, Monitors5})
+			eventsAB = Union({inter(EventsB, monitorA), inter(EventsA,monitorB),inter(EventsA,EventsB), inter(monitorA,monitorB)})
+		within 
+			normal((RmA [| eventsAB |] RmB))
+
+RoomBD = let 
+			monitorB = Union({Monitors5})
+			monitorD = Union({Monitors4, Monitors5})
+			eventsBD = Union({inter(EventsB, monitorD), inter(EventsD,monitorB),inter(EventsD,EventsB), inter(monitorD,monitorB)})
+		within 
+			normal((RmD [| eventsBD |] RmB))
+
+ExhibitionArea = let 
+					monitorA = Union({Monitors4,Monitors5})
+					monitorB = Union({Monitors5})
+					monitorD = Union({Monitors5, Monitors2})
+					uEAD = union(EventsA,EventsB)
+					uMAD = union(monitorA,monitorB)
+					EventSet = Union({inter(uEAD, monitorD), inter(EventsD,uMAD),inter(uEAD,EventsD), inter(uMAD,monitorD)})
+					AllRooms = normal((RoomAB [|EventSet|] RmD))
+				within 
+					normal(AllRooms)
+
+---------------------------------------------
+--		Requirements Assertions
+---------------------------------------------
+channel star
+
+---------- at most MaxAgents people in room D ---------- 
+Requirement2 = let T(n) =   (n < MaxAgents & goto!EB!ED  -> T(n+1)) 
+								[] (n > 0  & goto!ED!Corr -> T(n-1))
+				within T(0)
+
+---------- at most MaxAgentsEA people in the Exhibition Area ----------  
+Requirement4 = let T(n) =   (n < MaxAgentsEA & goto!Corr?_:notR(Corr)  -> T(n+1)) 
+							[] (n >= 0  & goto?_:notR(Corr)!Corr -> T(n-1))
+							[] (goto?_:notR(Corr)?_:notR(Corr) -> T(n))
+			within T(0)
+
+---------- Logical Movement through Exhibition Area ---------- 
+Movement = let M(a,b,d) = (a > 0 and b <= MaxAgentsEA & goto!EA!EB -> M(a-1,b+1,d)) 
+							[] (b > 0 and a <= MaxAgentsEA & goto!EB!EA -> M(a+1,b-1,d))
+							[] (b > 0 and d <= MaxAgentsEA & goto!EB!ED -> M(a,b-1,d+1)) 
+							[] (d > 0 & goto!ED!Corr -> M(a,b,d-1)) 
+							[] (a > 0 & goto!EA!Corr -> M(a-1,b,d)) 
+							[] (a <= MaxAgentsEA & goto!Corr!EA -> M(a+1,b,d)) 
+			within M(0,0,0)
+
+
+---------- The people in the building should be able to reach the nearest emergency exit (With no composition) ---------- 
+--Requirement5D = ((emergency -> RUN(EventsD) [|EventsD|] BehaviourD)
+
+Requirement5D = ((Requirement2 /\ emergency -> RUN(EventsD)) [| EventsD |] BehaviourD)
+assert Requirement5D [F= (emergency -> SKIP [|{emergency}|] RmD)
+
+Requirement5B =  (BehaviourB /\ emergency -> RUN(EventsB)) [| EventsB |] BehaviourB
+assert Requirement5B [F= (emergency -> SKIP [|{emergency}|] RmB)
+
+assert Requirement5A [F= (emergency -> SKIP [|{emergency}|] ExhibitionArea)
+
+
+---------------------------------------------
+--	 Requirement 2 (First Approach)
+---------------------------------------------
+
+assert Requirement2 [T= (RmD [|{|emergency|}|] STOP)
+assert ((Requirement2 [|inter(EventsD,EventsB) |] RmB) [|{|emergency|}|] STOP) [T= (RoomBD  [|{|emergency|}|] STOP)
+assert ((Requirement2 [| EventsD |] RoomAB) [|{|emergency|}|] STOP) [T= (ExhibitionArea [|{|emergency|}|] STOP)
+
+---------------------------------------------
+--	 Requirement 4 (First Approach)
+---------------------------------------------
+
+assert Requirement4 [T= (ExhibitionArea [|{|emergency|}|] STOP)
+
+
+Requirement5A =  let
+					eventsAB = union(EventsB,EventsA)
+					events = Union({EventsA,EventsB,EventsD})
+					Y = (Requirement4 [|EventsD|] Requirement2)
+					X = (Y /\ (emergency -> RUN(events)))
+				within
+					(X [| {|goto|} |] Movement)
