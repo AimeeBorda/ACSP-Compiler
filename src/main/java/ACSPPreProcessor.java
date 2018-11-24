@@ -49,17 +49,17 @@ public class ACSPPreProcessor extends ACSPBaseVisitor<Environment> {
     @Override
     public Environment visitLocNames(ACSPParser.LocNamesContext ctx) {
         Environment g = defaultResult();
-        ctx.ID().stream().map(l -> l.getText()).forEach(l ->{
-            g.out(l);
-            g.in(l);
-        });
-        return g;
+        Environment environment = ctx.ID().stream().map(l -> l.getText()).map(g::bound).reduce((r, m) -> r.merge(m)).orElse(defaultResult());
+        return environment;
     }
 
-    @Override
-    public Environment visitParallelProc(ACSPParser.ParallelProcContext ctx) {
-        return visit(ctx.proc(0)).merge(visit(ctx.proc(1)));
-    }
+//    @Override
+//    public Environment visitParallelProc(ACSPParser.ParallelProcContext ctx) {
+//
+//        Environment env = visit(ctx.proc(0)).merge(visit(ctx.proc(1)));
+//
+//        return env.diff(visit(ctx.locNames()));
+//    }
 
     @Override
     public Environment visitLetProc(ACSPParser.LetProcContext ctx) {

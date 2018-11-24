@@ -6,18 +6,24 @@ public class Environment {
     private HashSet<String> in = new HashSet<>();
     private HashSet<String> out = new HashSet<>();
     private HashSet<String> callDependency = new HashSet<>();
+    private HashSet<String> bound = new HashSet<>();
 
     public Environment(HashMap<String, Environment> locMap) {
         this.locMap = locMap;
     }
 
 
-    public Environment in(String loc){
+    public Environment in(String loc) {
         in.add(loc);
         return this;
     }
 
-    public void removeAllIn(HashSet<String> loc){
+    public Environment bound(String loc) {
+        bound.add(loc);
+        return this;
+    }
+
+    public void removeAllIn(HashSet<String> loc) {
         in.removeAll(loc);
     }
 
@@ -25,17 +31,17 @@ public class Environment {
         out.removeAll(prefixes);
     }
 
-    public Environment out(String loc){
+    public Environment out(String loc) {
         out.add(loc);
         return this;
     }
 
-    public Environment call(String proc){
+    public Environment call(String proc) {
         callDependency.add(proc);
         return this;
     }
 
-    public Environment merge(Environment e){
+    public Environment merge(Environment e) {
         Environment env = new Environment(this.locMap);
 
         env.in.addAll(in);
@@ -47,11 +53,14 @@ public class Environment {
         env.callDependency.addAll(callDependency);
         env.callDependency.addAll(e.callDependency);
 
+        env.bound.addAll(bound);
+        env.bound.addAll(e.bound);
+
         return env;
     }
 
 
-    public Environment diff(Environment e){
+    public Environment diff(Environment e) {
         Environment env = new Environment(this.locMap);
 
         env.in.addAll(in);
@@ -60,51 +69,73 @@ public class Environment {
         env.out.addAll(out);
         env.out.removeAll(e.out);
 
-        env.callDependency.addAll(callDependency);
-        env.callDependency.removeAll(e.callDependency);
+        env.bound.addAll(bound);
+        env.bound.removeAll(e.bound);
 
         return env;
     }
 
-    public boolean isEmpty(){
+    public boolean isEmpty() {
         return locations().isEmpty() && prefixes().isEmpty();
     }
 
-    public HashSet<String> getCallDependency(){
-        HashSet<String> s = new HashSet<>(callDependency);
+    public Stack<String> getCallGraph() {
+        Stack<String> callGraph = new Stack<>();
+        callGraph.addAll(callDependency);
 
-        HashSet<String> res = new HashSet<>(callDependency);
-        while(!s.isEmpty()){
-            ArrayList<String> iterator = new ArrayList<>(s);
-            s.clear();
-            for(String next : iterator){
-                if(locMap.containsKey(next)){
-                    Environment env = locMap.get(next);
-                    s.addAll(env.callDependency);
-                    res.addAll(env.callDependency);
-                }
+        while (!callGraph.isEmpty()) {
+            String proc = callGraph.pop();
+
+            if (locMap.containsKey(proc)) {
+                Environment env = locMap.get(proc);
+                callGraph.addAll(env.callDependency);
             }
         }
 
+        return callGraph;
+    }
+
+
+    public HashSet<String> locations() {
+        HashSet<String> res = new HashSet<>();
+        Stack<String> callGraph = getCallGraph();
+        HashMap<String,Boolean> memo = new HashMap<>();
+
+        while(!callGraph.isEmpty()){
+            String next = callGraph.pop();
+            if (!memo.containsKey(next) && locMap.containsKey(next)) {
+                Environment env = locMap.get(next);
+                res.addAll(env.in);
+                res.removeAll(env.bound);
+
+                memo.put(next,true);
+            }
+        }
+
+        res.addAll(in);
+        res.removeAll(bound);
+
         return res;
     }
 
-    public HashSet<String> locations(){
-        HashSet<String> res = new HashSet<>(in);
-        for(String next : getCallDependency()){
-            Environment env = locMap.get(next);
-            res.addAll(env.in);
+    public HashSet<String> prefixes() {
+        HashSet<String> res = new HashSet<>();
+        Stack<String> callGraph = getCallGraph();
+        HashMap<String,Boolean> memo = new HashMap<>();
+
+        while(!callGraph.isEmpty()){
+            String next = callGraph.pop();
+            if (!memo.containsKey(next) && locMap.containsKey(next)) {
+                Environment env = locMap.get(next);
+                res.addAll(env.out);
+                res.removeAll(env.bound);
+
+                memo.put(next,true);
+            }
         }
 
-        return res;
-    }
-
-    public HashSet<String> prefixes(){
-        HashSet<String> res = new HashSet<>(out);
-        for(String next : getCallDependency()){
-            Environment env = locMap.get(next);
-            res.addAll(env.out);
-        }
+        res.addAll(out);
+        res.removeAll(bound);
 
         return res;
     }

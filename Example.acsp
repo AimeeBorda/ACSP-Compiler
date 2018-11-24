@@ -1,6 +1,3 @@
-R = (new l)(B ||| P)
-P = B
-B = l[SKIP]
-T = l!<STOP>.SKIP
-Y = l!<SKIP>.SKIP
-assert R:[deterministic]
+-- Example 3
+D = (new l,m,n)((l[SKIP] ||| m[SKIP]) ||| (l!<SKIP>.SKIP ||| n!<SKIP>.SKIP))
+assert D :[deadlock free [F]]

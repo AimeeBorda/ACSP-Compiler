@@ -53,7 +53,10 @@ public class ACSPTypeChecker extends ACSPBaseVisitor<Environment> {
 
     @Override
     public Environment visitAssertDefinition(ACSPParser.AssertDefinitionContext ctx) {
-        if(ctx.children.stream().map(c ->visit(c)).anyMatch(e -> !e.isEmpty())){
+
+        if(ctx.proc().stream().map(c ->visit(c)).anyMatch(e -> !e.isEmpty()) ||
+                (ctx.definitionLeft() != null && !visit(ctx.definitionLeft()).isEmpty())
+        ){
             errors.add("error in assertion "+ctx.getText()+" is not well typed");
         }
 

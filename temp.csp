@@ -1,15 +1,14 @@
 transparent normal 
 
-R = normal((B[|{| l|}|] P) \ {| l|})
-P = B
-B =let R = l?id -> (map(l,id) /\ R) 
- within (SKIP/\ R)
-T = l!0 -> SKIP
-Y = l!1 -> SKIP
-assert R:[deterministic]
 
-channel l : {0..1}
+D = normal(((let R = l?id -> (map(l,id) /\ R) 
+ within (SKIP/\ R) |||let R = m?id -> (map(m,id) /\ R) 
+ within (SKIP/\ R))[|{| l,m,n|}|] ( l!0 -> SKIP ||| n!0 -> SKIP)) \ {| l,m,n|})
+assert D :[deadlock free [F]]
 
-map = \ chName,id @ if chName == l and id == 0 then STOP 
-else if chName == l and id == 1 then SKIP 
+channel l : {0..0}
+channel n : {0..0}
+
+map = \ chName,id @ if chName == l and id == 0 then SKIP 
+else if chName == n and id == 0 then SKIP 
 else SKIP
