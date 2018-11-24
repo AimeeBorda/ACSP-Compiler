@@ -8,5 +8,7 @@ A compiler from A-CSP to CSP integrated with the FDR API.
 - Java 8 
 
 ## Setup
+Translation is the main class which takes as arguments the input file name. It produces a temp.csp file containing the translation and opens FDR with temp.csp. Any errors will be shown on the console.
 
-## Running the translator
+## Example
+The folder example has two case-studies: Art Gallery and Smart Stadium. These case-studies were used as part of the Evaluation of a thesis approach.
