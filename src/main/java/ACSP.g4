@@ -93,11 +93,11 @@ proc:     Skip
 event : ID ((QUERY | PLING | DOLLAR) any (COLLON type)?)*;
 locProcess : ID LBRACKET proc RBRACKET ;
 locOutput :  ID PLING LT proc GT DOT proc ;
-parallelProc :  (LPAREN NEW locNames RPAREN)? LPAREN proc (LSYNC set RSYNC | INTL) proc RPAREN;
+parallelProc :  (LPAREN NEW locNames RPAREN)? LPAREN proc parallelSync proc RPAREN;
 letProc : LET simpleDefinition+ WITHIN any;
 
 locNames: ID(COMMA ID)*;
-
+parallelSync : (LSYNC set RSYNC | INTL | LBRACKET set BAR BAR set RBRACKET);
 boolExp
 	: NOT boolExp
 	| expr (LT | GT | LTEQ | GTEQ | EQ | NEQ) expr

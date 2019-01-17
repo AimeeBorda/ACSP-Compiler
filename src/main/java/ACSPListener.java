@@ -1,4 +1,4 @@
-// Generated from /Users/aimee/IdeaProjects/untitled/src/main/java/ACSP.g4 by ANTLR 4.7
+// Generated from /Users/aimeeborda/ACSP-Compiler/src/main/java/ACSP.g4 by ANTLR 4.7
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
@@ -256,6 +256,16 @@ public interface ACSPListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitLocNames(ACSPParser.LocNamesContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ACSPParser#parallelSync}.
+	 * @param ctx the parse tree
+	 */
+	void enterParallelSync(ACSPParser.ParallelSyncContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ACSPParser#parallelSync}.
+	 * @param ctx the parse tree
+	 */
+	void exitParallelSync(ACSPParser.ParallelSyncContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link ACSPParser#boolExp}.
 	 * @param ctx the parse tree

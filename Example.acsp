@@ -1,0 +1,2 @@
+channel a
+P = (new l)(SKIP [|{a}|] SKIP)
