@@ -1,0 +1,54 @@
+---------------------------------------------
+--		Data Definitions
+---------------------------------------------
+transparent normal
+
+datatype State = Before | During | After
+datatype IDS = H.{0..NumSections} | L.{0..NumSections} | VIP.{0..NumSections} | Corr  | Emp
+
+subtype SectionID = H.{0..NumSections} | L.{0..NumSections} | VIP.{0..NumSections}  | Corr
+subtype Agent = VIP.{0..NumSections} | H.{0..NumSections} | L.{0..NumSections}  | Emp
+
+
+NumSections = 35 -- 35
+SectionSize = 100 -- 800 -- compiled in 667.77s (11 mins)
+---------------------------------------------
+--		First-order events
+---------------------------------------------
+
+channel goto : Agent.SectionID.SectionID
+channel event : State
+channel alarm : SectionID
+channel wind
+channel noisy : SectionID
+channel open : SectionID.SectionID
+channel lights : SectionID.Bool
+channel empty 
+
+channel ac : {0.. 7} 						-- location for a section
+
+
+---------------------------------------------
+--		Encoding
+---------------------------------------------
+include "Section.csp"
+
+---------------------------------------------
+--		Compositon
+---------------------------------------------
+
+Stands = let 	
+			globalEvents = {|wind,event|}
+			corrEvents = {goto.a.x.Corr,goto.a.Corr.x | a <- Agent, x <- SectionID}
+			sectionEvents =  \ id @ {goto.a.x.id,goto.a.id.x,open.x.id,open.id.x | a <- Agent, x <- SectionID} 
+			append(type,n) = (Section(type.n) [|union(globalEvents, sectionEvents(type.n)) |] n > 0 & append(type, n - 1 ))
+			normalSection = (append(H, NumSections) [| union(corrEvents,globalEvents) |] append(L, NumSections))
+			vipSection = append(VIP, NumSections)
+		within 
+			(vipSection [| union(corrEvents,globalEvents) |] normalSection)
+
+---------------------------------------------
+--		Assertions
+---------------------------------------------
+
+include "assertions.csp"
