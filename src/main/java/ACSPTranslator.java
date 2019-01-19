@@ -96,7 +96,7 @@ public class ACSPTranslator extends ACSPBaseVisitor<String> {
     public String visitLocNames(ACSPParser.LocNamesContext ctx) {
 
         String names = super.visitLocNames(ctx);
-        Arrays.stream(names.split(",")).forEach(l -> locations.putIfAbsent(l,new LinkedHashSet<>()));
+        Arrays.stream(names.split(",")).map(l -> l.trim()).forEach(l -> locations.putIfAbsent(l,new LinkedHashSet<>()));
         return names;
     }
 
