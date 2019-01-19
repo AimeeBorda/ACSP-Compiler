@@ -45,7 +45,7 @@ public class ACSPTypeChecker extends ACSPBaseVisitor<Environment> {
 
     @Override
     public Environment visitSimpleDefinition(ACSPParser.SimpleDefinitionContext ctx) {
-        String key = ctx.definitionLeft().ID().getText();
+        String key = ctx.definitionLeft().ID(ctx.definitionLeft().ID().size()-1).getText();
         Environment any = visit(ctx.any());
 
         locMap.compute(key, (k, v) -> (v == null) ? any : v.merge(any));
@@ -129,7 +129,7 @@ public class ACSPTypeChecker extends ACSPBaseVisitor<Environment> {
         Environment withinStat = visit(ctx.any());
 
         for(ACSPParser.SimpleDefinitionContext c : ctx.simpleDefinition()){
-            locMap.remove(c.definitionLeft().ID().getText());
+            locMap.remove(c.definitionLeft().ID(c.definitionLeft().ID().size()-1).getText());
         }
 
         return withinStat;

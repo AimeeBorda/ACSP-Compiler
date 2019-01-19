@@ -2,13 +2,14 @@ grammar ACSP;
 
 spec : definition*;
 
-definition : dataTypeDefinition | channelDecl  | assertDefinition | funcImport | includeFile |  simpleDefinition;
+definition : dataTypeDefinition | channelDecl  | assertDefinition | funcImport | includeFile  | simpleDefinition;
 
 includeFile : INCLUDE DBLQUOTE ID (DIV ID)* DOT ACSP DBLQUOTE;
 
 funcImport : (TRANSPARENT | EXTERNAL) ID ;
 
 dataTypeDefinition : (DATATYPE | SUBTYPE | NAMETYPE) ID EQUAL type (BAR type)*;
+
 
 channelDecl : CHANNEL channelNames (channelColonType)?;
 
@@ -57,6 +58,7 @@ modelCheckType
 
 type
 	: ID
+	| number
 	| type DOT type
 	| set
 	;
@@ -66,7 +68,7 @@ set
 	: (LBRACE (any(COMMA any)*|(any DOT DOT any)?) RBRACE)
 	| (LBBRACE (any(COMMA any)*|(any DOT DOT any)?) RBBRACE)
 	| definitionLeft
-	| LBRACE any BAR setComprehension(COMMA setComprehension)* RBRACE
+	| LBRACE (any(COMMA any)*) BAR setComprehension(COMMA setComprehension)* RBRACE
 	;
 
 setComprehension : any RARROW type | boolExp;
@@ -90,7 +92,7 @@ proc:     Skip
 	    | definitionLeft
 	    ;
 
-event : ID ((QUERY | PLING | DOLLAR) any (COLLON type)?)*;
+event : ID ((QUERY | PLING | DOLLAR | DOT) ID (COLLON type)?)*;
 locProcess : ID LBRACKET proc RBRACKET ;
 locOutput :  ID PLING LT proc GT DOT proc ;
 parallelProc :  (LPAREN NEW locNames RPAREN)? LPAREN proc parallelSync proc RPAREN;
@@ -104,7 +106,7 @@ boolExp
 	| boolExp  (AND | OR) boolExp
 	| TRUE
 	| FALSE
-	| ID
+	| definitionLeft
 	| number
 	| LPAREN boolExp RPAREN
 	;
@@ -199,6 +201,7 @@ EXTERNAL : 'external';
 NAMETYPE : 'nametype';
 DIGIT: ('0' .. '9');
 POR : 'partial order reduce';
+
 
 ID : [a-zA-Z_][a-zA-Z0-9'_]*	;
 

@@ -1,32 +1,18 @@
-
-transparent normal
-
-datatype State = Before | During | After
-datatype IDS = H.{0..NumSections} | L.{0..NumSections} | VIP.{0..NumSections} | Corr  | Emp
-
-subtype SectionID = H.{0..NumSections} | L.{0..NumSections} | VIP.{0..NumSections}  | Corr
-subtype Agent = VIP.{0..NumSections} | H.{0..NumSections} | L.{0..NumSections}  | Emp
-
-
-NumSections = 5
-SectionSize = 5
-
-channel goto : Agent.SectionID.SectionID
-channel event : State
-channel alarm : SectionID
-channel wind
-channel noisy : SectionID
-channel open : SectionID.SectionID
-channel lights : SectionID.Bool
-channel empty
- -- File /Users/aimee/IdeaProjects/ACSP Compiler/Examples/Stadium/Section.acsp
 module Sec(s)
-channel ac : {0.. 7}
+
+ ---------------------------------------------
+--		Adaptation Events
+---------------------------------------------
+channel ac : {0.. 7} 						-- location for a section
 
 channel adapt
 channel adapt1 : Bool
 
 channel ack
+
+---------------------------------------------
+--		Helper Functions
+---------------------------------------------
 
 
 next(Corr) = Corr
@@ -49,6 +35,10 @@ locEvents = union( {goto.y.x | x <- sections, y<- Agent} ,{open.x | x <- openEvt
 events = Union({locEvents, monEvents, {|empty|}})
 adEvents = {|ack,adapt,adapt1|}
 
+---------------------------------------------
+--		Processes for A Section
+---------------------------------------------
+
 Behaviour(n) = (n > 0 & goto?_:{x | x<- Agent, x!= Emp}!s?_: adj -> Behaviour(n-1))
 				[] (n < SectionSize & goto?_:{x | x<- Agent, x!= Emp}?_:adj!s -> Behaviour(n+1))
 				[] (goto!Emp?_:sections -> Behaviour(n))
@@ -58,7 +48,12 @@ Behaviour(n) = (n > 0 & goto?_:{x | x<- Agent, x!= Emp}!s?_: adj -> Behaviour(n-
 SOpen = goto?_:{s,Emp}?_:adj!s -> SOpen [] goto?_:{s,Emp}!s?_ :adj -> SOpen
 SExitAdj = goto!Emp?_:sections ->  SExit [] goto?_!s!Corr -> SExit [] goto?_?_:{next(s), prev(s)}!s -> SExit 
 SRoaming = goto?_?_:adj!s -> SRoaming	[] goto?_!s?_: adj -> SRoaming
-SExit = goto!Emp?_:sections ->  SExit [] goto?_!s!Corr -> SExit
+SExit = goto!Emp?_:sections ->  SExit [] goto?_!s!Corr -> SExit 
+
+
+---------------------------------------------
+--		Pattern for Req. A : event Pi (Before: ticketType)
+---------------------------------------------
 
 PA = let B = (event!Before  -> adapt -> ack -> B) 
 				[] (goto?_?_: sections -> B) 
@@ -70,7 +65,12 @@ PA = let B = (event!Before  -> adapt -> ack -> B)
 				[] (noisy!s -> B)
 		within B
 
-FA = adapt -> ac!0 ->  ack -> FA
+FA = adapt -> ac!<SOpen>. ack -> FA
+
+
+---------------------------------------------
+--		Pattern for Req. B : event Pi After
+---------------------------------------------
 
 PB = let B(aft,others) = (event!After  -> adapt1!False -> ack -> B(True,others)) 
 				[] (goto?_?_: sections -> B(aft,others)) 
@@ -83,7 +83,11 @@ PB = let B(aft,others) = (event!After  -> adapt1!False -> ack -> B(True,others))
 				[] (noisy!s -> B(aft,others))
 	within B(False,False)
 
-FB = adapt1?emp -> if not emp then ac!1 -> ack -> FB  else if  emp then ac!2 -> ack->FB else ack->FB
+FB = adapt1?emp -> if not emp then  ac!<(SExit ||| open!s?_ : {x | x <- adj, x!= Corr} -> SKIP)>.ack -> FB  else if  emp then ac!<(SExit ||| open?_ : {x | x <- adj, x!= Corr}!s -> SKIP)>.ack->FB else ack->FB
+
+---------------------------------------------
+--		Pattern for Req. C : alarm => exit
+---------------------------------------------
 
 PC = let B = (alarm!s  -> adapt-> ack -> B) 
 				[] (goto?_?_: sections -> B) 
@@ -94,7 +98,11 @@ PC = let B = (alarm!s  -> adapt-> ack -> B)
 				[] (wind -> B) 
 	within B
 
-FC = adapt -> ac!1 ->  ack -> FC
+FC = adapt -> ac!<(SExit ||| open!s?_ : {x | x <- adj, x!= Corr} -> SKIP)>. ack -> FC
+
+---------------------------------------------
+--		Pattern for Req. D : during roam unless empty, alarm, wind, noisy
+---------------------------------------------
 
 PD = let 
 			B(others,emp,dur) =  
@@ -114,7 +122,10 @@ PD = let
 		
 		within B(False,True,False)
  
-FD = adapt1?emp:Bool -> if not emp then ac!3 ->  ack -> FD else if emp then ac!4 ->  ack -> FD else ack -> FD
+FD = adapt1?emp:Bool -> if not emp then ac!<SRoaming>. ack -> FD else if emp then ac!<(SOpen ||| (open?_ : {x | x <-SectionID, x!=s, x!=Corr}!s -> SKIP))>. ack -> FD else ack -> FD
+---------------------------------------------
+--		Pattern for Req. E : windy => (close H and open backup) or (ticketType)
+---------------------------------------------
 
 PE = let 
 			A(alrm,w,dur) = 
@@ -132,7 +143,11 @@ PE = let
 				[] (noisy!s -> A(alrm,w,dur))
 		within A(False,False,False)
  
-FE = adapt1?backup -> if not backup then ac!5 ->  ack -> FE else if backup then ac!6 ->  ack -> FE else ack->FE
+FE = adapt1?backup -> if not backup then ac!<(SOpen ||| (open!s?_ : {L.x, VIP.x | x <- {0..NumSections}} -> SKIP))>. ack -> FE else if backup then ac!<(SExit ||| (open!s?_ : {x | x <- adj, x!= Corr} -> SKIP))>. ack -> FE else ack->FE
+
+---------------------------------------------
+--		Pattern for Req. F : if noisy by ticket type and open backup
+---------------------------------------------
 
 PF = let
 			B(ev,o) = (goto?_ ?_: sections-> B(ev,o)) 
@@ -147,7 +162,11 @@ PF = let
 	
 		within B(False,False) 
 
-FF = adapt -> ac!7 ->  ack -> FF
+FF = adapt -> ac!<(SOpen   ||| (open!s?_ : {x | x <- SectionID, x!=s,x!=Corr}-> SKIP))>. ack -> FF
+
+---------------------------------------------
+--		Pattern for Req. G : empty can be used as a backup (empty event, no backup if wind,alarm)
+---------------------------------------------
 
 PG = let B(o,e,d) = (goto!Emp?_: adj!s -> B(o,e,d)) 
 				[] (goto?_:notE?_: adj!s -> B(o,False,d)) 
@@ -164,37 +183,46 @@ PG = let B(o,e,d) = (goto!Emp?_: adj!s -> B(o,e,d))
 				
 		within B(False,True,False)
 
-FG = adapt1?d -> if d then ac!3 ->  ack -> FG else if not d then ac!8 ->  ack -> FG else ack -> FG
+FG = adapt1?d -> if d then ac!<SRoaming>. ack -> FG else if not d then ac!<SExitAdj>. ack -> FG else ack -> FG
+
+
+---------------------------------------------
+--		Composition
+---------------------------------------------
 
 AccessController = let
 		
 		
-		RA = normal((PA[|adEvents|] FA) ) \ adEvents
-		RB = normal((PB[|adEvents|] FB) ) \ adEvents
-		RC = normal((PC[|adEvents|] FC) ) \ adEvents
-		RD = normal((PD[|adEvents|] FD) ) \ adEvents
-		RE = normal((PE[|adEvents|] FE) ) \ adEvents
-		RF = normal((PF[|adEvents|] FF) ) \ adEvents
-		RG = normal((PG[|adEvents|] FG) ) \ adEvents
+		RA = (PA [| adEvents |] FA) \ adEvents
+		RB = (PB [| adEvents |] FB) \ adEvents
+		RC = (PC [| adEvents |] FC) \ adEvents
+		RD = (PD [| adEvents |] FD) \ adEvents
+		RE = (PE [| adEvents |] FE) \ adEvents
+		RF = (PF [| adEvents |] FF) \ adEvents
+		RG = (PG [| adEvents |] FG) \ adEvents
 
-		C1 = normal((RA[|events|] RB) )
-		C2 = normal((C1[|events|] RC) )
-		C3 = normal((C2[|events|] RD) )
-		C4 = normal((C3[|events|] RE) )
-		C5 = normal((C4[|events|] RF) )
-		C6 = normal((C5[|events|] RG) )
+		C1 = (RA [| events |] RB)
+		C2 = (C1 [| events |] RC)
+		C3 = (C2 [| events |] RD)
+		C4 = (C3 [| events |] RE)
+		C5 = (C4 [| events |] RF)
+		C6 = (C5 [| events |] RG)
 
 
-		AdaptationProc = normal((C6[|{|goto,empty|}|] Behaviour(0)) )
+		AdaptationProc = (C6 [|{|goto,empty|}|] Behaviour(0))
 		
-	within normal((let R = ac?id -> (map(ac,id) /\ R) 
- within (SExit/\ R)[|union( locEvents,{| ac|})|] AdaptationProc)  \ {| ac|})
+	within
+			(new ac)(ac[SExit] [| locEvents |] AdaptationProc)
 
 EventStatus = event!Before -> event!During -> event!After -> EventStatus
 
 exports
 
-Section = normal((AccessController[|{|event|}|] EventStatus) )
+Section = (AccessController [|{|event|}|] EventStatus)
+
+---------------------------------------------
+--		Req. 1: enter on ticket type
+---------------------------------------------
 
 ReqA = 	let 
 				R =  (goto?_?_:sections -> R) 
@@ -215,6 +243,11 @@ ReqA = 	let
 					[] (alarm!s -> R) 
 					[] (goto?_!s?_: adj -> B) 
 			within R
+
+---------------------------------------------
+--		Req. 0: after => exit only 
+--		TODO: how do I check open as well on exit
+---------------------------------------------
 
 ReqB = 	let 
 				
@@ -243,6 +276,10 @@ ReqB = 	let
 			within 
 				B(False)
 
+---------------------------------------------
+--		Req. 3:  alarm => exit
+---------------------------------------------
+
 ReqC = 	let 
 				R =  (goto?_ ?_:sections-> R) 
 					[] (noisy!s -> R) 
@@ -264,6 +301,10 @@ ReqC = 	let
 			within 
 				R
 
+---------------------------------------------
+--		Req. 2: during visitors can roam unless empty
+---------------------------------------------
+
 ReqD = 	let R(emp) = (event!Before -> R(True)) [] (event!During -> during(emp)) [] (event!After -> R(emp)) 
 							[] (goto?_: notE?_ :adj!s -> R(False)) [] (goto!Emp?_:adj!s -> R(emp)) [] (goto?_!s?_ :adj-> R(emp))
 							[] (noisy!s -> R(emp)) [] (wind -> R(emp)) [] (alarm!s -> R(emp)) [] (open?_ :openEvt-> R(emp)) [] (empty -> R(emp)) 
@@ -281,6 +322,10 @@ ReqD = 	let R(emp) = (event!Before -> R(True)) [] (event!During -> during(emp)) 
 							[] (empty -> during(b)) 
 			within 
 				  R(True)
+
+---------------------------------------------
+--		Req. E:  windy => close H (may need to change for during only)
+---------------------------------------------
 
 ReqE = let 	
 				R1(w) = (goto?_?_:sections -> R1(w)) [] (noisy!s -> R1(w)) [] (wind -> R1(member(s, {|H|}))) 
@@ -302,6 +347,10 @@ ReqE = let
 					[] (not w & open?_ : {x | x <- SectionID, x!= s, x!=Corr}!s -> W(backup,w))	
 			within
 				R1(False)
+
+---------------------------------------------
+--		Req. F:  noisy => open if Closed (need to check that open is performed)
+---------------------------------------------
 
 ReqF = let 
 			R =  (goto?_?_:sections -> R)
@@ -325,6 +374,10 @@ ReqF = let
 					[] (n & goto!s?_:adj!s -> B(n))
 					[] (not n & goto?_:notE?_:adj!s -> B(n))
 			within R
+
+---------------------------------------------
+--		Req. G:  empty can be used as a backup TODO: for when empty
+---------------------------------------------
 
 ReqG = 	let 
 			R(other,emp,opn) = (goto!Emp?_ :sections-> R(other,emp,opn)) 
@@ -373,38 +426,3 @@ ReqG = 	let
 			B(False,True,False)
 
 endmodule
-
- -- File /Users/aimee/IdeaProjects/ACSP Compiler/Examples/Stadium/assertions.acsp
-
-
-
-instance LSec = Sec(L.0)
-instance HSec = Sec(H.1)
-instance VIPSec = Sec(VIP.2)
-
-assert LSec::ReqA [T= LSec::Section 
-
-assert LSec::ReqB [T= LSec::Section 
-assert LSec::ReqC [T= LSec::Section 
-assert LSec::ReqD [T= LSec::Section 
-assert LSec::ReqE [T= LSec::Section 
-assert LSec::ReqF [T= LSec::Section 
-assert LSec::ReqG [T= LSec::Section
-
-assert LSec::Section :[deterministic]
-assert LSec::Section :[deadlock free]
-assert LSec::Section :[livelock free]
-
-
-channel ac : {0..8}
-
-map = \ chName,id @ if chName == ac and id == 0 then SOpen 
-else if chName == ac and id == 1 then  normal((SExit||| open!s?_ : {x | x <- adj, x!= Corr} -> SKIP) ) 
-else if chName == ac and id == 2 then  normal((SExit||| open?_ : {x | x <- adj, x!= Corr}!s -> SKIP) ) 
-else if chName == ac and id == 3 then SRoaming 
-else if chName == ac and id == 4 then  normal((SOpen||| (open?_ : {x | x <-SectionID, x!=s, x!=Corr}!s -> SKIP)) ) 
-else if chName == ac and id == 5 then  normal((SOpen||| (open!s?_ : {L.x, VIP.x | x <- {0..NumSections}} -> SKIP)) ) 
-else if chName == ac and id == 6 then  normal((SExit||| (open!s?_ : {x | x <- adj, x!= Corr} -> SKIP)) ) 
-else if chName == ac and id == 7 then  normal((SOpen||| (open!s?_ : {x | x <- SectionID, x!=s,x!=Corr}-> SKIP)) ) 
-else if chName == ac and id == 8 then SExitAdj 
-else SKIP
