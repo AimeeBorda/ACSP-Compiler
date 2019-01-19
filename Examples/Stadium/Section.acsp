@@ -1,9 +1,8 @@
-module Sec(s)
-
  ---------------------------------------------
 --		Adaptation Events
 ---------------------------------------------
-channel ac : {0.. 7} 						-- location for a section
+s = L.0
+
 
 channel adapt
 channel adapt1 : Bool
@@ -14,15 +13,13 @@ channel ack
 --		Helper Functions
 ---------------------------------------------
 
+t(x) = (x + 1) %NumSections
+next(y.x) = y.t(x)
+next(_) = Corr
 
-next(Corr) = Corr
-
-
-prev(Corr) = Corr
-
-
-
-
+r(x) = (x - 1) %NumSections
+prev(y.x) = y.r(x)
+prev(_) = Corr
 
 notE = {x | x <- Agent, x != Emp}
 
@@ -49,7 +46,11 @@ SOpen = goto?_:{s,Emp}?_:adj!s -> SOpen [] goto?_:{s,Emp}!s?_ :adj -> SOpen
 SExitAdj = goto!Emp?_:sections ->  SExit [] goto?_!s!Corr -> SExit [] goto?_?_:{next(s), prev(s)}!s -> SExit 
 SRoaming = goto?_?_:adj!s -> SRoaming	[] goto?_!s?_: adj -> SRoaming
 SExit = goto!Emp?_:sections ->  SExit [] goto?_!s!Corr -> SExit 
-
+AC_3 = (SOpen ||| (open?_ : {x | x <-SectionID, x!=s, x!=Corr}!s -> SKIP))
+AC_5 = (SOpen   ||| (open!s?_ : {x | x <- SectionID, x!=s,x!=Corr}-> SKIP))
+AC_4 = (SOpen 	 ||| (open!s?_ : {L.x, VIP.x | x <- {0..NumSections}} -> SKIP))
+AC_2 = (SExit ||| open?_ : {x | x <- adj, x!= Corr}!s -> SKIP)
+AC_1 = (SExit ||| open!s?_ : {x | x <- adj, x!= Corr} -> SKIP)
 
 ---------------------------------------------
 --		Pattern for Req. A : event Pi (Before: ticketType)
@@ -65,7 +66,7 @@ PA = let B = (event!Before  -> adapt -> ack -> B)
 				[] (noisy!s -> B)
 		within B
 
-FA = adapt -> ac!<SOpen>. ack -> FA
+FA = adapt -> ac!<SOpen>.ack -> FA
 
 
 ---------------------------------------------
@@ -79,11 +80,11 @@ PB = let B(aft,others) = (event!After  -> adapt1!False -> ack -> B(True,others))
 				[] (open?_ : openEvt -> B(aft,others))
 				[] (alarm!s -> B(aft,True)) 
 				[] (empty -> if not others and aft then adapt1!True -> ack -> B(aft,others) else B(aft,others)) 
-				[] (wind -> B(aft,others or member(s,{|H|})))
+				[] (wind -> B(aft,others or member(s,{|H|}))) 
 				[] (noisy!s -> B(aft,others))
 	within B(False,False)
 
-FB = adapt1?emp -> if not emp then  ac!<(SExit ||| open!s?_ : {x | x <- adj, x!= Corr} -> SKIP)>.ack -> FB  else if  emp then ac!<(SExit ||| open?_ : {x | x <- adj, x!= Corr}!s -> SKIP)>.ack->FB else ack->FB
+FB = adapt1?emp -> if not emp then  ac!<AC_1>.ack -> FB  else if  emp then ac!<AC_2>.ack->FB else ack->FB
 
 ---------------------------------------------
 --		Pattern for Req. C : alarm => exit
@@ -98,7 +99,7 @@ PC = let B = (alarm!s  -> adapt-> ack -> B)
 				[] (wind -> B) 
 	within B
 
-FC = adapt -> ac!<(SExit ||| open!s?_ : {x | x <- adj, x!= Corr} -> SKIP)>. ack -> FC
+FC = adapt -> ac!<AC_1>.ack -> FC
 
 ---------------------------------------------
 --		Pattern for Req. D : during roam unless empty, alarm, wind, noisy
@@ -122,7 +123,8 @@ PD = let
 		
 		within B(False,True,False)
  
-FD = adapt1?emp:Bool -> if not emp then ac!<SRoaming>. ack -> FD else if emp then ac!<(SOpen ||| (open?_ : {x | x <-SectionID, x!=s, x!=Corr}!s -> SKIP))>. ack -> FD else ack -> FD
+FD = adapt1?emp:Bool -> if not emp then ac!<SRoaming>.ack -> FD else if emp then ac!<AC_3>. ack -> FD else ack -> FD
+
 ---------------------------------------------
 --		Pattern for Req. E : windy => (close H and open backup) or (ticketType)
 ---------------------------------------------
@@ -143,7 +145,7 @@ PE = let
 				[] (noisy!s -> A(alrm,w,dur))
 		within A(False,False,False)
  
-FE = adapt1?backup -> if not backup then ac!<(SOpen ||| (open!s?_ : {L.x, VIP.x | x <- {0..NumSections}} -> SKIP))>. ack -> FE else if backup then ac!<(SExit ||| (open!s?_ : {x | x <- adj, x!= Corr} -> SKIP))>. ack -> FE else ack->FE
+FE = adapt1?backup -> if not backup then ac!<AC_4>. ack -> FE else if backup then ac!<AC_1>. ack -> FE else ack->FE
 
 ---------------------------------------------
 --		Pattern for Req. F : if noisy by ticket type and open backup
@@ -162,7 +164,7 @@ PF = let
 	
 		within B(False,False) 
 
-FF = adapt -> ac!<(SOpen   ||| (open!s?_ : {x | x <- SectionID, x!=s,x!=Corr}-> SKIP))>. ack -> FF
+FF = adapt -> ac!<AC_5>. ack -> FF
 
 ---------------------------------------------
 --		Pattern for Req. G : empty can be used as a backup (empty event, no backup if wind,alarm)
@@ -183,7 +185,8 @@ PG = let B(o,e,d) = (goto!Emp?_: adj!s -> B(o,e,d))
 				
 		within B(False,True,False)
 
-FG = adapt1?d -> if d then ac!<SRoaming>. ack -> FG else if not d then ac!<SExitAdj>. ack -> FG else ack -> FG
+FG = adapt1?d -> if d then ac!<SRoaming>. ack -> FG else if not d then ac!<SExitAdj>.ack -> FG else ack -> FG
+
 
 
 ---------------------------------------------
@@ -216,7 +219,6 @@ AccessController = let
 
 EventStatus = event!Before -> event!During -> event!After -> EventStatus
 
-exports
 
 Section = (AccessController [|{|event|}|] EventStatus)
 
@@ -424,5 +426,3 @@ ReqG = 	let
 				[] (other or emp & open?_ :{x.y | x.y <- openEvt,y == s} -> A(other,emp,True)) 
 		within 
 			B(False,True,False)
-
-endmodule

@@ -1947,9 +1947,12 @@ public class ACSPParser extends Parser {
 	}
 
 	public static class EventContext extends ParserRuleContext {
-		public List<TerminalNode> ID() { return getTokens(ACSPParser.ID); }
-		public TerminalNode ID(int i) {
-			return getToken(ACSPParser.ID, i);
+		public TerminalNode ID() { return getToken(ACSPParser.ID, 0); }
+		public List<ExprContext> expr() {
+			return getRuleContexts(ExprContext.class);
+		}
+		public ExprContext expr(int i) {
+			return getRuleContext(ExprContext.class,i);
 		}
 		public List<TerminalNode> QUERY() { return getTokens(ACSPParser.QUERY); }
 		public TerminalNode QUERY(int i) {
@@ -2024,7 +2027,7 @@ public class ACSPParser extends Parser {
 						consume();
 					}
 					setState(318);
-					match(ID);
+					expr(0);
 					setState(321);
 					_errHandler.sync(this);
 					switch ( getInterpreter().adaptivePredict(_input,30,_ctx) ) {
@@ -2503,9 +2506,9 @@ public class ACSPParser extends Parser {
 		public ExprContext expr(int i) {
 			return getRuleContext(ExprContext.class,i);
 		}
-		public TerminalNode LT() { return getToken(ACSPParser.LT, 0); }
-		public TerminalNode GT() { return getToken(ACSPParser.GT, 0); }
 		public TerminalNode LTEQ() { return getToken(ACSPParser.LTEQ, 0); }
+		public TerminalNode GT() { return getToken(ACSPParser.GT, 0); }
+		public TerminalNode LT() { return getToken(ACSPParser.LT, 0); }
 		public TerminalNode GTEQ() { return getToken(ACSPParser.GTEQ, 0); }
 		public TerminalNode EQ() { return getToken(ACSPParser.EQ, 0); }
 		public TerminalNode NEQ() { return getToken(ACSPParser.NEQ, 0); }
@@ -3056,7 +3059,7 @@ public class ACSPParser extends Parser {
 		"\2\2\2\u0139\u012a\3\2\2\2\u0139\u012d\3\2\2\2\u0139\u0130\3\2\2\2\u0139"+
 		"\u0133\3\2\2\2\u0139\u0136\3\2\2\2\u013a\u013d\3\2\2\2\u013b\u0139\3\2"+
 		"\2\2\u013b\u013c\3\2\2\2\u013c\'\3\2\2\2\u013d\u013b\3\2\2\2\u013e\u0147"+
-		"\7P\2\2\u013f\u0140\t\7\2\2\u0140\u0143\7P\2\2\u0141\u0142\7\'\2\2\u0142"+
+		"\7P\2\2\u013f\u0140\t\7\2\2\u0140\u0143\58\35\2\u0141\u0142\7\'\2\2\u0142"+
 		"\u0144\5 \21\2\u0143\u0141\3\2\2\2\u0143\u0144\3\2\2\2\u0144\u0146\3\2"+
 		"\2\2\u0145\u013f\3\2\2\2\u0146\u0149\3\2\2\2\u0147\u0145\3\2\2\2\u0147"+
 		"\u0148\3\2\2\2\u0148)\3\2\2\2\u0149\u0147\3\2\2\2\u014a\u014b\7P\2\2\u014b"+

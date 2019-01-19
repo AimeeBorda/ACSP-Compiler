@@ -29,7 +29,7 @@ public class ACSPPreProcessor extends ACSPBaseVisitor<Environment> {
 
     @Override
     public Environment visitSimpleDefinition(ACSPParser.SimpleDefinitionContext ctx) {
-        String key = ctx.definitionLeft().ID(ctx.definitionLeft().ID().size() - 1).getText();
+        String key = ctx.definitionLeft().ID().getText();
         Environment any = visit(ctx.any());
 
         envMap.put(key,any);
@@ -70,7 +70,7 @@ public class ACSPPreProcessor extends ACSPBaseVisitor<Environment> {
         Environment withinStat = visit(ctx.any());
 
         for(ACSPParser.SimpleDefinitionContext c : ctx.simpleDefinition()){
-            envMap.remove(c.definitionLeft().ID(c.definitionLeft().ID().size() - 1).getText());
+            envMap.remove(c.definitionLeft().ID().getText());
         }
 
         return withinStat;
@@ -79,7 +79,7 @@ public class ACSPPreProcessor extends ACSPBaseVisitor<Environment> {
     @Override
     public Environment visitDefinitionLeft(ACSPParser.DefinitionLeftContext ctx) {
         Environment res = ctx.children.stream().map(c ->visit(c)).reduce((r,t) -> r = r.merge(t)).orElse(defaultResult());
-        return res.call(ctx.ID(ctx.ID().size() -1).getText().trim());
+        return res.call(ctx.ID().getText().trim());
     }
 
     @Override

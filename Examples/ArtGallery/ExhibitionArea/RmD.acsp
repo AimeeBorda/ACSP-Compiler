@@ -20,9 +20,8 @@ BehaviourD = let D(n) =  (n > 0 & goto!ED!Corr -> D(n-1))
 ---------------------------------------------
 --		Requirements for ED
 ---------------------------------------------
-Pattern2 = let P(n) = 
-			(n > 0 & goto!ED!Corr -> if n==MaxAgents then adapt!n-1 -> ack -> P(n-1) else P(n-1))
-				[] (n <=MaxAgentsEA & goto!EB!ED -> if n == MaxAgents - 1 then adapt!n+1 -> ack -> P(n+1) else P(n+1))
+Pattern2 = let P(n) = (n <= MaxAgentsEA & goto!EB!ED -> if n == MaxAgents - 1 then adapt!n+1 -> ack -> P(n+1) else P(n+1))
+				[] (n > 0 & goto!ED!Corr -> if (n == MaxAgents) then adapt!(n-1) -> ack -> P(n-1) else P(n-1))
 				[] (emergency -> RUN(union(EventsD,Monitors2)))
 		within P(0)
 Pi2 =  adapt?v  ->  if v == MaxAgents then rd!<D1>.ack -> Pi2 else rd!<D0>.ack -> Pi2	

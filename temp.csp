@@ -20,23 +20,22 @@ channel open : SectionID.SectionID
 channel lights : SectionID.Bool
 channel empty
  -- File /Users/aimee/IdeaProjects/ACSP Compiler/Examples/Stadium/Section.acsp
-module Sec(s)
-channel ac : {0.. 7}
+
+s = L.0
+
 
 channel adapt
 channel adapt1 : Bool
 
 channel ack
 
+t(x) = (x + 1) %NumSections
+next(y.x) = y.t(x)
+next(_) = Corr
 
-next(Corr) = Corr
-
-
-prev(Corr) = Corr
-
-
-
-
+r(x) = (x - 1) %NumSections
+prev(y.x) = y.r(x)
+prev(_) = Corr
 
 notE = {x | x <- Agent, x != Emp}
 
@@ -58,7 +57,12 @@ Behaviour(n) = (n > 0 & goto?_:{x | x<- Agent, x!= Emp}!s?_: adj -> Behaviour(n-
 SOpen = goto?_:{s,Emp}?_:adj!s -> SOpen [] goto?_:{s,Emp}!s?_ :adj -> SOpen
 SExitAdj = goto!Emp?_:sections ->  SExit [] goto?_!s!Corr -> SExit [] goto?_?_:{next(s), prev(s)}!s -> SExit 
 SRoaming = goto?_?_:adj!s -> SRoaming	[] goto?_!s?_: adj -> SRoaming
-SExit = goto!Emp?_:sections ->  SExit [] goto?_!s!Corr -> SExit
+SExit = goto!Emp?_:sections ->  SExit [] goto?_!s!Corr -> SExit 
+AC_3 = normal((SOpen||| (open?_ : {x | x <-SectionID, x!=s, x!=Corr}!s -> SKIP)) )
+AC_5 = normal((SOpen||| (open!s?_ : {x | x <- SectionID, x!=s,x!=Corr}-> SKIP)) )
+AC_4 = normal((SOpen||| (open!s?_ : {L.x, VIP.x | x <- {0..NumSections}} -> SKIP)) )
+AC_2 = normal((SExit||| open?_ : {x | x <- adj, x!= Corr}!s -> SKIP) )
+AC_1 = normal((SExit||| open!s?_ : {x | x <- adj, x!= Corr} -> SKIP) )
 
 PA = let B = (event!Before  -> adapt -> ack -> B) 
 				[] (goto?_?_: sections -> B) 
@@ -70,7 +74,7 @@ PA = let B = (event!Before  -> adapt -> ack -> B)
 				[] (noisy!s -> B)
 		within B
 
-FA = adapt -> ac!0 ->  ack -> FA
+FA = adapt -> ac!0 -> ack -> FA
 
 PB = let B(aft,others) = (event!After  -> adapt1!False -> ack -> B(True,others)) 
 				[] (goto?_?_: sections -> B(aft,others)) 
@@ -79,7 +83,7 @@ PB = let B(aft,others) = (event!After  -> adapt1!False -> ack -> B(True,others))
 				[] (open?_ : openEvt -> B(aft,others))
 				[] (alarm!s -> B(aft,True)) 
 				[] (empty -> if not others and aft then adapt1!True -> ack -> B(aft,others) else B(aft,others)) 
-				[] (wind -> B(aft,others or member(s,{|H|})))
+				[] (wind -> B(aft,others or member(s,{|H|}))) 
 				[] (noisy!s -> B(aft,others))
 	within B(False,False)
 
@@ -94,7 +98,7 @@ PC = let B = (alarm!s  -> adapt-> ack -> B)
 				[] (wind -> B) 
 	within B
 
-FC = adapt -> ac!1 ->  ack -> FC
+FC = adapt -> ac!1 -> ack -> FC
 
 PD = let 
 			B(others,emp,dur) =  
@@ -114,7 +118,7 @@ PD = let
 		
 		within B(False,True,False)
  
-FD = adapt1?emp:Bool -> if not emp then ac!3 ->  ack -> FD else if emp then ac!4 ->  ack -> FD else ack -> FD
+FD = adapt1?emp:Bool -> if not emp then ac!3 -> ack -> FD else if emp then ac!4 ->  ack -> FD else ack -> FD
 
 PE = let 
 			A(alrm,w,dur) = 
@@ -132,7 +136,7 @@ PE = let
 				[] (noisy!s -> A(alrm,w,dur))
 		within A(False,False,False)
  
-FE = adapt1?backup -> if not backup then ac!5 ->  ack -> FE else if backup then ac!6 ->  ack -> FE else ack->FE
+FE = adapt1?backup -> if not backup then ac!5 ->  ack -> FE else if backup then ac!1 ->  ack -> FE else ack->FE
 
 PF = let
 			B(ev,o) = (goto?_ ?_: sections-> B(ev,o)) 
@@ -147,7 +151,7 @@ PF = let
 	
 		within B(False,False) 
 
-FF = adapt -> ac!7 ->  ack -> FF
+FF = adapt -> ac!6 ->  ack -> FF
 
 PG = let B(o,e,d) = (goto!Emp?_: adj!s -> B(o,e,d)) 
 				[] (goto?_:notE?_: adj!s -> B(o,False,d)) 
@@ -164,7 +168,7 @@ PG = let B(o,e,d) = (goto!Emp?_: adj!s -> B(o,e,d))
 				
 		within B(False,True,False)
 
-FG = adapt1?d -> if d then ac!3 ->  ack -> FG else if not d then ac!8 ->  ack -> FG else ack -> FG
+FG = adapt1?d -> if d then ac!3 ->  ack -> FG else if not d then ac!7 -> ack -> FG else ack -> FG
 
 AccessController = let
 		
@@ -192,7 +196,6 @@ AccessController = let
 
 EventStatus = event!Before -> event!During -> event!After -> EventStatus
 
-exports
 
 Section = normal((AccessController[|{|event|}|] EventStatus) )
 
@@ -372,39 +375,31 @@ ReqG = 	let
 		within 
 			B(False,True,False)
 
-endmodule
-
  -- File /Users/aimee/IdeaProjects/ACSP Compiler/Examples/Stadium/assertions.acsp
 
 
+assert ReqA [T= Section
 
-instance LSec = Sec(L.0)
-instance HSec = Sec(H.1)
-instance VIPSec = Sec(VIP.2)
+assert ReqB [T= Section
+assert ReqC [T= Section
+assert ReqD [T= Section
+assert ReqE [T= Section
+assert ReqF [T= Section
+assert ReqG [T= Section
 
-assert LSec::ReqA [T= LSec::Section 
-
-assert LSec::ReqB [T= LSec::Section 
-assert LSec::ReqC [T= LSec::Section 
-assert LSec::ReqD [T= LSec::Section 
-assert LSec::ReqE [T= LSec::Section 
-assert LSec::ReqF [T= LSec::Section 
-assert LSec::ReqG [T= LSec::Section
-
-assert LSec::Section :[deterministic]
-assert LSec::Section :[deadlock free]
-assert LSec::Section :[livelock free]
+assert Section :[deterministic]
+assert Section :[deadlock free]
+assert Section :[livelock free]
 
 
-channel ac : {0..8}
+channel ac : {0..7}
 
 map = \ chName,id @ if chName == ac and id == 0 then SOpen 
-else if chName == ac and id == 1 then  normal((SExit||| open!s?_ : {x | x <- adj, x!= Corr} -> SKIP) ) 
-else if chName == ac and id == 2 then  normal((SExit||| open?_ : {x | x <- adj, x!= Corr}!s -> SKIP) ) 
+else if chName == ac and id == 1 then AC_1 
+else if chName == ac and id == 2 then AC_2 
 else if chName == ac and id == 3 then SRoaming 
-else if chName == ac and id == 4 then  normal((SOpen||| (open?_ : {x | x <-SectionID, x!=s, x!=Corr}!s -> SKIP)) ) 
-else if chName == ac and id == 5 then  normal((SOpen||| (open!s?_ : {L.x, VIP.x | x <- {0..NumSections}} -> SKIP)) ) 
-else if chName == ac and id == 6 then  normal((SExit||| (open!s?_ : {x | x <- adj, x!= Corr} -> SKIP)) ) 
-else if chName == ac and id == 7 then  normal((SOpen||| (open!s?_ : {x | x <- SectionID, x!=s,x!=Corr}-> SKIP)) ) 
-else if chName == ac and id == 8 then SExitAdj 
+else if chName == ac and id == 4 then AC_3 
+else if chName == ac and id == 5 then AC_4 
+else if chName == ac and id == 6 then AC_5 
+else if chName == ac and id == 7 then SExitAdj 
 else SKIP
