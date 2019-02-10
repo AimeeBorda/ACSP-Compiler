@@ -50,17 +50,14 @@ Movement = let M(a,b,d) = (a > 0 and b <= MaxAgentsEA & goto!EA!EB -> M(a-1,b+1,
 			within M(0,0,0)
 
 
----------- The people in the building should be able to reach the nearest emergency exit (With no composition) ---------- 
---Requirement5D = ((emergency -> RUN(EventsD) [|EventsD|] BehaviourD)
+---------- The people in the building should be able to reach the nearest emergency exit (With no composition) ----------
+Requirement5D = RmD /\  (emergency -> RUN(union(EventsD,{emergency})))
+Requirement5B = RmB /\  (emergency -> RUN(union(EventsB,{emergency})))
+Requirement5A = RmA /\  (emergency -> RUN(union(EventsA,{emergency})))
 
-Requirement5D = ((Requirement2 /\ emergency -> RUN(EventsD)) [| EventsD |] BehaviourD)
-assert Requirement5D [F= (emergency -> SKIP [|{emergency}|] RmD)
-
-Requirement5B =  (BehaviourB /\ emergency -> RUN(EventsB)) [| EventsB |] BehaviourB
-assert Requirement5B [F= (emergency -> SKIP [|{emergency}|] RmB)
-
-assert Requirement5A [F= (emergency -> SKIP [|{emergency}|] ExhibitionArea)
-
+assert Requirement5D [F=  RmD
+assert Requirement5B [F=  RmB
+assert Requirement5A [F=  RmA
 
 ---------------------------------------------
 --	 Requirement 2 (First Approach)

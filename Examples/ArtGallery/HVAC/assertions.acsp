@@ -39,6 +39,7 @@ Requirement3B = let
 							[] (connect?_!Secure -> T(n))
 						within connect!True!HVAC -> T(0)
 
+
 assert Requirement6 [T= accessPtComp
 assert Requirement3A [T= accessPtComp
 assert Requirement3B [T= accessPtComp
@@ -55,4 +56,14 @@ assert Upstairs :[deadlock free]
 assert Upstairs :[deterministic]
 assert Upstairs :[livelock free]
 
-assert Requirement3 [T=  (Requirement3B [|{|connect,disconnect,update|}|]Requirement3A)
+assert Requirement3 [T=  Requirement3B [|{|connect,disconnect,update|}|]Requirement3A
+
+
+assert Pattern3A \ {|adapt3,adapt6,ack|} [T= RUN(EventsA)
+assert RUN(EventsA)[F= Pattern3A \ {|adapt3,adapt6,ack|}
+
+assert Pattern3B \ {|adapt3,adapt6,ack|} [T= RUN(EventsA)
+assert RUN(EventsA)[F= Pattern3B \ {|adapt3,adapt6,ack|}
+
+assert Pattern6 \ {|adapt3,adapt6,ack|} [T=RUN(EventsA)
+assert RUN(EventsA)[F= Pattern6 \ {|adapt3,adapt6,ack|}

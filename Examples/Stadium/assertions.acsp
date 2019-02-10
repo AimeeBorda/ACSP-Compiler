@@ -1,23 +1,305 @@
 
+ReqA = 	let
+				R =  (goto?_?_:sections -> R)
+					[] (noisy?_ -> R)
+					[] (wind -> R)
+					[] (alarm?_ -> R)
+					[] (event!Before -> B)
+					[] (event?_:{During,After} -> R)
+					[] (open?_ : openEvt -> R)
+					[] (empty -> R)
+				B = (goto!Emp?_:adj!s -> B)
+					[] (goto!s?_:adj!s -> B)
+					[] (event?_:{During,After} -> R)
+					[] (event!Before -> B)
+					[] (empty -> B)
+					[] (noisy?_ -> B)
+					[] (wind -> B)
+					[] (alarm?_ -> R)
+					[] (goto?_!s?_: adj -> B)
+			within R
+
+---------------------------------------------
+--		Req. 0: after => exit only
+--		TODO: how do I check open as well on exit
+---------------------------------------------
+
+ReqB = 	let
+				B(emer) =
+						 (event!During -> B(emer))
+						[] (event!Before -> B(False))
+						[] (event!After -> T(emer,False))
+						[] (noisy?_ -> B(emer))
+						[] (wind -> B(emer or member(s,{|H|})))
+						[] (alarm?b -> B(b))
+						[] (goto?_?_ :sections-> B(emer))
+						[] (open?_ : openEvt -> B(emer))
+						[] (empty -> B(emer))
+				T(emer,emp)  = (goto!Emp?_ :sections-> T(emer,emp))
+						[] (event!During -> B(emer))
+						[] (event!Before -> B(False))
+						[] (event!After -> T(emer,False))
+						[] (noisy?_ -> T(emer,emp))
+						[] (wind -> T(emer or member(s,{|H|}),emp))
+						[] (alarm?b -> B(b))
+						[] (goto?_:notE!s!Corr -> T(emer,emp))
+						[] (empty -> T(emer,True))
+						[] (emp & goto?_:notE?_:{next(s),prev(s)}!s -> T(emer,emp))
+					 	[] (emp & open?_ :{x.y | x.y <- openEvt,y==s, member(x, adj)} -> T(emer,emp))
+					 	[] (not emp or emer & open?_ :{x.y | x.y <- openEvt,x==s} -> T(emer,emp))
+			within
+				B(False)
+
+---------------------------------------------
+--		Req. 3:  alarm => exit
+---------------------------------------------
+
+ReqC = 	let
+				R =  (goto?_ ?_:sections-> R)
+					[] (noisy?_ -> R)
+					[] (wind -> R)
+					[] (alarm!True -> B)
+					[] (alarm!False -> R)
+					[] (event!After -> R)
+					[] (event?_:{During,Before} -> R)
+					[] (open?_ : openEvt -> R)
+					[] (empty -> R)
+				B = (goto!Emp?_:adj!s -> B)
+					[] (event!Before -> R)
+					[] (event?_:{After,During} -> B)
+					[] (noisy?_ -> B)
+					[] (wind -> B)
+					[] (open?_ : {x.y | x.y <- openEvt, y != s}  -> B)
+					[] (alarm!True -> B)
+					[] (alarm!False -> R)
+					[] (goto?_!s?_: adj -> B)
+					[] (empty -> B)
+			within
+				R
+
+---------------------------------------------
+--		Req. 2: during visitors can roam unless empty
+---------------------------------------------
+
+ReqD = 	let R(emp) = (event!Before -> R(True))
+						[] (event!During -> during(emp))
+						[] (event!After -> R(emp))
+						[] (goto?_: notE?_ :adj!s -> R(False))
+						[] (goto!Emp?_:adj!s -> R(emp))
+						[] (goto?_!s?_ :adj-> R(emp))
+						[] (noisy?_ -> R(emp))
+						[] (wind -> R(emp))
+						[] (alarm?_ -> R(emp))
+						[] (open?_ :openEvt-> R(emp))
+						[] (empty -> R(emp))
+				during(b) =  (goto!Emp?_ :sections-> during(b))
+						[] (goto?_:notE!s?_ :adj -> during(b))
+						[] (b and not member(s,{|VIP|}) & goto!s?_ :adj!s -> during(False))
+						[] (not b or member(s,{|VIP|}) & goto?_:notE?_ :adj!s -> during(b))
+						[] (noisy?_ -> during(b))
+						[] (wind -> during(b))
+						[] (alarm?_ -> during(b))
+						[] (event?_ :{Before,After} -> R(True))
+						[] (event!During -> during(b))
+						[] (open?_ : {x.y | x.y <- openEvt,y!=s} -> during(b))
+						[] (b & open?_ : {x.y | x.y <- openEvt,y ==s} -> R(b))
+						[] (empty -> during(b))
+			within
+				  R(True)
+
+---------------------------------------------
+--		Req. E:  windy => close H (may need to change for during only)
+---------------------------------------------
+
+ReqE = let
+				R1(w) = (goto?_?_:sections -> R1(w))
+					[] (noisy?_ -> R1(w))
+					[] (wind -> R1(member(s, {|H|})))
+					[] (open?_ :openEvt -> R1(w))
+					[] (event!Before  -> R1(False))
+					[] (event!After  -> R1(w))
+					[] (event!During  -> W(False,w))
+					[] (alarm?_ -> R1(w))
+					[] (empty -> R1(w))
+				W(backup,w) = (goto!Emp?_ :sections-> W(backup,w))
+					[] (not backup and w and member(s,{|H|}) & goto!s?_:adj!s -> W(backup,w))
+					[] (not w or not member(s,{|H|})& goto?_:notE?_:adj!s -> W(backup,w))
+					[] (empty -> W(backup,w))
+					[] (event!After -> R1(w))
+					[] (event!Before -> R1(False))
+					[] (event!During -> W(False,w))
+					[] (noisy?_ -> W(backup,w))
+					[] (wind -> W(False,member(s, {|H|})))
+					[] (alarm?_ -> W(backup,w))
+					[] (goto?_:notE!s?_: adj -> W(backup,w))
+					[] (open!s?_ : {x | x <- SectionID, not member(x, {|H,VIP|}), x!= s} -> W(w,w))
+					[] (open!s?_ : {x | x <- SectionID, member(x, {|H,VIP|}), x!= s} -> W(backup,w))
+					[] (not w & open?_ : {x | x <- SectionID, x!= s, x!=Corr}!s -> W(backup,w))
+			within
+				R1(False)
+
+---------------------------------------------
+--		Req. F:  noisy => open if Closed (need to check that open is performed)
+---------------------------------------------
+
+ReqF = let
+			R =  (goto?_?_:sections -> R)
+					[] (noisy?_ -> R)
+					[] (wind -> R)
+					[] (alarm?_ -> R)
+					[] (open?_ :openEvt -> R)
+					[] (empty -> R)
+					[] (event?_ :{Before,After}-> R)
+					[] (event!During -> B(False))
+			B(n) = (goto!Emp?_ :sections-> B(n))
+					[] (event?_ :{Before,After} -> R)
+					[] (event!During -> B(n))
+					[] (noisy?b -> B(b))
+					[] (wind -> B(n))
+					[] (alarm?_ -> B(n))
+					[] (empty -> B(n))
+					[] (goto?_:notE!s?_: adj -> B(n))
+					[] (n & open?_ : {x.y | x.y <- openEvt,y != s} -> B(n))
+					[] (not n & open?_ : openEvt -> B(n))
+					[] (n & goto!s?_:adj!s -> B(n))
+					[] (not n & goto?_:notE?_:adj!s -> B(n))
+			within R
+
+---------------------------------------------
+--		Req. G:  empty can be used as a backup TODO: for when empty
+---------------------------------------------
+
+ReqG = 	let
+			applies(alrm,wnd,nois) = not (alrm or wnd or nois)
+			R(alrm,wnd,no,emp,opn) = (goto!Emp?_ :sections-> R(alrm,wnd,no,emp,opn))
+				[] (goto?_:notE!s?_:adj -> R(alrm,wnd,no,emp,opn))
+				[] (emp & goto!s?_:adj!s  -> R(alrm,wnd,no,False,opn))
+				[] (not emp or opn or member(s,{|VIP|}) &goto?_:notE?_:adj!s  -> R(alrm,wnd,no,False,opn))
+
+				[] (event!During -> R(alrm,wnd,no,emp,opn))
+				[] (event!Before -> B(False,False,False,True,False))
+				[] (event!After -> A(alrm,wnd,no,emp,opn))
+				[] (noisy?b -> R(alrm,wnd,b,emp,opn))
+				[] (wind -> R(alrm,member(s, {|H|}),no ,emp,opn))
+				[] (alarm?b -> R(b,wnd,no,emp,opn))
+				[] (empty -> R(alrm,wnd,no,emp,opn))
+
+				[] (open?_ :{x.y | x.y <- openEvt,y != s} -> R(alrm,wnd,no,emp,opn))
+				[] (applies(alrm,wnd,no) and emp & open?_ :{x.y | x.y <- openEvt,y == s} -> B(alrm,wnd,no,emp,True))
+			B(alrm,wnd,no,emp,opn) = (goto!Emp?_ :sections-> B(alrm,wnd,no,emp,opn))
+				[] (goto?_:notE!s?_:adj -> B(alrm,wnd,no,emp,opn))
+				[] (goto?_:notE?_ :adj !s -> B(alrm,wnd,no,False,opn))
+
+				[] (event!During -> R(alrm,wnd,no,emp,opn))
+				[] (event!Before -> B(False,False,False,True,False))
+				[] (event!After -> A(alrm,wnd,no,emp,opn))
+				[] (noisy?b -> B(alrm,wnd,b,emp,opn))
+				[] (wind -> B(alrm, member(s, {|H|}),no,emp,opn))
+				[] (alarm?b -> B(b,wnd,no,emp,opn))
+				[] (empty -> B(alrm,wnd,no,emp,opn))
+
+				[] (open?_ :{x.y | x.y <- openEvt,y != s} -> B(alrm,wnd,no,emp,opn))
+			A(alrm,wnd,no,emp,opn) = (goto!Emp?_ :sections -> A(alrm,wnd,no,emp,opn))
+				[] (goto?_:notE!s!Corr -> A(alrm,wnd,no,False,opn))
+				[] (opn & goto?_:notE?_:{next(s),prev(s)}!s -> A(alrm,wnd,no,emp,opn))
+
+				[] (event!During -> R(alrm,wnd,no,emp,opn))
+				[] (event!Before -> B(False,False,False,True,opn))
+				[] (event!After -> A(alrm,wnd,no,emp,opn))
+				[] (noisy?b -> A(alrm,wnd,b,emp,opn))
+				[] (wind -> A(alrm,member(s, {|H|}),no,emp,opn))
+				[] (alarm?b -> A(b,wnd,no,emp,opn))
+				[] (empty -> A(alrm,wnd,no,True,opn))
+
+				[] (open?_ :{x.y | x.y <- openEvt,y != s} -> A(alrm,wnd,no,emp,opn))
+				[] (not applies(alrm,wnd,no) or emp & open?_ :{x.y | x.y <- openEvt,y == s} -> A(alrm,wnd,no,emp,True))
+		within
+			B(False,False,False,True,False)
+
+ReqH =
+		let
+			B(emp,n) = (goto!Emp?_:sections -> B(emp,n))
+
+			--	[] (not emp & goto?_: notE?_ :sections -> B(emp,n))
+				[] (goto?_ : notE?_:adj!s -> B(False,n))
+				[] (goto?_ : notE!s?_:adj -> B(emp,n))
+
+				[] (empty -> B(True,n))
+				[] (open?_ :openEvt -> B(emp,n))
+				[] (not emp & noisy!not n -> B(emp,not n))
+				[] (emp and n& noisy!False -> B(emp,False))
+
+				[] (event!After -> B(True,n))
+				[] (event!Before -> B(True,n))
+				[] (event!During -> B(emp,n))
+
+		within B(True,False)
+
+
+ReqI = 	let B(n,emp,ev) = (goto!Emp?_:sections -> B(n,emp,ev))
+				[] (empty -> B(n,emp or ev == After,ev))
+				[] (event!During -> B(n,emp,During))
+				[] (event!Before -> B(n,True,Before))
+				[] (event!After  -> B(n,emp,After))
+
+				[] (not n and not emp & lights!not n -> B(not n,emp,ev))
+				[] (n and emp and ev != Before & lights!not n -> B(not n,emp,ev))
+				[] (not n and ev == Before & lights!not n -> B(not n,emp,ev))
+
+				[] (goto?_ :notE?_:adj!s -> B(n,False,ev))
+				[] (goto?_ :notE!s?_:adj -> B(n,emp,ev))
+
+				[] (open?_ : {x.y | x.y <- openEvt, y !=s} -> B(n,emp,ev))
+				[] (open?_ : {x.y | x.y <- openEvt, y ==s} ->  B(n,False,ev))
+				[] (alarm?_ -> B(n,emp,ev))
+				[] (noisy?_ -> B(n,emp,ev))
+				[] (wind -> B(n,emp,ev))
+			within  B(False,True,Before)
 
 ---------------------------------------------
 --		Verification for Requirements
 ---------------------------------------------
 
-assert ReqA [T= Section
-
-assert ReqB [T= Section
-assert ReqC [T= Section
-assert ReqD [T= Section
-assert ReqE [T= Section
-assert ReqF [T= Section
-assert ReqG [T= Section
+assert ReqA [T= PhysicalController
+assert ReqB [T= PhysicalController
+assert ReqC [T= PhysicalController
+assert ReqD [T= PhysicalController
+assert ReqE [T= PhysicalController
+assert ReqF [T= PhysicalController
+assert ReqG [T= PhysicalController
+assert ReqH [T= NoisePanel
+assert ReqI [T= LightsPanel [|{|event,goto,empty,open|}|] PhysicalController
 
 ---------------------------------------------
---		Basic Assertions
+--		Verification for Adaptation Patterns
 ---------------------------------------------
 
-assert Section :[deterministic]
-assert Section :[deadlock free]
-assert Section :[livelock free]
+assert PG \ adEvents [T= RUN(events)
+assert RUN(events)[F= PG \ adEvents
 
+assert PF \ adEvents [T= RUN(events)
+assert RUN(events)[F= PF \ adEvents
+
+assert PE \ adEvents [T= RUN(events)
+assert RUN(events)[F= PE \ adEvents
+
+assert PD \ adEvents [T= RUN(events)
+assert RUN(events)[F= PD \ adEvents
+
+assert PC \ adEvents [T= RUN(events)
+assert RUN(events)[F= PC \ adEvents
+
+assert PB \ adEvents [T= RUN(events)
+assert RUN(events)[F= PB \ adEvents
+
+assert PA \ adEvents [T= RUN(events)
+assert RUN(events)[F= PA \ adEvents
+
+assert PHNoisy \ {|adapt2,ack|} [T= RUN(union(locEvents,{|noisy, empty,event|}))
+assert RUN(union(locEvents,{|noisy, empty,event|}))[F= PHNoisy \ {|adapt2,ack|}
+
+assert PHAlarm \ {|adapt2,ack|} [T= RUN(union(locEvents,{|alarm, empty,event|}))
+assert RUN(union(locEvents,{|alarm, empty,event|}))[F= PHAlarm \ {|adapt2,ack|}
+
+assert PI \ {|adapt2,ack|} [T= RUN(union(locEvents,{|lights, empty,event|}))
+assert RUN(union(locEvents,{|lights, empty,event|}))[F= PI \ {|adapt2,ack|}

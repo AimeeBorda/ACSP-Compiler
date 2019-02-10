@@ -1,0 +1,219 @@
+ ---------------------------------------------
+--		Adaptation Events
+---------------------------------------------
+
+channel adapt
+channel adapt1 : Bool
+
+channel ack
+
+---------------------------------------------
+--		Helper Functions
+---------------------------------------------
+
+t(x) = (x + 1) %NumSections
+next(y.x) = y.t(x)
+next(_) = Corr
+
+r(x) = (x - 1) %NumSections
+prev(y.x) = y.r(x)
+prev(_) = Corr
+
+notE = {x | x <- Agent, x != Emp}
+
+adj = {next(s),prev(s),Corr}
+sections = {y.z | y <- union({s},adj), z <- union({s},adj), y!=z,z == s or y ==s }
+
+openEvt = {x.y | x <- SectionID, y <- SectionID, x == s or y ==s, x!=Corr, y != Corr}
+monEvents = {| noisy,event,wind ,alarm |}
+locEvents = union( {goto.y.x | x <- sections, y<- Agent} ,{open.x | x <- openEvt}	)
+events = Union({locEvents, monEvents, {|empty|}})
+adEvents = {|ack,adapt,adapt1|}
+
+---------------------------------------------
+--		Processes for A Section
+---------------------------------------------
+
+Behaviour(n) = (n > 0 & goto?_:{x | x<- Agent, x!= Emp}!s?_: adj -> Behaviour(n-1))
+				[] (n < SectionSize & goto?_:{x | x<- Agent, x!= Emp}?_:adj!s -> Behaviour(n+1))
+				[] (goto!Emp?_:sections -> Behaviour(n))
+				[] (n == 0 & empty -> Behaviour(n))
+
+
+SOpen = goto?_:{s,Emp}?_:adj!s -> SOpen [] goto?_:{s,Emp}!s?_ :adj -> SOpen
+SExitAdj = goto!Emp?_:sections ->  SExit [] goto?_!s!Corr -> SExit [] goto?_?_:{next(s), prev(s)}!s -> SExit
+SRoaming = goto?_?_:adj!s -> SRoaming	[] goto?_!s?_: adj -> SRoaming
+SExit = goto!Emp?_:sections ->  SExit [] goto?_!s!Corr -> SExit
+
+
+---------------------------------------------
+--		Pattern for Req. A : event Pi (Before: ticketType)
+---------------------------------------------
+
+PA = let
+
+		B = (event!Before  -> adapt -> ack -> B)
+				[] (goto?_?_: sections -> B)
+				[] (event?_:{During,After} -> B)
+				[] (open?_ : openEvt -> B)
+				[] (alarm?b ->  B)
+				[] (empty -> B)
+				[] (wind -> B)
+				[] (noisy?_ -> B)
+		within B
+
+FA = adapt -> ac!<SOpen>.ack -> FA
+
+
+---------------------------------------------
+--		Pattern for Req. B : event Pi After
+---------------------------------------------
+
+PB = let B(aft,alrm) = (event!After  -> adapt1!False -> ack -> B(True,alrm))
+				[] (goto?_?_: sections -> B(aft,alrm))
+				[] (event!Before -> B(False,False))
+				[] (event!During -> B(False,alrm))
+				[] (open?_ : openEvt -> B(aft,alrm))
+				[] (alarm?b -> B(aft,b))
+				[] (empty -> if not alrm and aft then adapt1!True -> ack -> B(aft,alrm) else B(aft,alrm))
+				[] (wind -> B(aft,alrm or member(s,{|H|})))
+				[] (noisy?_ -> B(aft,alrm))
+	within B(False,False)
+
+FB = adapt1?emp -> if not emp then  ac!<SExit ||| open!s?_ : {x | x <- adj, x!= Corr} -> SKIP>.ack -> FB  else if  emp then ac!<SExit ||| open?_ : {x | x <- adj, x!= Corr}!s -> SKIP>.ack->FB else ack->FB
+
+---------------------------------------------
+--		Pattern for Req. C : alarm => exit
+---------------------------------------------
+
+PC = let B = (alarm!True  -> adapt-> ack -> B)
+				[] (alarm!False -> B)
+				[] (goto?_?_: sections -> B)
+				[] (noisy?_ -> B)
+				[] (event?_ -> B)
+				[] (open?_ : openEvt -> B)
+				[] (empty -> B)
+				[] (wind -> B)
+	within B
+
+FC = adapt -> ac!<SExit ||| open!s?_ : {x | x <- adj, x!= Corr} -> SKIP>.ack -> FC
+
+---------------------------------------------
+--		Pattern for Req. D : during roam unless empty, alarm, wind, noisy
+---------------------------------------------
+
+PD = let
+			applies(w, n, a,ev) = not (w or n or a) and ev == During
+			B(wnd, n, alrm ,emp,ev) =
+							(goto?_:notE?_:adj!s -> if applies(wnd,n,alrm,ev) then adapt1!False -> ack -> B(wnd, n, alrm ,False,ev) else B(wnd, n, alrm ,False,ev))
+						[] (goto!Emp?_ : sections -> B(wnd, n, alrm, emp,ev))
+						[] (goto?_:notE!s?_:adj -> B(wnd, n, alrm, emp,ev))
+						[] (empty -> B(wnd, n, alrm, emp,ev))
+						[] (open?_ :{x.y | x.y <-openEvt,y!=s} -> B(wnd, n, alrm, emp,ev))
+						[] (open?_ :{x.y | x.y <-openEvt,y ==s} -> B(wnd, n, alrm, False,ev))
+						[] (event!Before -> B(False, False,False,True,Before))
+						[] (event!After -> B(wnd, n, alrm ,emp,After))
+						[] (event!During -> if applies(wnd,n,alrm,ev) then  adapt1!emp -> ack -> B(wnd, n,alrm,emp,During) else B(wnd, n, alrm ,emp,During))
+
+						[] (wind -> B(member(s, {|H|}), n, alrm,emp,ev))
+						[] (alarm?b -> if applies(wnd,n,b,ev) then adapt1!emp -> ack -> B(wnd, n, b,emp,ev) else B(wnd,n,b,emp,ev))
+						[] (noisy?b -> if applies(wnd,b,alrm,ev) then adapt1!emp -> ack -> B(wnd, b, alrm,emp,ev) else B(wnd,b,alrm,emp,ev))
+
+		within B(False,False,False,True,Before)
+
+FD = adapt1?emp:Bool -> if not emp or member(s,{|VIP|}) then ac!<SRoaming>.ack -> FD else if emp then ac!<SOpen ||| (open?_ : {x | x <-SectionID, x!=s, x!=Corr}!s -> SKIP)>.ack -> FD else ack -> FD
+
+
+---------------------------------------------
+--		Pattern for Req. E : windy => (close H and open backup) or (ticketType)
+---------------------------------------------
+
+PE = let
+			applies(alrm,ev) = (not alrm) and (ev == During)
+			A(alrm,w,ev,ba) =
+					(goto?_?_: sections -> A(alrm,w,ev,ba))
+				[] (open!s?_ :{y | x.y <- openEvt,x==s, member(y,{|L|})} -> if applies(alrm,ev) and w then adapt1!True -> ack -> A(alrm,w,ev,True)else A(alrm,w,ev,True))
+				[] (open?_ : {x.y | x.y <- openEvt, x != s or not member(y,{|L|})} -> A(alrm,w,ev,ba))
+				[] (empty -> A(alrm,w,ev,ba))
+
+				[] (event!Before -> A(False,False,Before,False))
+				[] (event!During -> if applies(alrm,ev) and w then adapt1!False -> ack -> A(alrm,w,During,ba) else A(alrm,w,During,ba))
+				[] (event!After -> A(alrm,w,After,ba))
+
+				[] (wind -> if applies(alrm,ev) then adapt1!False -> ack -> A(alrm,True,ev,False) else A(alrm,True,ev,False))
+				[] (alarm?b -> if applies(b,ev) and w then adapt1!ba -> ack -> A(b,w,ev,ba) else A(b,w,ev,ba))
+				[] (noisy?_ -> A(alrm,w,ev,ba))
+		within A(False,False,Before,False)
+
+FE = adapt1?backup -> if not backup and member(s, {|H|}) then ac!<SOpen ||| (open!s?_ : {L.x, VIP.x | x <- {0..NumSections}} -> SKIP)>.ack -> FE else if backup and member(s, {|H|}) then ac!<SExit ||| open!s?_ : {x | x <- adj, x!= Corr} -> SKIP>.ack -> FE else ack->FE
+
+---------------------------------------------
+--		Pattern for Req. F : if noisy by ticket type and open backup
+---------------------------------------------
+
+PF = let
+			applies(alrm,w,ev) = not(alrm or w) and (ev == During)
+			B(alrm,w,n,ev) = (goto?_ ?_: sections-> B(alrm,w,n,ev))
+					[] (event!Before -> B(False,False,False,Before))
+					[] (event!After -> B(alrm,w,n,After))
+					[] (event!During -> B(alrm,w,n,During))
+					[] (open?_ : openEvt -> B(alrm,w,n,ev))
+					[] (noisy?b -> if applies(alrm,w,ev) and b then adapt -> ack -> B(alrm,w,b,ev) else B(alrm,w,b,ev))
+					[] (wind -> B(alrm,member(s,{|H|}),n,ev))
+					[] (alarm?b -> if applies(b,w,ev) and n then adapt -> ack -> B(b,w,n,ev) else B(b,w,n,ev))
+					[] (empty -> B(alrm,w,n,ev))
+
+		within B(False,False,False,Before)
+
+FF = adapt -> ac!<SOpen ||| (open!s?_ : {x | x <- SectionID, x!=s,x!=Corr}-> SKIP)>.ack -> FF
+
+---------------------------------------------
+--		Pattern for Req. G : empty can be used as a backup (empty event, no backup if wind,alarm)
+---------------------------------------------
+
+PG = let
+		applies(alrm,w,n,ev) = not (alrm or w or n) and ev != Before
+		B(alrm,w,n,e,ev) = (goto!Emp?_: adj!s -> B(alrm,w,n,e,ev))
+				[] (goto?_:notE?_: adj!s -> B(alrm,w,n,False,ev))
+				[] (goto?_!s?_: adj -> B(alrm,w,n,e,ev))
+				[] (event!Before -> B(False,False,False,True,Before))
+				[] (event!After -> B(alrm,w,n,e,After))
+				[] (open?_ : {x.y | x.y <- openEvt, y != s} -> B(alrm,w,n,e,ev))
+				[] (open?_ : {x.y | x.y <- openEvt, y == s} -> if applies(alrm,w,n,ev) and e then adapt1!ev == During -> ack -> B(alrm,w,n,False,ev) else B(alrm,w,n,False,ev))
+				[] (wind -> B(alrm,member(s, {|H|}),n,e,ev))
+				[] (noisy?b -> B(alrm,w,b,e,ev))
+				[] (event!During -> B(alrm,w,n,e,During))
+				[] (empty -> B(alrm,w,n,True,ev))
+				[] (alarm?b ->  B(b,w,n,e,ev))
+
+		within B(False,False,False,True,Before)
+
+FG = adapt1?d -> if d then ac!<SRoaming>.ack -> FG else if not d then ac!<SExitAdj>.ack -> FG else ack -> FG
+
+---------------------------------------------
+--		Composition
+---------------------------------------------
+
+AccessController = let
+
+
+		RA = (PA [| adEvents |] FA) \ adEvents
+		RB = (PB [| adEvents |] FB) \ adEvents
+		RC = (PC [| adEvents |] FC) \ adEvents
+		RD = (PD [| adEvents |] FD) \ adEvents
+		RE = (PE [| adEvents |] FE) \ adEvents
+		RF = (PF [| adEvents |] FF) \ adEvents
+		RG = (PG [| adEvents |] FG) \ adEvents
+
+		C1 = (RA [| events |] RB)
+		C2 = (C1 [| events |] RC)
+		C3 = (C2 [| events |] RD)
+		C4 = (C3 [| events |] RE)
+		C5 = (C4 [| events |] RF)
+		C6 = (C5 [| events |] RG)
+
+
+		AdaptationProc = (C6 [|{|goto,empty|}|] Behaviour(0))
+
+	within
+			(new ac)(ac[SExit] [| locEvents |] AdaptationProc

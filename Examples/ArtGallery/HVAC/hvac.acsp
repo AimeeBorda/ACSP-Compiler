@@ -1,0 +1,61 @@
+
+EventsH = {|connect.True.HVAC, connect.False.HVAC |}
+
+Monitors3H = {|connect.True.Open,connect.False.Open,disconnect,update|}
+Monitors6 = {|update|}
+
+
+channel adapt : Connections.Bool
+
+---------------------------------------------
+--		Processes for HVAC
+---------------------------------------------
+H0 = connect!True!HVAC -> STOP
+H1 = connect!False!HVAC -> STOP
+
+---------------------------------------------
+--		Pattern for HVAC
+---------------------------------------------
+Pattern3(n,b) =      (n == 0 & connect!True!Open -> adapt!1!b -> ack -> Pattern3(n+1,False))
+				[] (n > 0 and n < MaxConnections & connect!True!Open -> Pattern3(n+1,b))
+				[] (n == 1 & connect!False!Open -> adapt!n-1!b -> ack -> Pattern3(n-1,b))
+				[] (n > 1 & connect!False!Open -> Pattern3(n-1,b))
+				[] (disconnect -> adapt!0!b -> ack -> Pattern3(0,b))
+				[] (connect?b':Bool!HVAC -> Pattern3(n,b'))
+				[] (update -> Pattern3(n,b))
+			--	[] (connect?_!Secure -> Pattern3(n,b))
+
+Pattern6H =      (connect?_!HVAC -> Pattern6H)  [] (update -> adapt6 -> ack -> Pattern6H)
+
+---------------------------------------------
+--		Adaptation Function
+---------------------------------------------
+PiHvac =  adapt?v : Connections? t : Bool ->
+						if v > 0 then h!<H1> -> ack -> PiHvac
+						else if v == 0 then h!<H0> -> ack -> PiHvac
+						else ack -> PiHvac
+---------------------------------------------
+--		Adaptatable Processes
+---------------------------------------------
+SysH =
+		let
+			map = \ id @ (if id == 0 then H0
+						 else if id == 1 then H1
+						 else SKIP)
+			StateRec = (l?id : Processes -> (map(id) /\ StateRec))
+		within
+			H0 /\ StateRec
+
+---------------------------------------------
+--		Composition
+---------------------------------------------
+hvacComp = let
+			eventsR3 = union(EventsH,Monitors3H)
+			eventsR6 = union(EventsH,Monitors6)
+
+			R3H = (PiHvac [| {|adapt,ack |}|] Pattern3(0,True)) \ {|adapt,ack|}
+			R6 = (PiA6 [|{| adapt6,ack |}|] Pattern6H) \ {|adapt6,ack|}
+
+			AdptManager = R6 [|inter(eventsR6,eventsR3)|] R3H
+		within
+			(new h)(h[H0] [| EventsH |] AdptManager)

@@ -1,0 +1,34 @@
+include "restorationArea.acsp"
+include "corrTwo.acsp"
+
+transparent normal
+
+datatype Room = Corr2 | RA | Str
+
+Processes = {0..1}
+MaxAgents = 2
+EmergencyCount = 2
+
+
+---------------------------------------------
+--		Events
+---------------------------------------------
+channel adapt : {0..MaxAgents}
+channel adaptE
+channel emergency 				-- local state (True over MaxAgents, False under MaxAgents)
+channel goto : Room.Room			-- visitors' movement
+channel grd : Room.Room			-- visitors' movement
+
+
+channel ack
+
+include "assertions.acsp"
+
+Upstairs = RestorationArea [|event("R","C")|] CorrTwo
+
+
+event(x,t)= Union({inter(E(x), M(t)), inter(E(t),M(x)),inter(E(t),E(x)), inter(M(t),M(x))})
+E("") = {}
+E(<x>^xs) =  if x == 'C' then union(EventsC2,E(xs)) else if x == 'R' then union(EventsRA,E(xs)) else {}
+M("") = {}
+M(<x>^xs) = if x == 'C' then union(MonitorsC2,M(xs)) else if x == 'R' then union(MonitorsRA,M(xs)) else {}

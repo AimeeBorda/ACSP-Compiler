@@ -1,0 +1,60 @@
+---------------------------------------------
+--		Event for RestorationArea
+---------------------------------------------
+EventsRA = {goto.RA.Corr2,goto.Corr2.RA,grd.Corr2.RA,grd.RA.Corr2}
+
+Monitors5 = {|emergency|}
+Monitors1 =  union(EventsC2,Monitors5)
+
+MonitorsRA = union(Monitors5,Monitors1)
+
+---------------------------------------------
+--		Processes for Restoration Area
+---------------------------------------------
+
+R0 = (goto!RA!Corr2 -> R0) [] (goto!Corr2!RA -> R0) [] (grd?_ :{x| grd.x <- EventsRA}-> R0)
+R1 = (goto!RA!Corr2 -> R1) [] (grd?_ :{x| grd.x <- EventsRA}-> R1)
+---------------------------------------------
+--		Behaviour for Restoration Area
+---------------------------------------------
+BehaviourRA = R(0) ||| R2(False)
+
+ R(v) =  (v < MaxAgents & goto!Corr2!RA -> R(v+1))
+		[] (v > 0 & goto!RA!Corr2 -> R(v-1))
+
+
+R2(b) = (not b & grd!Corr2!RA -> R2(True))
+		[] (b & grd!RA!Corr2 -> R2(False))
+
+---------------------------------------------
+--		Requirements for ED
+---------------------------------------------
+Pattern1 = let P =
+					(goto?_ :{ x | goto.x <- union(EventsRA, Monitors1) } -> P)
+				[] (grd!Str!Corr2 ->  adapt!1 -> ack -> P)
+				[] (grd!Corr2!Str -> adapt!0 -> ack -> P)
+				[] (grd?_: {x.y | x <-{Corr2,RA}, y<-{RA,Corr2}, x!= y} -> P)
+				[] (emergency -> RUN(union(EventsRA,Monitors1)))
+		within P
+Pi1 =  adapt?n  ->  if n > 0 then ra!<R0>.ack -> Pi1 else ra!<R1>.ack -> Pi1
+
+
+Pattern5RA = (emergency -> adaptE -> ack -> Pattern5RA) [] (goto?_: {x | goto.x <- EventsRA} -> Pattern5RA) [] (grd?_: {x | grd.x <- EventsRA} -> Pattern5RA)
+Pi5RA =  adaptE  ->  ra!<R0>.ack -> Pi5RA
+
+---------------------------------------------
+--		Composition
+---------------------------------------------
+RestorationArea = let
+		eventsR1 = union(EventsRA,Monitors1)
+		eventsR5 = union(EventsRA,Monitors5)
+
+		events = union(eventsR1,eventsR5)
+		R1 = (Pattern1 [|{|adapt,ack|}|] Pi1) \ {|adapt,ack|}
+		R5 = (Pattern5RA [|{|adaptE,ack|}|] Pi5RA) \ {|adaptE,ack|}
+
+
+		AdaptationProc = BehaviourRA [|inter(EventsRA,events)|] (R1  [|inter(eventsR1,eventsR5)|] R5)
+
+    within
+		(new ra)(ra[R0] [| EventsRA |] AdaptationProc)

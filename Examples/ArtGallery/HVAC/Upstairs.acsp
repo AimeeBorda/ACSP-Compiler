@@ -2,9 +2,10 @@
 ---------------------------------------------
 --		Components
 ---------------------------------------------
-include "accessPoint.acsp"
+include "assertions.csp"
+include "accessPoint.csp"
 
-transparent normal	
+transparent normal
 
 datatype Connection = Secure | Open | HVAC
 
@@ -18,25 +19,18 @@ Connections = {0 .. MaxConnections}
 ---------------------------------------------
 
 channel connect : Bool.Connection		-- agents' movement
-channel disconnect 
+channel disconnect
 channel update
 
-channel ack 
+channel ack
 channel adapt6
 
 ---------------------------------------------
 --		Composition
 ---------------------------------------------
 
-Upstairs = let 	
+Upstairs = let
 				EventSet = {|connect.True.HVAC, connect.False.HVAC |}
 				hvacComp = connect?_:Bool!HVAC -> hvacComp
-			within 
-					(hvacComp [|EventSet|]accessPtComp)
-
-
----------------------------------------------
---		Assertions
----------------------------------------------
-
-include "assertions.acsp"
+			within
+					normal(hvacComp [|EventSet|]accessPtComp)
