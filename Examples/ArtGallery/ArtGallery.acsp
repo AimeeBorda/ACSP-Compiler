@@ -218,15 +218,6 @@ RmA = let
 			(new la) (la[A0] [| EventsA |] (if(approachOne) then FirstApproach else SecondApproach))
 
 
----------- at most MaxAgentsEA people in the Exhibition Area ----------  
-Requirement4 = let T(n) =   (n < MaxAgentsEA & goto!Corr!EA  -> T(n+1)) 
-							[] (n >= 0  & goto?_:{EA,ED}!Corr -> T(n-1))
-							[] (goto?_:{EA.EB,EB.EA,EB.ED} -> T(n))
-							[] (emergency -> RUN(Union({MonitorsA,MonitorsB,MonitorsD,EventsA,EventsB,EventsD})))
-			within T(0)
-
-approachOne=False
-
 ---------------------------------------------
 --		Event for RestorationArea
 ---------------------------------------------

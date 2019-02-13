@@ -2,36 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="53a9a71f-bbf0-4ac0-8c5b-275c2c36ead5" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/Examples/ArtGallery/ArtGallery.acsp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Examples/ArtGallery/assertions.acsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Examples/ArtGallery/ExhibitionArea/AssertionsF.acsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Examples/ArtGallery/ExhibitionArea/ExhibitionArea.acsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Examples/ArtGallery/ExhibitionArea/RmA.acsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Examples/ArtGallery/ExhibitionArea/RmB.acsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Examples/ArtGallery/ExhibitionArea/RmD.acsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Examples/ArtGallery/HVAC/Upstairs.acsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Examples/ArtGallery/HVAC/accessPoint.acsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Examples/ArtGallery/HVAC/assertions.acsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Examples/ArtGallery/HVAC/hvac.acsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Examples/ArtGallery/RestorationArea/Composition.acsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Examples/ArtGallery/RestorationArea/assertions.acsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Examples/ArtGallery/RestorationArea/corrTwo.acsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Examples/ArtGallery/RestorationArea/restorationArea.acsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Examples/Stadium/AccessController.acsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Examples/Stadium/Controller.acsp" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Examples/Stadium/Section.acsp" beforeDir="false" afterPath="$PROJECT_DIR$/Examples/Stadium/Section.acsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Examples/Stadium/assertions.acsp" beforeDir="false" afterPath="$PROJECT_DIR$/Examples/Stadium/assertions.acsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ACSP.g4" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ACSP.g4" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ACSP.tokens" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ACSP.tokens" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ACSPBaseListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ACSPBaseListener.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ACSPBaseVisitor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ACSPBaseVisitor.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ACSPLexer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ACSPLexer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ACSPLexer.tokens" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ACSPLexer.tokens" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ACSPListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ACSPListener.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ACSPParser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ACSPParser.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/ACSPVisitor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ACSPVisitor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Examples/ArtGallery/ArtGallery.acsp" beforeDir="false" afterPath="$PROJECT_DIR$/Examples/ArtGallery/ArtGallery.acsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Examples/ArtGallery/assertions.acsp" beforeDir="false" afterPath="$PROJECT_DIR$/Examples/ArtGallery/assertions.acsp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/temp.csp" beforeDir="false" afterPath="$PROJECT_DIR$/temp.csp" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
@@ -137,7 +109,7 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="acsp" value="2022" />
+          <entry key="acsp" value="2027" />
           <entry key="csp" value="29" />
           <entry key="g4" value="1698" />
           <entry key="java" value="8660" />
@@ -148,7 +120,7 @@
         <counts>
           <entry key="ANTLR v4 grammar file" value="1698" />
           <entry key="JAVA" value="8660" />
-          <entry key="PLAIN_TEXT" value="2051" />
+          <entry key="PLAIN_TEXT" value="2056" />
           <entry key="XML" value="15" />
         </counts>
       </usages-collector>
@@ -198,8 +170,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/Examples/ArtGallery/assertions.acsp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="409">
-              <caret line="171" column="59" selection-start-line="171" selection-start-column="59" selection-end-line="171" selection-end-column="59" />
+            <state relative-caret-position="111">
+              <caret line="117" column="97" selection-start-line="117" selection-start-column="97" selection-end-line="117" selection-end-column="97" />
             </state>
           </provider>
         </entry>
@@ -207,8 +179,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Examples/ArtGallery/ArtGallery.acsp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="769">
-              <caret line="462" column="24" selection-start-line="462" selection-start-column="24" selection-end-line="462" selection-end-column="24" />
+            <state relative-caret-position="236">
+              <caret line="219" lean-forward="true" selection-start-line="219" selection-end-line="219" />
             </state>
           </provider>
         </entry>
@@ -242,10 +214,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>channelN</find>
-      <find>proc</find>
-      <find>addIn</find>
-      <find>addO</find>
       <find>l!</find>
       <find>isWell</find>
       <find>stop</find>
@@ -272,6 +240,10 @@
       <find>channel</find>
       <find>beh</find>
       <find>if</find>
+      <find>appro</find>
+      <find>approachOne</find>
+      <find>Requirement4</find>
+      <find>REquirement4</find>
     </findStrings>
     <replaceStrings>
       <replace />
@@ -433,7 +405,7 @@
     <property name="SearchEverywhereHistoryKey" value="ACSPTy&#9;FILE&#9;file:///Users/aimee/IdeaProjects/untitled/src/main/java/ACSPTypeChecker.java&#10;example.&#9;FILE&#9;file:///Users/aimeeborda/ACSP-Compiler/Example.acsp" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1550058362134" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1550058804376" />
     <property name="extract.method.default.visibility" value="private" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
@@ -474,7 +446,7 @@
     <configuration name="Translation" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="Translation" />
       <module name="Translator" />
-      <option name="PROGRAM_PARAMETERS" value="Examples/Stadium/Section.acsp" />
+      <option name="PROGRAM_PARAMETERS" value="Examples/ArtGallery/ArtGallery.acsp" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -562,7 +534,7 @@
       <workItem from="1544041794649" duration="1341000" />
       <workItem from="1549915302443" duration="3183000" />
       <workItem from="1549998116323" duration="1691000" />
-      <workItem from="1550052155046" duration="3909000" />
+      <workItem from="1550052155046" duration="4371000" />
     </task>
     <servers />
   </component>
@@ -572,7 +544,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="112051000" />
+    <option name="totallyTimeSpent" value="112513000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -587,7 +559,7 @@
     <frame x="0" y="-1200" width="1920" height="1200" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.4979592" visible="true" weight="0.17838125" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.4979592" weight="0.17838125" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.24959612" />
       <window_info id="Designer" order="2" />
       <window_info id="Image Layers" order="3" />
@@ -620,7 +592,7 @@
       <window_info anchor="right" id="Theme Preview" order="9" />
     </layout>
     <layout-to-restore>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.4979592" visible="true" weight="0.22294022" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.4979592" visible="true" weight="0.17838125" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.24959612" />
       <window_info id="Designer" order="2" />
       <window_info id="Image Layers" order="3" />
@@ -629,15 +601,15 @@
       <window_info id="Capture Tool" order="6" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49676898" visible="true" weight="0.4048387" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49676898" visible="true" weight="0.24159291" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="TODO" order="6" weight="0.32741934" />
+      <window_info anchor="bottom" id="TODO" order="6" weight="0.32739726" />
       <window_info anchor="bottom" id="Terminal" order="7" weight="0.8547945" />
       <window_info anchor="bottom" id="Tool Output" order="8" weight="0.4" />
       <window_info anchor="bottom" id="Event Log" order="9" sideWeight="0.503231" side_tool="true" weight="0.4048387" />
-      <window_info anchor="bottom" id="Messages" order="10" weight="0.32419354" />
+      <window_info anchor="bottom" id="Messages" order="10" weight="0.3240876" />
       <window_info anchor="bottom" id="Database Changes" order="11" show_stripe_button="false" />
       <window_info anchor="bottom" id="Version Control" order="12" show_stripe_button="false" />
       <window_info anchor="bottom" id="ANTLR Preview" order="13" />
@@ -909,13 +881,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Examples/ArtGallery/ArtGallery.acsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="769">
-          <caret line="462" column="24" selection-start-line="462" selection-start-column="24" selection-end-line="462" selection-end-column="24" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Examples/Stadium/assertions.acsp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="799">
@@ -923,10 +888,17 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/Examples/ArtGallery/ArtGallery.acsp">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="236">
+          <caret line="219" lean-forward="true" selection-start-line="219" selection-end-line="219" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/Examples/ArtGallery/assertions.acsp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="409">
-          <caret line="171" column="59" selection-start-line="171" selection-start-column="59" selection-end-line="171" selection-end-column="59" />
+        <state relative-caret-position="111">
+          <caret line="117" column="97" selection-start-line="117" selection-start-column="97" selection-end-line="117" selection-end-column="97" />
         </state>
       </provider>
     </entry>

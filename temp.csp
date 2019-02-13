@@ -1,522 +1,533 @@
+transparent normal
 
- transparent normal
+datatype Room = EA | EB | ED | Corr | Corr2 | RA | Str
+datatype Connection = Secure | Open | HVAC
 
- datatype State = Before | During | After
- datatype IDS = H.{0..NumSections} | L.{0..NumSections} | VIP.{0..NumSections} | Corr  | Emp
+Processes = {0..4}
+MaxAgents = 100
+MaxAgentsEA = MaxAgents*2
+MaxAgentsPair = MaxAgents
+EmergencyCount = 2
 
- subtype SectionID = H.{0..NumSections} | L.{0..NumSections} | VIP.{0..NumSections}  | Corr
- subtype Agent = VIP.{0..NumSections} | H.{0..NumSections} | L.{0..NumSections}  | Emp
+notR(rm) = {x | x<- Room, x != rm}
+channel adapt : {0..MaxAgentsEA}
+channel adaptRA : {0..MaxAgents*2}.Bool
+channel adaptE
+channel adapt6
 
- s = VIP.0
+channel emergency
+channel goto : Room.Room
+channel grd : Room.Room
 
- NumSections = 5
- SectionSize = 5
-
- channel goto : Agent.SectionID.SectionID
- channel event : State
- channel alarm :Bool
- channel wind
- channel noisy : Bool
- channel open : SectionID.SectionID
- channel lights : Bool
- channel empty
-
-
-
- Sensors = normal(( normal((NoisePanel[|{|goto,event,open,empty|}|] AlarmPanel) )[|{|event|}|] EventStatus) )
- PhysicalController = normal((AccessController[|{|event|}|] EventStatus) )
- Section = normal((PhysicalController[|{|goto,event,open,empty,noisy,alarm|}|] Sensors) )
-channel adapt2 : Bool.Bool
-channel adapt
-channel adapt1 : Bool
+channel connect : Bool.Connection
+channel disconnect 
+channel update
 
 channel ack
 
-t(x) = (x + 1) %NumSections
-next(y.x) = y.t(x)
-next(_) = Corr
-
-r(x) = (x - 1) %NumSections
-prev(y.x) = y.r(x)
-prev(_) = Corr
-
-notE = {x | x <- Agent, x != Emp}
-
-adj = {next(s),prev(s),Corr}
-sections = {y.z | y <- union({s},adj), z <- union({s},adj), y!=z,z == s or y ==s }
-
-openEvt = {x.y | x <- SectionID, y <- SectionID, x == s or y ==s, x!=Corr, y != Corr}
-monEvents = {| noisy,event,wind ,alarm |}
-locEvents = union( {goto.y.x | x <- sections, y<- Agent} ,{open.x | x <- openEvt}	)
-events = Union({locEvents, monEvents, {|empty|}})
-adEvents = {|ack,adapt,adapt1|}
-
-Behaviour(n) = (n > 0 & goto?_:{x | x<- Agent, x!= Emp}!s?_: adj -> Behaviour(n-1))
-				[] (n < SectionSize & goto?_:{x | x<- Agent, x!= Emp}?_:adj!s -> Behaviour(n+1))
-				[] (goto!Emp?_:sections -> Behaviour(n))
-				[] (n == 0 & empty -> Behaviour(n))
-
-
-SOpen = goto?_:{s,Emp}?_:adj!s -> SOpen [] goto?_:{s,Emp}!s?_ :adj -> SOpen
-SExitAdj = goto!Emp?_:sections ->  SExit [] goto?_!s!Corr -> SExit [] goto?_?_:{next(s), prev(s)}!s -> SExit
-SRoaming = goto?_?_:adj!s -> SRoaming	[] goto?_!s?_: adj -> SRoaming
-SExit = goto!Emp?_:sections ->  SExit [] goto?_!s!Corr -> SExit
-
-PA = let
-
-		B = (event!Before  -> adapt -> ack -> B)
-				[] (goto?_?_: sections -> B)
-				[] (event?_:{During,After} -> B)
-				[] (open?_ : openEvt -> B)
-				[] (alarm?b ->  B)
-				[] (empty -> B)
-				[] (wind -> B)
-				[] (noisy?_ -> B)
-		within B
-
-FA = adapt -> ac!0 -> ack -> FA
-
-PB = let B(aft,alrm) = (event!After  -> adapt1!False -> ack -> B(True,alrm))
-				[] (goto?_?_: sections -> B(aft,alrm))
-				[] (event!Before -> B(False,False))
-				[] (event!During -> B(False,alrm))
-				[] (open?_ : openEvt -> B(aft,alrm))
-				[] (alarm?b -> B(aft,b))
-				[] (empty -> if not alrm and aft then adapt1!True -> ack -> B(aft,alrm) else B(aft,alrm))
-				[] (wind -> B(aft,alrm or member(s,{|H|})))
-				[] (noisy?_ -> B(aft,alrm))
-	within B(False,False)
-
-FB = adapt1?emp -> if not emp then ac!1 -> ack -> FB  else if  emp then ac!2 ->  ack->FB else ack->FB
-
-PC = let B = (alarm!True  -> adapt-> ack -> B)
-				[] (alarm!False -> B)
-				[] (goto?_?_: sections -> B)
-				[] (noisy?_ -> B)
-				[] (event?_ -> B)
-				[] (open?_ : openEvt -> B)
-				[] (empty -> B)
-				[] (wind -> B)
-	within B
-
-FC = adapt -> ac!1 -> ack -> FC
-
-PD = let
-			applies(w, n, a,ev) = not (w or n or a) and ev == During
-			B(wnd, n, alrm ,emp,ev) =
-							(goto?_:notE?_:adj!s -> if applies(wnd,n,alrm,ev) then adapt1!False -> ack -> B(wnd, n, alrm ,False,ev) else B(wnd, n, alrm ,False,ev))
-						[] (goto!Emp?_ : sections -> B(wnd, n, alrm, emp,ev))
-						[] (goto?_:notE!s?_:adj -> B(wnd, n, alrm, emp,ev))
-						[] (empty -> B(wnd, n, alrm, emp,ev))
-						[] (open?_ :{x.y | x.y <-openEvt,y!=s} -> B(wnd, n, alrm, emp,ev))
-						[] (open?_ :{x.y | x.y <-openEvt,y ==s} -> B(wnd, n, alrm, False,ev))
-						[] (event!Before -> B(False, False,False,True,Before))
-						[] (event!After -> B(wnd, n, alrm ,emp,After))
-						[] (event!During -> if applies(wnd,n,alrm,ev) then  adapt1!emp -> ack -> B(wnd, n,alrm,emp,During) else B(wnd, n, alrm ,emp,During))
-
-						[] (wind -> B(member(s, {|H|}), n, alrm,emp,ev))
-						[] (alarm?b -> if applies(wnd,n,b,ev) then adapt1!emp -> ack -> B(wnd, n, b,emp,ev) else B(wnd,n,b,emp,ev))
-						[] (noisy?b -> if applies(wnd,b,alrm,ev) then adapt1!emp -> ack -> B(wnd, b, alrm,emp,ev) else B(wnd,b,alrm,emp,ev))
-
-		within B(False,False,False,True,Before)
-
-FD = adapt1?emp:Bool -> if not emp or member(s,{|VIP|}) then ac!3 -> ack -> FD else if emp then ac!4 ->  ack -> FD else ack -> FD
-
-PE = let
-			applies(alrm,ev) = (not alrm) and (ev == During)
-			A(alrm,w,ev,ba) =
-					(goto?_?_: sections -> A(alrm,w,ev,ba))
-				[] (open!s?_ :{y | x.y <- openEvt,x==s, member(y,{|L|})} -> if applies(alrm,ev) and w then adapt1!True -> ack -> A(alrm,w,ev,True)else A(alrm,w,ev,True))
-				[] (open?_ : {x.y | x.y <- openEvt, x != s or not member(y,{|L|})} -> A(alrm,w,ev,ba))
-				[] (empty -> A(alrm,w,ev,ba))
-
-				[] (event!Before -> A(False,False,Before,False))
-				[] (event!During -> if applies(alrm,ev) and w then adapt1!False -> ack -> A(alrm,w,During,ba) else A(alrm,w,During,ba))
-				[] (event!After -> A(alrm,w,After,ba))
-
-				[] (wind -> if applies(alrm,ev) then adapt1!False -> ack -> A(alrm,True,ev,False) else A(alrm,True,ev,False))
-				[] (alarm?b -> if applies(b,ev) and w then adapt1!ba -> ack -> A(b,w,ev,ba) else A(b,w,ev,ba))
-				[] (noisy?_ -> A(alrm,w,ev,ba))
-		within A(False,False,Before,False)
-
-FE = adapt1?backup -> if (not backup and member(s, {|H|})) then ac!5 -> ack -> FE else if (backup and member(s, {|H|})) then ac!1 -> ack -> FE else ack->FE
-
-PF = let
-			applies(alrm,w,ev) = not(alrm or w) and (ev == During)
-			B(alrm,w,n,ev) = (goto?_ ?_: sections-> B(alrm,w,n,ev))
-					[] (event!Before -> B(False,False,False,Before))
-					[] (event!After -> B(alrm,w,n,After))
-					[] (event!During -> B(alrm,w,n,During))
-					[] (open?_ : openEvt -> B(alrm,w,n,ev))
-					[] (noisy?b -> if applies(alrm,w,ev) and b then adapt -> ack -> B(alrm,w,b,ev) else B(alrm,w,b,ev))
-					[] (wind -> B(alrm,member(s,{|H|}),n,ev))
-					[] (alarm?b -> if applies(b,w,ev) and n then adapt -> ack -> B(b,w,n,ev) else B(b,w,n,ev))
-					[] (empty -> B(alrm,w,n,ev))
-
-		within B(False,False,False,Before)
-
-FF = adapt -> ac!6 ->  ack -> FF
-
-PG = let
-		applies(alrm,w,n,ev) = not (alrm or w or n) and ev != Before
-		B(alrm,w,n,e,ev) = (goto!Emp?_: adj!s -> B(alrm,w,n,e,ev))
-				[] (goto?_:notE?_: adj!s -> B(alrm,w,n,False,ev))
-				[] (goto?_!s?_: adj -> B(alrm,w,n,e,ev))
-				[] (event!Before -> B(False,False,False,True,Before))
-				[] (event!After -> B(alrm,w,n,e,After))
-				[] (open?_ : {x.y | x.y <- openEvt, y != s} -> B(alrm,w,n,e,ev))
-				[] (open?_ : {x.y | x.y <- openEvt, y == s} -> if applies(alrm,w,n,ev) and e then adapt1!ev == During -> ack -> B(alrm,w,n,False,ev) else B(alrm,w,n,False,ev))
-				[] (wind -> B(alrm,member(s, {|H|}),n,e,ev))
-				[] (noisy?b -> B(alrm,w,b,e,ev))
-				[] (event!During -> B(alrm,w,n,e,During))
-				[] (empty -> B(alrm,w,n,True,ev))
-				[] (alarm?b ->  B(b,w,n,e,ev))
-
-		within B(False,False,False,True,Before)
-
-FG = adapt1?d -> if d then ac!3 ->  ack -> FG else if not d then ac!7 ->  ack -> FG else ack -> FG
-
-AccessController = let
-
-
-		RA = normal((PA[|adEvents|] FA) ) \ adEvents
-		RB = normal((PB[|adEvents|] FB) ) \ adEvents
-		RC = normal((PC[|adEvents|] FC) ) \ adEvents
-		RD = normal((PD[|adEvents|] FD) ) \ adEvents
-		RE = normal((PE[|adEvents|] FE) ) \ adEvents
-		RF = normal((PF[|adEvents|] FF) ) \ adEvents
-		RG = normal((PG[|adEvents|] FG) ) \ adEvents
-
-		C1 = normal((RA[|events|] RB) )
-		C2 = normal((C1[|events|] RC) )
-		C3 = normal((C2[|events|] RD) )
-		C4 = normal((C3[|events|] RE) )
-		C5 = normal((C4[|events|] RF) )
-		C6 = normal((C5[|events|] RG) )
-
-
-		AdaptationProc = normal((C6[|{|goto,empty|}|] Behaviour(0)) )
-
-	within normal((let R = ac?id -> (map(ac,id) /\ R) 
- within (SExit/\ R)[|union( locEvents,{| ac|})|] AdaptationProc)  \ {| ac|})
-
-EventStatus = event!Before -> event!During -> event!After -> EventStatus
-Lights_0 = lights!True -> STOP
-Lights_1 = lights!False -> STOP
-PI =
-		let B(n,emp,ev) = (goto!Emp?_:sections -> B(n,emp,ev))
-
-				[] (event!During-> adapt2!n!emp -> ack ->  B(n,emp,During))
-				[] (event!Before -> adapt2!n!False -> ack -> B(n, True,Before))
-				[] (event!After ->  B(n,emp,After))
-				[] (empty -> if ev == After then adapt2!n!True -> ack -> B(n,True,ev) else B(n,emp,ev))
-
-				[] (goto?_ :notE?_:adj!s -> if emp and ev != Before then adapt2!n!False -> ack -> B(n,False,ev) else B(n,False,ev))
-				[] (goto?_ :notE!s?_:adj -> B(n,emp,ev))
-
-				[] (open?_ : {x.y | x.y <- openEvt, y !=s} -> B(n,emp,ev))
-				[] (open?_ : {x.y | x.y <- openEvt, y ==s} -> adapt2!n!False -> ack -> B(n,False,ev))
-				[] (lights?b -> B(b,emp,ev))
-			within B(False,True,Before)
-
-
-FI = adapt2?l?emp -> if l and emp then lp!0 ->  ack -> FI else if not l and not emp then lp!1 -> ack -> FI else lp!2 -> ack -> FI
-
-
-
-LightsPanel = let
-		AdaptationProc = normal((PI[|{|adapt2,ack|}|] FI) ) \ {|adapt2,ack|}
-	within normal((let R = lp?id -> (map(lp,id) /\ R) 
- within (STOP/\ R)[|union( {|lights|},{| lp|})|] AdaptationProc)  \ {| lp|})
-
-Noisy_0 = noisy!False -> STOP
-Noisy_1(b) = noisy!b -> Noisy_1(not b)
-
-PH =
-		let B(n,emp,ev) = (goto!Emp?_:sections -> B(n,emp,ev))
-				[] (event!Before -> adapt2!n!True -> ack -> B(n,True,Before))
-				[] (event!During -> if emp then adapt2!n!emp -> ack-> B(n,emp,During) else B(n,emp,During))
-				[] (event!After -> adapt2!n!True-> ack -> B(n,emp,After))
-				[] (noisy?b -> B(b,emp,ev))
-				[] (empty -> if ev == During then adapt2!n!True -> ack ->  B(n,True,ev) else B(n,True, ev))
-				[] (goto?_ :notE?_:adj!s -> if ev == During and emp then  adapt2!n!False -> ack->  B(n,False,ev)else B(n,False,ev))
-				[] (goto?_ :notE!s?_:adj -> B(n,emp,ev))
-				[] (open?_ :openEvt-> B(n,emp,ev))
-			within  B(False,True,Before)
-
-FH = adapt2?n?emp -> if emp and n then np!0 ->  ack -> FH
-					else if not emp and n then np!1 ->  ack -> FH
-					else if not emp and not n then np!2 -> ack -> FH
-					else if emp and not n then np!3 ->  ack -> FH
-					else ack -> FH
-
-
-NoisePanel = let
-		AdaptationProc = normal((PH[|{|adapt2,ack|}|] FH) ) \ {|adapt2,ack|}
-	within normal((let R = np?id -> (map(np,id) /\ R) 
- within (STOP/\ R)[|union( {|noisy|},{| np|})|] AdaptationProc)  \ {| np|})
-
-Alarm_1(b) = alarm!b -> Alarm_1(not b)
-
-AlarmPanel = Alarm_1(True)
- -- File /Users/aimeeborda/ACSP-Compiler/Examples/Stadium/assertions.acsp
-
-
-ReqA = 	let
-				R =  (goto?_?_:sections -> R)
-					[] (noisy?_ -> R)
-					[] (wind -> R)
-					[] (alarm?_ -> R)
-					[] (event!Before -> B)
-					[] (event?_:{During,After} -> R)
-					[] (open?_ : openEvt -> R)
-					[] (empty -> R)
-				B = (goto!Emp?_:adj!s -> B)
-					[] (goto!s?_:adj!s -> B)
-					[] (event?_:{During,After} -> R)
-					[] (event!Before -> B)
-					[] (empty -> B)
-					[] (noisy?_ -> B)
-					[] (wind -> B)
-					[] (alarm?_ -> R)
-					[] (goto?_!s?_: adj -> B)
-			within R
-
-ReqB = 	let
-				B(emer) =
-						 (event!During -> B(emer))
-						[] (event!Before -> B(False))
-						[] (event!After -> T(emer,False))
-						[] (noisy?_ -> B(emer))
-						[] (wind -> B(emer or member(s,{|H|})))
-						[] (alarm?b -> B(b))
-						[] (goto?_?_ :sections-> B(emer))
-						[] (open?_ : openEvt -> B(emer))
-						[] (empty -> B(emer))
-				T(emer,emp)  = (goto!Emp?_ :sections-> T(emer,emp))
-						[] (event!During -> B(emer))
-						[] (event!Before -> B(False))
-						[] (event!After -> T(emer,False))
-						[] (noisy?_ -> T(emer,emp))
-						[] (wind -> T(emer or member(s,{|H|}),emp))
-						[] (alarm?b -> B(b))
-						[] (goto?_:notE!s!Corr -> T(emer,emp))
-						[] (empty -> T(emer,True))
-						[] (emp & goto?_:notE?_:{next(s),prev(s)}!s -> T(emer,emp))
-					 	[] (emp & open?_ :{x.y | x.y <- openEvt,y==s, member(x, adj)} -> T(emer,emp))
-					 	[] (not emp or emer & open?_ :{x.y | x.y <- openEvt,x==s} -> T(emer,emp))
-			within
-				B(False)
-
-ReqC = 	let
-				R =  (goto?_ ?_:sections-> R)
-					[] (noisy?_ -> R)
-					[] (wind -> R)
-					[] (alarm!True -> B)
-					[] (alarm!False -> R)
-					[] (event!After -> R)
-					[] (event?_:{During,Before} -> R)
-					[] (open?_ : openEvt -> R)
-					[] (empty -> R)
-				B = (goto!Emp?_:adj!s -> B)
-					[] (event!Before -> R)
-					[] (event?_:{After,During} -> B)
-					[] (noisy?_ -> B)
-					[] (wind -> B)
-					[] (open?_ : {x.y | x.y <- openEvt, y != s}  -> B)
-					[] (alarm!True -> B)
-					[] (alarm!False -> R)
-					[] (goto?_!s?_: adj -> B)
-					[] (empty -> B)
-			within
-				R
-
-ReqD = 	let R(emp) = (event!Before -> R(True))
-						[] (event!During -> during(emp))
-						[] (event!After -> R(emp))
-						[] (goto?_: notE?_ :adj!s -> R(False))
-						[] (goto!Emp?_:adj!s -> R(emp))
-						[] (goto?_!s?_ :adj-> R(emp))
-						[] (noisy?_ -> R(emp))
-						[] (wind -> R(emp))
-						[] (alarm?_ -> R(emp))
-						[] (open?_ :openEvt-> R(emp))
-						[] (empty -> R(emp))
-				during(b) =  (goto!Emp?_ :sections-> during(b))
-						[] (goto?_:notE!s?_ :adj -> during(b))
-						[] (b and not member(s,{|VIP|}) & goto!s?_ :adj!s -> during(False))
-						[] (not b or member(s,{|VIP|}) & goto?_:notE?_ :adj!s -> during(b))
-						[] (noisy?_ -> during(b))
-						[] (wind -> during(b))
-						[] (alarm?_ -> during(b))
-						[] (event?_ :{Before,After} -> R(True))
-						[] (event!During -> during(b))
-						[] (open?_ : {x.y | x.y <- openEvt,y!=s} -> during(b))
-						[] (b & open?_ : {x.y | x.y <- openEvt,y ==s} -> R(b))
-						[] (empty -> during(b))
-			within
-				  R(True)
-
-ReqE = let
-				R1(w) = (goto?_?_:sections -> R1(w))
-					[] (noisy?_ -> R1(w))
-					[] (wind -> R1(member(s, {|H|})))
-					[] (open?_ :openEvt -> R1(w))
-					[] (event!Before  -> R1(False))
-					[] (event!After  -> R1(w))
-					[] (event!During  -> W(False,w))
-					[] (alarm?_ -> R1(w))
-					[] (empty -> R1(w))
-				W(backup,w) = (goto!Emp?_ :sections-> W(backup,w))
-					[] (not backup and w and member(s,{|H|}) & goto!s?_:adj!s -> W(backup,w))
-					[] (not w or not member(s,{|H|})& goto?_:notE?_:adj!s -> W(backup,w))
-					[] (empty -> W(backup,w))
-					[] (event!After -> R1(w))
-					[] (event!Before -> R1(False))
-					[] (event!During -> W(False,w))
-					[] (noisy?_ -> W(backup,w))
-					[] (wind -> W(False,member(s, {|H|})))
-					[] (alarm?_ -> W(backup,w))
-					[] (goto?_:notE!s?_: adj -> W(backup,w))
-					[] (open!s?_ : {x | x <- SectionID, not member(x, {|H,VIP|}), x!= s} -> W(w,w))
-					[] (open!s?_ : {x | x <- SectionID, member(x, {|H,VIP|}), x!= s} -> W(backup,w))
-					[] (not w & open?_ : {x | x <- SectionID, x!= s, x!=Corr}!s -> W(backup,w))
-			within
-				R1(False)
-
-ReqF = let
-			R =  (goto?_?_:sections -> R)
-					[] (noisy?_ -> R)
-					[] (wind -> R)
-					[] (alarm?_ -> R)
-					[] (open?_ :openEvt -> R)
-					[] (empty -> R)
-					[] (event?_ :{Before,After}-> R)
-					[] (event!During -> B(False))
-			B(n) = (goto!Emp?_ :sections-> B(n))
-					[] (event?_ :{Before,After} -> R)
-					[] (event!During -> B(n))
-					[] (noisy?b -> B(b))
-					[] (wind -> B(n))
-					[] (alarm?_ -> B(n))
-					[] (empty -> B(n))
-					[] (goto?_:notE!s?_: adj -> B(n))
-					[] (n & open?_ : {x.y | x.y <- openEvt,y != s} -> B(n))
-					[] (not n & open?_ : openEvt -> B(n))
-					[] (n & goto!s?_:adj!s -> B(n))
-					[] (not n & goto?_:notE?_:adj!s -> B(n))
-			within R
-
-ReqG = 	let
-			applies(alrm,wnd,nois) = not (alrm or wnd or nois)
-			R(alrm,wnd,no,emp,opn) = (goto!Emp?_ :sections-> R(alrm,wnd,no,emp,opn))
-				[] (goto?_:notE!s?_:adj -> R(alrm,wnd,no,emp,opn))
-				[] (emp & goto!s?_:adj!s  -> R(alrm,wnd,no,False,opn))
-				[] (not emp or opn or member(s,{|VIP|}) &goto?_:notE?_:adj!s  -> R(alrm,wnd,no,False,opn))
-
-				[] (event!During -> R(alrm,wnd,no,emp,opn))
-				[] (event!Before -> B(False,False,False,True,False))
-				[] (event!After -> A(alrm,wnd,no,emp,opn))
-				[] (noisy?b -> R(alrm,wnd,b,emp,opn))
-				[] (wind -> R(alrm,member(s, {|H|}),no ,emp,opn))
-				[] (alarm?b -> R(b,wnd,no,emp,opn))
-				[] (empty -> R(alrm,wnd,no,emp,opn))
-
-				[] (open?_ :{x.y | x.y <- openEvt,y != s} -> R(alrm,wnd,no,emp,opn))
-				[] (applies(alrm,wnd,no) and emp & open?_ :{x.y | x.y <- openEvt,y == s} -> B(alrm,wnd,no,emp,True))
-			B(alrm,wnd,no,emp,opn) = (goto!Emp?_ :sections-> B(alrm,wnd,no,emp,opn))
-				[] (goto?_:notE!s?_:adj -> B(alrm,wnd,no,emp,opn))
-				[] (goto?_:notE?_ :adj !s -> B(alrm,wnd,no,False,opn))
-
-				[] (event!During -> R(alrm,wnd,no,emp,opn))
-				[] (event!Before -> B(False,False,False,True,False))
-				[] (event!After -> A(alrm,wnd,no,emp,opn))
-				[] (noisy?b -> B(alrm,wnd,b,emp,opn))
-				[] (wind -> B(alrm, member(s, {|H|}),no,emp,opn))
-				[] (alarm?b -> B(b,wnd,no,emp,opn))
-				[] (empty -> B(alrm,wnd,no,emp,opn))
-
-				[] (open?_ :{x.y | x.y <- openEvt,y != s} -> B(alrm,wnd,no,emp,opn))
-			A(alrm,wnd,no,emp,opn) = (goto!Emp?_ :sections -> A(alrm,wnd,no,emp,opn))
-				[] (goto?_:notE!s!Corr -> A(alrm,wnd,no,False,opn))
-				[] (opn & goto?_:notE?_:{next(s),prev(s)}!s -> A(alrm,wnd,no,emp,opn))
-
-				[] (event!During -> R(alrm,wnd,no,emp,opn))
-				[] (event!Before -> B(False,False,False,True,opn))
-				[] (event!After -> A(alrm,wnd,no,emp,opn))
-				[] (noisy?b -> A(alrm,wnd,b,emp,opn))
-				[] (wind -> A(alrm,member(s, {|H|}),no,emp,opn))
-				[] (alarm?b -> A(b,wnd,no,emp,opn))
-				[] (empty -> A(alrm,wnd,no,True,opn))
-
-				[] (open?_ :{x.y | x.y <- openEvt,y != s} -> A(alrm,wnd,no,emp,opn))
-				[] (not applies(alrm,wnd,no) or emp & open?_ :{x.y | x.y <- openEvt,y == s} -> A(alrm,wnd,no,emp,True))
-		within
-			B(False,False,False,True,False)
-
-ReqH =
-		let
-			B(emp,n) = ((goto!Emp?_:sections -> B(emp,n))
-				[] (goto?_ : notE?_:adj!s -> B(False,n))
-				[] (goto?_ : notE!s?_:adj -> B(emp,n))
-				[] (empty -> B(True,n))
-				[] (open?_ :openEvt -> B(emp,n))
-				[] ((not emp) & noisy!(not n) -> B(emp,(not n)))
-				[] (emp and n& noisy!False -> B(emp,False))
-				[] (event!After -> B(True,n))
-				[] (event!Before -> B(True,n))
-				[] (event!During -> B(emp,n)))
-		within B(True,False)
-
-
-ReqI = 	let B(n,emp,ev) = (goto!Emp?_:sections -> B(n,emp,ev))
-				[] (empty -> B(n,emp or ev == After,ev))
-				[] (event!During -> B(n,emp,During))
-				[] (event!Before -> B(n,True,Before))
-				[] (event!After  -> B(n,emp,After))
-
-				[] (not n and not emp & lights!not n -> B(not n,emp,ev))
-				[] (n and emp and ev != Before & lights!not n -> B(not n,emp,ev))
-				[] (not n and ev == Before & lights!not n -> B(not n,emp,ev))
-
-				[] (goto?_ :notE?_:adj!s -> B(n,False,ev))
-				[] (goto?_ :notE!s?_:adj -> B(n,emp,ev))
-
-				[] (open?_ : {x.y | x.y <- openEvt, y !=s} -> B(n,emp,ev))
-				[] (open?_ : {x.y | x.y <- openEvt, y ==s} ->  B(n,False,ev))
-				[] (alarm?_ -> B(n,emp,ev))
-				[] (noisy?_ -> B(n,emp,ev))
-				[] (wind -> B(n,emp,ev))
-			within  B(False,True,Before)
-
-assert ReqA [T= PhysicalController
-assert ReqB [T= PhysicalController
-assert ReqC [T= PhysicalController
-assert ReqD [T= PhysicalController
-assert ReqE [T= PhysicalController
-assert ReqF [T= PhysicalController
-assert ReqG [T= PhysicalController
-assert ReqH [T= NoisePanel
-assert ReqI [T= normal((LightsPanel[|{|event,goto,empty,open|}|] PhysicalController) )
-
-
-channel ac : {0..7}
-channel np : {0..3}
-channel lp : {0..2}
-
-map = \ chName,id @ if chName == ac and id == 0 then SOpen 
-else if chName == ac and id == 1 then  normal((SExit||| open!s?_ : {x | x <- adj, x!= Corr} -> SKIP) ) 
-else if chName == ac and id == 2 then  normal((SExit||| open?_ : {x | x <- adj, x!= Corr}!s -> SKIP) ) 
-else if chName == ac and id == 3 then SRoaming 
-else if chName == ac and id == 4 then  normal((SOpen||| (open?_ : {x | x <-SectionID, x!=s, x!=Corr}!s -> SKIP)) ) 
-else if chName == ac and id == 5 then  normal((SOpen||| (open!s?_ : {L.x, VIP.x | x <- {0..NumSections}} -> SKIP)) ) 
-else if chName == ac and id == 6 then  normal((SOpen||| (open!s?_ : {x | x <- SectionID, x!=s,x!=Corr}-> SKIP)) ) 
-else if chName == ac and id == 7 then SExitAdj 
-else if chName == np and id == 0 then Noisy_0 
-else if chName == np and id == 1 then Noisy_1(False) 
-else if chName == np and id == 2 then Noisy_1(True) 
-else if chName == np and id == 3 then STOP 
-else if chName == lp and id == 0 then Lights_1 
-else if chName == lp and id == 1 then Lights_0 
-else if chName == lp and id == 2 then STOP 
+Stairs = 
+
+		let P(n) = (n > 0 & goto!Str!Corr2 -> (connect!True!Open  -> P(n-1)))
+					[] (n > 0 & goto!Str!Corr -> P(n-1))
+					[] (n < MaxAgents & goto!Corr!Str -> P(n+1))
+					[] (n < MaxAgents & goto!Corr2!Str ->(connect!False!Open  -> P(n+1)))
+					[] (grd!Corr2!Str -> connect!False!Secure  -> P(n))
+					[] (grd!Str!Corr2 -> connect!True!Secure  -> P(n))
+					[] (grd!Str!Corr -> P(n))
+		within P(0)
+EventsD = {goto.EB.ED,goto.ED.Corr}
+Monitors2 = {|emergency|}
+
+MonitorsD = union(Monitors5, {x | x <- Monitors2, approachOne})
+
+D0 = (goto!ED!Corr -> D0) [] (goto!EB!ED -> D0)
+D1 = goto!ED!Corr -> D1
+
+BehaviourD = let D(n) =  (n > 0 & goto!ED!Corr -> D(n-1))
+					[] (n <= MaxAgentsEA & goto!EB!ED -> D(n+1))
+				within D(0)
+
+Pattern2 = let P(n) = 
+				   (goto!ED!Corr -> if n==MaxAgents then adapt!n-1 -> ack -> P(n-1) else if n > 0 then P(n-1) else P(0))
+				[] (goto!EB!ED -> if n >= MaxAgents - 1 then adapt!MaxAgents -> ack -> P(MaxAgents) else P(n+1))
+				[] (emergency -> RUN(union(EventsD,Monitors2)))
+		within P(0)
+Pi2 =  adapt?v  ->  if v == MaxAgents then ld!0 -> ack -> Pi2 else ld!1 -> ack -> Pi2
+
+
+Pattern5D = (emergency -> adaptE -> ack -> Pattern5D) [] (goto?_: {x | goto.x <- EventsD} -> Pattern5D)
+Pi5D =  adaptE  -> ld!1 -> ack -> Pi5D
+
+RmD = let
+		eventsR2 = union(EventsD,Monitors2)
+		eventsR5 = union(EventsD,Monitors5)
+
+		events = union(eventsR2,eventsR5)
+		R2 = normal((Pattern2[|{|adapt,ack|}|] Pi2) ) \ {|adapt,ack|}
+		R5 = normal((Pattern5D[|{|adaptE,ack|}|] Pi5D) ) \ {|adaptE,ack|}
+
+		FirstApproach = normal((BehaviourD[|inter(EventsD,events)|] normal((R2[|inter(eventsR2,eventsR5)|] R5) )) )
+		SecondApproach = normal((BehaviourD[|inter(EventsD,eventsR5)|] R5) )
+    within normal((let R = ld?id -> (map(ld,id) /\ R) 
+ within (D0/\ R)[|union( EventsD,{| ld|})|] (if(approachOne) then FirstApproach else SecondApproach))  \ {| ld|})
+EventsB = {goto.EB.EA,goto.EB.ED,goto.EA.EB}
+Monitors2B = union(EventsD,Monitors5)
+
+MonitorsB = union({x | x<- Monitors2B, not approachOne}, Monitors5)
+B0 = (goto!EB?_:{EA,ED} -> B0) [] (goto!EA!EB -> B0) 
+B1 = (goto!EB?_:{EA,ED} -> B1)
+BehaviourB = let B(n) =  (n > 0 & goto!EB?_:{EA,ED} -> B(n-1))
+					[] (n <= MaxAgentsEA & goto!EA!EB -> B(n+1))
+				within B(0)
+Pattern2B = let P(n) = 
+		   	   		(goto!EB!EA -> if(n == MaxAgentsPair) then adapt!n-1 -> ack -> P(n-1) else if(n > 0) then P(n-1) else P(0)) 
+		   	 	[] (goto!EA!EB -> if(n >= MaxAgentsPair-1) then adapt!n+1 -> ack -> P(MaxAgentsPair) else P(n+1))
+				[] (goto!ED!Corr -> if(n == MaxAgentsPair) then adapt!n-1 -> ack -> P(n-1) else if (n >0) then P(n-1) else P(0)) 
+				[] (goto!EB!ED -> P(n))
+				[] (emergency -> RUN(union(EventsB,Monitors2B)))
+			within P(0)
+Pi2B =  adapt?v  ->  if v == MaxAgentsPair then lb!0 -> ack -> Pi2B else lb!1 -> ack -> Pi2B
+
+
+Pattern5B = (emergency -> adaptE -> ack -> Pattern5B) [] (goto?_: {x | goto.x <- EventsB} -> Pattern5B)
+PiEmergencyB =  adaptE  -> lb!1 -> ack -> PiEmergencyB
+RmB = let
+			eventsR2B = union(EventsB,Monitors2B)
+			eventsR5 = union(EventsB,Monitors5)
+
+			events = Union({eventsR2B,eventsR5})
+			R5 = normal((PiEmergencyB[|{|adaptE,ack|}|] Pattern5B) )  \ {|adaptE,ack|}
+			R2B = normal((Pi2B[|{|adapt,ack|}|] Pattern2B) ) \ {|adapt,ack|}
+			
+			FirstApproach = normal((R5[|inter(EventsB,eventsR5)|] BehaviourB) )
+			SecondApproach = normal((BehaviourB[|inter(EventsB,events)|] normal((R5[|inter(eventsR5,eventsR2B)|] R2B) )) )
+		within normal((let R = lb?id -> (map(lb,id) /\ R) 
+ within (B0/\ R)[|union( EventsB,{| lb|})|] (if(approachOne) then FirstApproach else SecondApproach))  \ {| lb|})
+
+EventsA = {goto.EB.EA,goto.EA.Corr,goto.EA.EB,goto.Corr.EA}
+
+Monitors4 = union(EventsD,Monitors5)
+Monitors2A = union(EventsB,Monitors5)
+Monitors5 = {emergency}
+
+MonitorsA = Union({Monitors5,Monitors4, {x | x <- Monitors2A, not approachOne}})
+A0 = (goto!EB!EA -> A0) [] (goto!EA?_:{Corr,EB} -> A0) [] (goto!Corr!EA -> A0)
+A1 = (goto!EB!EA -> A1) [] (goto!EA?_:{Corr,EB} -> A1)
+BehaviourA =  let B(n) = (n <= MaxAgentsEA & goto!Corr!EA -> B(n+1))
+							[] (n > 0 & goto!EA!Corr -> B(n-1))
+							[] (n > 0 & goto!EA!EB -> B(n-1))
+							[] (n <= MaxAgentsEA & goto!EB!EA -> B(n+1))
+				within B(0)
+Pattern4 =  
+		let P(n) =  (goto?_:{EA,ED}!Corr -> if(n >= MaxAgentsEA) then adapt!n-1 -> ack-> P(n-1) else if (n > 0) then P(n-1) else P(0))
+				[] (goto!Corr!EA -> if(n >= MaxAgentsEA - 1) then adapt!MaxAgentsEA -> ack -> P(MaxAgentsEA) else P(n+1))
+				[] (goto!EA!EB -> P(n))  
+				[] (goto!EB!EA -> P(n)) 
+				[] (goto!EB!ED -> P(n))
+				[] (emergency -> RUN(union(EventsA,Monitors4))) 
+			
+		within P(0)
+Pi4 =  adapt?v  ->  if v >= MaxAgentsEA then la!0 -> ack -> Pi4 else la!1 ->  ack -> Pi4
+
+Pattern2A = let P(n) =  (goto!Corr!EA -> if(n >= MaxAgentsPair - 1) then adapt!MaxAgentsPair -> ack -> P(MaxAgentsPair) else P(n+1))
+					[] (goto!EA!Corr -> if(n >= MaxAgentsPair) then adapt!n-1 -> ack -> P(n-1) else if (n > 0) then P(n-1) else P(0))
+					[] (goto!EB!ED   -> if(n >= MaxAgentsPair) then adapt!n-1 -> ack -> P(n-1) else if (n > 0) then P(n-1) else P(0))
+					[] (goto!EA!EB -> P(n))  
+					[] (goto!EB!EA -> P(n)) 
+					[] (emergency -> RUN(union(EventsA,Monitors2A))) 
+			within P(0)
+Pi2A =  adapt?v  ->  if v >= MaxAgentsPair then la!0 -> ack -> Pi2A else la!1 -> ack -> Pi2A
+
+
+Pattern5A = (emergency -> adaptE -> ack -> Pattern5A) [] (goto?_: {x | goto.x <- EventsA} -> Pattern5A)
+PiEmergencyA =  adaptE  -> la!1 -> ack -> PiEmergencyA
+RmA = let
+			eventsR2A = union(EventsA,Monitors2A)
+			eventsR4 = union(EventsA,Monitors4)
+			eventsR5 = union(EventsA,Monitors5)
+
+
+			R4 = normal((Pi4[|{|adapt,ack|}|] Pattern4) ) \ {|adapt,ack|}
+			R2A = normal((Pi2A[|{|adapt,ack|}|] Pattern2A) ) \ {|adapt,ack|}
+			R5 = normal((PiEmergencyA[|{|adaptE,ack|}|] Pattern5A) ) \ {|adaptE,ack|}
+			
+			FirstApproach = normal(( normal((R4[|inter(eventsR4,eventsR5)|] R5) )[|inter(EventsA,Union({eventsR4,eventsR5}))|] BehaviourA) )
+			SecondApproach = normal(( normal((R2A[|inter(eventsR2A,eventsR5)|] R5) )[|inter(EventsA,Union({eventsR2A,eventsR5}))|] BehaviourA) )
+        within normal((let R = la?id -> (map(la,id) /\ R) 
+ within (A0/\ R)[|union( EventsA,{| la|})|] (if(approachOne) then FirstApproach else SecondApproach))  \ {| la|})
+EventsRA = {goto.RA.Corr2,goto.Corr2.RA,grd.Corr2.RA,grd.RA.Corr2}
+
+Monitors5RA = {|emergency|}
+Monitors1 =  union(EventsC2,Monitors5RA)
+
+MonitorsRA = union(Monitors5RA,Monitors1)
+
+EventsC2 = {goto.Str.Corr2,goto.Corr2.Str, grd.Corr2.Str, grd.Str.Corr2,goto.Corr2.RA,goto.RA.Corr2,grd.Corr2.RA,grd.RA.Corr2}
+Monitors1C2 =  {emergency}
+MonitorsC2 = union(Monitors5RA, Monitors1C2)
+
+eventsR1 = Union({EventsC2,EventsRA,Monitors1})
+eventsR5RA = union(EventsRA,Monitors5RA)
+eventsR5C2 = union(EventsC2,Monitors5RA)
+
+R0 = (goto!RA!Corr2 -> R0) [] (goto!Corr2!RA -> R0) [] (grd?_ :{x| grd.x <- EventsRA}-> R0)
+R1 = (goto!RA!Corr2 -> R1) [] (grd?_ :{x| grd.x <- EventsRA}-> R1)
+BehaviourRA = normal((R(0)||| R2(False)) )
+
+R(v) =  (v < MaxAgents & goto!Corr2!RA -> R(v+1))
+		[] (v > 0 & goto!RA!Corr2 -> R(v-1))
+			
+	
+R2(b) = (not b & grd!Corr2!RA -> R2(True)) 
+		[] (b & grd!RA!Corr2 -> R2(False))
+
+C2_0 =  (goto?_: {x | goto.x <- EventsC2} -> C2_0)
+		[] (grd?_: {x | grd.x <- EventsC2} -> C2_0)
+		
+
+C2_1 = 	(goto?_: {x | goto.x <- EventsC2} -> C2_1)
+		[] grd?_:{Str,RA}!Corr2 -> C2_1
+		[] grd!Corr2!RA -> C2_1
+
+C(n) = (n > 0 & goto!Corr2!RA -> C(n-1)) 
+		[](n > 0 & goto!Corr2!Str -> C(n-1)) 
+		[] (n < MaxAgents & goto!Str!Corr2 -> C(n+1))
+		[] (n < MaxAgents & goto!RA!Corr2 -> C(n+1))
+	
+C2(u) = (u & grd!Corr2!Str -> C2(False)) 
+		[] (u & grd!Corr2!RA -> C2(True)) 
+		[] (u & grd!RA!Corr2 -> C2(True))
+		[] (not u & grd!Str!Corr2 -> C2(True))
+
+
+		
+Beh = normal((C(0)||| C2(False)) )
+Pattern1 = let P(v,g) = 
+				 (grd!Str!Corr2 ->  adaptRA!v!True -> ack -> P(v,True))
+				[] (grd!Corr2!Str -> adaptRA!v!False -> ack -> P(v,False))
+				[] (grd?_: {x.y | x <-{Corr2,RA}, y<-{RA,Corr2}, x!= y} -> P(v,g))
+				
+				[] (goto!Corr2!Str -> if v == 1 then adaptRA!v-1!g -> ack -> P(v-1,g) else if v > 0 then P(v-1,g) else P(0,g)) 
+				[] (goto!Str!Corr2 -> if v == 0 then adaptRA!v+1!g -> ack -> P(v+1,g) else if v < MaxAgents*2 then P(v+1,g) else P(MaxAgents*2,g)) 
+				[] (goto?_ :{x.y| x <- {RA,Corr2}, y <- {RA,Corr2},x!=y} -> P(v,g))						
+				
+				[] (emergency -> RUN(Union({EventsC2,EventsRA,Monitors1})))
+		within P(0,False)
+Pi1 =  adaptRA?v?g  ->  let F2 = if g then ra!0 ->  ack -> Pi1 else ra!1 ->  ack -> Pi1
+					within if v>0 then c2!0 ->  F2 else c2!1 -> F2
+
+
+
+Pattern5RA = (emergency -> adaptE -> ack -> Pattern5RA) [] (goto?_: {x | goto.x <- EventsRA} -> Pattern5RA) [] (grd?_: {x | grd.x <- EventsRA} -> Pattern5RA)
+Pi5RA =  adaptE  -> ra!0 -> ack -> Pi5RA
+
+
+Pattern5C2 = (emergency -> adaptE -> ack -> Pattern5C2) [] (goto?_: {x | goto.x <- EventsC2} -> Pattern5C2) [] (grd?_: {x | grd.x <- EventsC2} -> Pattern5C2)
+Pi5C2 =  adaptE  -> c2!1 -> ack -> Pi5C2
+Composition = let
+		events = Union({eventsR1,eventsR5RA,eventsR5C2})
+
+		R1 = normal((Pattern1[|{|adaptRA,ack|}|] Pi1) ) \ {|adaptRA,ack|}
+		R5RA = normal((Pattern5RA[|{|adaptE,ack|}|] Pi5RA) ) \ {|adaptE,ack|}
+		R5C2 = normal((Pattern5C2[|{|adaptE,ack|}|] Pi5C2) ) \ {|adaptE,ack|}
+
+		
+        AdaptationProc = normal((R1[|inter(eventsR1,union(eventsR5RA,eventsR5C2))|] normal((R5RA[|inter(eventsR5C2,eventsR5RA)|] R5C2) )) )
+		
+		within normal(( normal(( normal((BehaviourRA[|EventsRA|]let R = ra?id -> (map(ra,id) /\ R) 
+ within (R0/\ R)) )[|inter(EventsRA,EventsC2)|] normal((Beh[|EventsC2|]let R = c2?id -> (map(c2,id) /\ R) 
+ within (C2_0/\ R)) )) )[|union( Union({EventsRA,EventsC2}),{| c2,ra|})|] AdaptationProc)  \ {| c2,ra|})
+
+
+
+
+EventsAP = {|connect,disconnect,update|}
+MonitorsAP = {}
+
+channel adapt3 : Connections
+
+AP0 = connect!True!HVAC -> RUN({connect.x.y | x<- Bool, y <- {Secure,Open}})
+AP1 = connect!False!HVAC -> RUN({connect.x.y | x<- Bool, y <- {Secure,Open}})
+AP2 = disconnect -> connect!True!HVAC -> RUN({connect.x.Secure | x<- Bool})
+AP3 = RUN({connect.x.y | x<- Bool, y <- {Secure,Open}})
+AP4 = disconnect -> connect!True!HVAC -> RUN({connect.x.y | x<- Bool, y <- {Secure,Open}})
+SAV(v) =  (v < MaxConnections & connect!True!Open -> SAV(v + 1))
+		[] (v > 0 & connect!False!Open -> SAV(v - 1))
+		[] (disconnect -> SAV(0))
+
+SAS(s) =  (s < MaxConnections & connect!True!Secure -> SAS(s + 1))
+		[] (s > 0 & connect!False!Secure -> SAS(s - 1))
+
+SAH(h) =  (connect!True!HVAC -> SAH(True))
+		[] (connect!False!HVAC -> SAH(False))
+
+SAU = update -> SAU
+		
+Behaviour = normal(( normal(( normal((SAV(0)||| SAS(0)) )||| SAH(False)) )||| SAU) )
+Pattern3A =   let P(n) = 
+				   (connect!True!Secure -> if n == 0 then adapt3!1 -> ack -> P(1) else if n < MaxConnections then P(n+1) else P(MaxConnections))
+					[] (connect!False!Secure -> if n == 1 then adapt3!0 -> ack -> P(0) else if n > 0 then P(n-1) else P(0))
+					[] (disconnect -> P(n))
+					[] (update -> P(n))
+					[] (connect?_:Bool?_:{HVAC,Open} -> P(n))
+				within P(0)			
+	
+Pattern3B =   let P(n) = (connect!True!Open -> if n == 0 then adapt3!n+1 -> ack -> P(1) else if n < MaxConnections then P(n+1) else P(MaxConnections))
+						[] (connect!False!Open -> if (n == 1) then adapt3!0 -> ack -> P(0) else if n > 0 then P(n-1) else P(0))				
+						[] (disconnect -> P(0))
+						[] (update -> P(n))
+						[] (connect?_:Bool?_:{HVAC,Secure} -> P(n))
+				within P(0)
+
+Pattern6 =      (connect?_ -> Pattern6)  [] (disconnect -> Pattern6) [] (update -> adapt6 -> ack -> Pattern6)
+Pi3A =  adapt3?n : Connections ->  
+						if n == 1 then l!0 -> ack -> Pi3A
+						else if n == 0 then l!1 -> ack -> Pi3A
+						else ack -> Pi3A
+
+Pi3B =  adapt3?n : Connections ->  
+						if n == 1 then l!2 -> ack -> Pi3B
+						else if n == 0 then l!3 -> ack -> Pi3B
+						else ack -> Pi3B
+
+Pi6 =  adapt6 -> l!4 -> ack -> Pi6
+accessPtComp = let
+			R3A = normal((Pi3A[|{|adapt3,ack|}|] Pattern3A) ) \ {| adapt3,ack|}
+			R3B = normal((Pi3B[|{|adapt3,ack|}|] Pattern3B) ) \ {| adapt3,ack|}
+			R6 = normal((Pi6[|{|adapt6,ack|}|] Pattern6) ) \ {|adapt6,ack|}
+			AdaptationProc = normal(( normal(( normal((R3A[|EventsAP|] R6) )[|EventsAP|] R3B) )[|{|connect,disconnect|}|] Behaviour) )
+		within normal((let R = l?id -> (map(l,id) /\ R) 
+ within (AP0/\ R)[|union( union(EventsAP,{|l|}),{| l|})|] AdaptationProc)  \ {| l|})
+
+
+MaxConnections = 3
+Connections = {0 .. MaxConnections}
+
+Upstairs = let 	
+				EventSet = {|connect.True.HVAC, connect.False.HVAC |}
+				hvacComp = connect?_:Bool!HVAC -> hvacComp
+			within normal((hvacComp[|EventSet|]accessPtComp) )
+
+RoomAB = normal( normal((RmA[|event("A","B")|] RmB) ))
+RoomBD = normal( normal((RmD[|event("D","B")|] RmB) ))
+
+ExhibitionArea = normal( normal((RoomAB[|event("AB","D")|] RmD) ))
+
+event(x,t)= Union({inter(E(x), M(t)), inter(E(t),M(x)),inter(E(t),E(x)), inter(M(t),M(x))})
+
+
+
+E("") = {}
+E(<x>^xs) = (if (x == 'A') then union(EventsA,E(xs)) else if (x == 'B') then union(EventsB,E(xs)) else if x == 'D' then union(EventsD,E(xs)) else {})
+
+M("") = {}
+M(<x>^xs) = (if x == 'A' then union(MonitorsA,M(xs)) else if (x == 'B') then union(MonitorsB,M(xs)) else if (x == 'D') then union(MonitorsD,M(xs)) else {})
+
+
+ArtGallery = normal(( normal(( normal((Upstairs[|{|connect,disconnect|}|]Stairs) )[|{|goto.Str.Corr2,goto.Corr2.Str,grd.Str.Corr2,grd.Corr2.Str|}|] Composition) )[|{|goto.Str.Corr,goto.Corr.Str,grd.Str.Corr,grd.Corr.Str|}|] ExhibitionArea) )
+ -- File /Users/aimeeborda/ACSP-Compiler/Examples/ArtGallery/assertions.acsp
+
+assert Composition :[deadlock free]
+assert Composition :[deterministic]
+assert Composition :[livelock free]
+
+ Specification = let NoGrd =  (grd!Str!Corr2 -> GrdPres(0))
+						[] (goto!Str!Corr2 -> NoGrd)
+						[] (goto!Corr2!Str -> NoGrd)
+					GrdPres(n) =  (n < MaxAgents & goto!Corr2!RA -> GrdPres(n+1))
+						[] (n > 0  & goto!RA!Corr2 -> GrdPres(n-1))
+						[] (n == 0 & grd!Corr2!Str -> NoGrd)
+						[] (grd!Str!Corr2 -> GrdPres(n))
+						[] (grd?_:{Corr2,RA}?_:{RA,Corr2} -> GrdPres(n))
+						[] (goto?_:{Corr2,Str}?_:{Str,Corr2} -> GrdPres(n))
+				within normal((NoGrd||| emergency -> RUN(Union({MonitorsC2,MonitorsRA,EventsRA,EventsC2}))) )
+
+assert Specification [T= Composition
+
+
+assert Pattern1 \ {|adaptRA,adaptE,ack|} [T= RUN(eventsR1)
+assert RUN(eventsR1)[F= Pattern1 \ {|adaptRA,adaptE,ack|}
+
+assert Pattern5C2 \ {|adaptRA,adaptE,ack|} [T= RUN(eventsR5C2)
+assert RUN(eventsR5C2)[F= Pattern5C2 \ {|adaptRA,adaptE,ack|}
+
+assert Pattern5RA \ {|adaptRA,adaptE,ack|} [T= RUN(eventsR5RA)
+assert RUN(eventsR5RA)[F= Pattern5RA \ {|adaptRA,adaptE,ack|}
+Requirement3 = let
+					T(m,n) = (n  == 0  & connect!True!Secure -> disconnect -> connect!True!HVAC-> T(0,n+1))
+							[] (n > 0 and n < MaxConnections & connect!True!Secure -> T(m,n+1))
+							[] (n > 0 & connect!False!Secure -> T(m,n-1))
+							[] (m  == 0  & connect!True!Open -> connect!False!HVAC -> T(m+1,n))
+							[] (m  == 0  & connect!False!Open  -> T(m,n))
+							[] (m > 0 and m < MaxConnections & connect!True!Open -> T(m+1,n))
+							[] (m > 1 & connect!False!Open -> T(m-1,n))
+							[] (m == 1 & connect!False!Open -> connect!True!HVAC -> T(m-1,n))
+							[] (update -> T(m,n))
+						within connect!True!HVAC ->T(0,0)
+
+
+Requirement6 =  (connect?_?_ -> Requirement6) [] (update -> disconnect -> connect!True!HVAC -> Requirement6) [] (disconnect->Requirement6)
+
+Requirement3A = let
+					T(n) = (n  == 0  & connect!True!Secure -> disconnect ->  T(n+1))
+							[] (n > 0 and n < MaxConnections & connect!True!Secure -> T(n+1))
+							[] (n > 0 & connect!False!Secure -> T(n-1))
+							[] (n == 0 & connect?_!Open -> T(n))
+							[] (update -> T(n))
+							[] (connect?_!HVAC -> T(n))
+						within T(0)
+
+
+Requirement3B = let
+					T(n) = (n  == 0  & connect!True!Open -> connect!False!HVAC -> T(n+1))
+							[](n  == 0  & connect!False!Open  -> T(n))
+							[] (n > 0 and n < MaxConnections & connect!True!Open -> T(n+1))
+							[] (n > 1 & connect!False!Open -> T(n-1))
+							[] (n == 1 & connect!False!Open -> connect!True!HVAC -> T(n-1))
+							[] (update -> T(n))
+							[] (disconnect -> connect!True!HVAC-> T(0))
+							[] (connect?_!Secure -> T(n))
+						within connect!True!HVAC -> T(0)
+Requirement2 = let T(n) =   (n < MaxAgents & goto!EB!ED  -> T(n+1))
+								[] (n > 0  & goto!ED!Corr -> T(n-1))
+								[] (emergency -> RUN(union(EventsD,MonitorsD)))
+				within T(0)
+Requirement4 = let T(n) =   (n < MaxAgentsEA & goto!Corr!EA  -> T(n+1))
+							[] (n >= 0  & goto?_:{EA,ED}!Corr -> T(n-1))
+							[] (goto?_:{EA.EB,EB.EA,EB.ED} -> T(n))
+							[] (emergency -> RUN(Union({MonitorsA,MonitorsB,MonitorsD,EventsA,EventsB,EventsD})))
+			within T(0)
+Movement = let M(a,b,d) = (a > 0 and b <= MaxAgentsEA & goto!EA!EB -> M(a-1,b+1,d))
+							[] (b > 0 and a <= MaxAgentsEA & goto!EB!EA -> M(a+1,b-1,d))
+							[] (b > 0 and d <= MaxAgentsEA & goto!EB!ED -> M(a,b-1,d+1))
+							[] (d > 0 & goto!ED!Corr -> M(a,b,d-1))
+							[] (a > 0 & goto!EA!Corr -> M(a-1,b,d))
+							[] (a <= MaxAgentsEA & goto!Corr!EA -> M(a+1,b,d))
+			within M(0,0,0)
+
+Requirement5D =  RmD /\  (emergency -> RUN(union(EventsD,{emergency})))
+Requirement5B =  RmB /\ (emergency -> RUN(union(EventsB,{emergency})))
+Requirement5A =  RmA /\ (emergency -> RUN(union(EventsA,{emergency})))
+
+
+ExtraRequirement = normal((Requirement2A[|{emergency,goto.EA.EB,goto.EB.EA,goto.EB.ED}|] Requirement2B) )
+
+
+Requirement2A = let P(a,b) =  (a > 0  & goto!EA!EB -> P(a-1,b+1))
+								[] (b > 0  & goto!EB!EA -> P(a+1,b-1))
+								[] (b > 0 & goto!EB!ED -> P(a,b-1))
+								[] (a > 0  & goto!EA!Corr -> P(a-1,b))
+								[] (a + b < MaxAgentsPair & goto!Corr!EA -> P(a+1,b))
+								[] (goto!ED!Corr -> P(a,b))
+								[] (emergency -> RUN(Union({MonitorsA,MonitorsB,EventsA,EventsB})))
+			within P(0,0)
+
+Requirement2B = let P(b,d) =  (d + b < MaxAgentsPair & goto!EA!EB -> P(b+1,d))
+								[] (b > 0  & goto!EB!EA -> P(b-1,d))
+								[] (b > 0  & goto!EB!ED -> P(b-1,d+1))
+								[] (d > 0  & goto!ED!Corr -> P(b,d-1))
+								[] (emergency -> RUN(Union({MonitorsB,MonitorsD,EventsB,EventsD})))
+				within P(0,0)
+
+
+assert Requirement6 [T= accessPtComp
+assert Requirement3A [T= accessPtComp
+assert Requirement3B [T= accessPtComp
+
+assert accessPtComp :[deadlock free]
+assert accessPtComp :[deterministic]
+assert accessPtComp :[livelock free]
+
+assert Requirement6 [T= Upstairs
+assert Requirement3A [T= Upstairs
+assert Requirement3B [T= Upstairs
+
+assert Upstairs :[deadlock free]
+assert Upstairs :[deterministic]
+assert Upstairs :[livelock free]
+
+assert Requirement3 [T= normal((Requirement3B[|{|connect,disconnect,update|}|]Requirement3A) )
+
+
+assert Pattern3A \ {|adapt3,adapt6,ack|} [T= RUN(EventsAP)
+assert RUN(EventsAP)[F= Pattern3A \ {|adapt3,adapt6,ack|}
+
+assert Pattern3B \ {|adapt3,adapt6,ack|} [T= RUN(EventsAP)
+assert RUN(EventsAP)[F= Pattern3B \ {|adapt3,adapt6,ack|}
+
+assert Pattern6 \ {|adapt3,adapt6,ack|} [T=RUN(EventsAP)
+assert RUN(EventsAP)[F= Pattern6 \ {|adapt3,adapt6,ack|}
+approachOne = False
+
+assert Requirement5D [F=  RmD
+assert Requirement5B [F=  RmB
+assert Requirement5A [F=  RmA
+
+assert normal((Requirement2[|event("D","B")|] RmB) )  [T= RoomBD
+assert normal((Requirement2[|event("D","AB")|] RoomAB) )  [T= ExhibitionArea
+
+assert Requirement4 [T= ExhibitionArea
+assert Requirement2B  [T= RoomBD
+assert Requirement2A [T= RoomAB
+assert normal((Requirement2A[|event("AB","D")|] RmD) ) [T= ExhibitionArea
+assert normal((Requirement2B[|event("BD","A")|] RmA) ) [T= ExhibitionArea
+assert ExtraRequirement [T= ExhibitionArea
+
+assert Pattern2A \ {|adapt,adaptE,ack|} [T= RUN(union(EventsA,Monitors2A))
+assert RUN(union(EventsA,Monitors2A))[F= Pattern2A \ {|adapt,adaptE,ack|}
+
+assert Pattern2B \ {|adapt,adaptE,ack|} [T= RUN(union(EventsB,Monitors2B))
+assert RUN(union(EventsB,Monitors2B))[F= Pattern2B \ {|adapt,adaptE,ack|}
+
+assert Pattern4 \ {|adapt,adaptE,ack|} [T= RUN(union(EventsA,MonitorsA))
+assert RUN(union(EventsA,MonitorsA))[F= Pattern4 \ {|adapt,adaptE,ack|}
+
+assert Pattern5A \ {|adapt,adaptE,ack|} [T= RUN(union(EventsA,Monitors5))
+assert RUN(union(EventsA,Monitors5))[F= Pattern5A \ {|adapt,adaptE,ack|}
+
+assert Pattern5B \ {|adapt,adaptE,ack|} [T= RUN(union(EventsB,Monitors5))
+assert RUN(union(EventsB,Monitors5))[F= Pattern5B \ {|adapt,adaptE,ack|}
+
+assert Pattern5D \ {|adapt,adaptE,ack|} [T= RUN(union(EventsD,Monitors5))
+assert RUN(union(EventsD,Monitors5))[F= Pattern5D \ {|adapt,adaptE,ack|}
+
+assert ExhibitionArea :[deadlock free]
+assert ExhibitionArea :[deterministic]
+assert ExhibitionArea :[livelock free]
+
+assert Movement [T= normal((ExhibitionArea[|{|emergency|}|] STOP) )
+assert RmA :[deadlock free]
+assert RmA :[deterministic]
+assert RmA :[livelock free]
+assert RmB :[deadlock free]
+assert RmB :[deterministic]
+assert RmB :[livelock free]
+
+assert RmD :[deadlock free]
+assert RmD :[deterministic]
+assert RmD :[livelock free]
+
+
+channel la : {0..1}
+channel lb : {0..1}
+channel ld : {0..1}
+channel l : {0..4}
+channel ra : {0..1}
+channel c2 : {0..1}
+
+map = \ chName,id @ if chName == la and id == 0 then A1 
+else if chName == la and id == 1 then A0 
+else if chName == lb and id == 0 then B1 
+else if chName == lb and id == 1 then B0 
+else if chName == ld and id == 0 then D1 
+else if chName == ld and id == 1 then D0 
+else if chName == l and id == 0 then AP2 
+else if chName == l and id == 1 then AP3 
+else if chName == l and id == 2 then AP1 
+else if chName == l and id == 3 then AP0 
+else if chName == l and id == 4 then AP4 
+else if chName == ra and id == 0 then R0 
+else if chName == ra and id == 1 then R1 
+else if chName == c2 and id == 0 then C2_1 
+else if chName == c2 and id == 1 then C2_0 
 else SKIP

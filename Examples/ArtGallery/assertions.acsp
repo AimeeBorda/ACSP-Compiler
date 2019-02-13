@@ -78,6 +78,62 @@ Requirement3B = let
 							[] (connect?_!Secure -> T(n))
 						within connect!True!HVAC -> T(0)
 
+---------------------------------------------
+--		Requirements Assertions
+---------------------------------------------
+
+---------- at most MaxAgents people in room D ----------
+Requirement2 = let T(n) =   (n < MaxAgents & goto!EB!ED  -> T(n+1))
+								[] (n > 0  & goto!ED!Corr -> T(n-1))
+								[] (emergency -> RUN(union(EventsD,MonitorsD)))
+				within T(0)
+
+---------- at most MaxAgentsEA people in the Exhibition Area ----------
+Requirement4 = let T(n) =   (n < MaxAgentsEA & goto!Corr!EA  -> T(n+1))
+							[] (n >= 0  & goto?_:{EA,ED}!Corr -> T(n-1))
+							[] (goto?_:{EA.EB,EB.EA,EB.ED} -> T(n))
+							[] (emergency -> RUN(Union({MonitorsA,MonitorsB,MonitorsD,EventsA,EventsB,EventsD})))
+			within T(0)
+
+---------- Logical Movement through Exhibition Area ----------
+Movement = let M(a,b,d) = (a > 0 and b <= MaxAgentsEA & goto!EA!EB -> M(a-1,b+1,d))
+							[] (b > 0 and a <= MaxAgentsEA & goto!EB!EA -> M(a+1,b-1,d))
+							[] (b > 0 and d <= MaxAgentsEA & goto!EB!ED -> M(a,b-1,d+1))
+							[] (d > 0 & goto!ED!Corr -> M(a,b,d-1))
+							[] (a > 0 & goto!EA!Corr -> M(a-1,b,d))
+							[] (a <= MaxAgentsEA & goto!Corr!EA -> M(a+1,b,d))
+			within M(0,0,0)
+
+Requirement5D =  RmD /\  (emergency -> RUN(union(EventsD,{emergency})))
+Requirement5B =  RmB /\ (emergency -> RUN(union(EventsB,{emergency})))
+Requirement5A =  RmA /\ (emergency -> RUN(union(EventsA,{emergency}))) -- (emergency -> (BehaviourA ||| RUN({emergency})))
+
+
+
+---------------------------------------------
+--	 Assertions for Strong Adaptability
+---------------------------------------------
+
+
+ExtraRequirement = (Requirement2A [|{emergency,goto.EA.EB,goto.EB.EA,goto.EB.ED}|] Requirement2B)
+
+
+Requirement2A = let P(a,b) =  (a > 0  & goto!EA!EB -> P(a-1,b+1))
+								[] (b > 0  & goto!EB!EA -> P(a+1,b-1))
+								[] (b > 0 & goto!EB!ED -> P(a,b-1))
+								[] (a > 0  & goto!EA!Corr -> P(a-1,b))
+								[] (a + b < MaxAgentsPair & goto!Corr!EA -> P(a+1,b))
+								[] (goto!ED!Corr -> P(a,b))
+								[] (emergency -> RUN(Union({MonitorsA,MonitorsB,EventsA,EventsB})))
+			within P(0,0)
+
+Requirement2B = let P(b,d) =  (d + b < MaxAgentsPair & goto!EA!EB -> P(b+1,d))
+								[] (b > 0  & goto!EB!EA -> P(b-1,d))
+								[] (b > 0  & goto!EB!ED -> P(b-1,d+1))
+								[] (d > 0  & goto!ED!Corr -> P(b,d-1))
+								[] (emergency -> RUN(Union({MonitorsB,MonitorsD,EventsB,EventsD})))
+				within P(0,0)
+
 
 assert Requirement6 [T= accessPtComp
 assert Requirement3A [T= accessPtComp
@@ -95,7 +151,7 @@ assert Upstairs :[deadlock free]
 assert Upstairs :[deterministic]
 assert Upstairs :[livelock free]
 
-assert Requirement3 [T=  Requirement3B [|{|connect,disconnect,update|}|]Requirement3A
+assert Requirement3 [T=  (Requirement3B [|{|connect,disconnect,update|}|]Requirement3A)
 
 
 assert Pattern3A \ {|adapt3,adapt6,ack|} [T= RUN(EventsAP)
