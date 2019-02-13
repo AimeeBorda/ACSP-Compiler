@@ -1,4 +1,4 @@
-// Generated from /Users/aimee/IdeaProjects/ACSP Compiler/src/main/java/ACSP.g4 by ANTLR 4.7
+// Generated from /Users/aimeeborda/ACSP-Compiler/src/main/java/ACSP.g4 by ANTLR 4.7
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
 /**
@@ -82,11 +82,23 @@ public interface ACSPVisitor<T> extends ParseTreeVisitor<T> {
 	 */
 	T visitDefinitionLeft(ACSPParser.DefinitionLeftContext ctx);
 	/**
+	 * Visit a parse tree produced by {@link ACSPParser#tuple}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitTuple(ACSPParser.TupleContext ctx);
+	/**
 	 * Visit a parse tree produced by {@link ACSPParser#any}.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
 	T visitAny(ACSPParser.AnyContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link ACSPParser#literal}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitLiteral(ACSPParser.LiteralContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link ACSPParser#checkConditionBody}.
 	 * @param ctx the parse tree

@@ -1,0 +1,194 @@
+---------------------------------------------
+--		Restoration Area General Assertions
+---------------------------------------------
+assert Composition :[deadlock free]
+assert Composition :[deterministic]
+assert Composition :[livelock free]
+
+
+---------------------------------------------
+--		Requirement 1
+---------------------------------------------
+
+ Specification = let NoGrd =  (grd!Str!Corr2 -> GrdPres(0))
+						[] (goto!Str!Corr2 -> NoGrd)
+						[] (goto!Corr2!Str -> NoGrd)
+					GrdPres(n) =  (n < MaxAgents & goto!Corr2!RA -> GrdPres(n+1))
+						[] (n > 0  & goto!RA!Corr2 -> GrdPres(n-1))
+						[] (n == 0 & grd!Corr2!Str -> NoGrd)
+						[] (grd!Str!Corr2 -> GrdPres(n))
+						[] (grd?_:{Corr2,RA}?_:{RA,Corr2} -> GrdPres(n))
+						[] (goto?_:{Corr2,Str}?_:{Str,Corr2} -> GrdPres(n))
+				within (NoGrd ||| emergency -> RUN(Union({MonitorsC2,MonitorsRA,EventsRA,EventsC2})))
+
+assert Specification [T= Composition
+
+---------------------------------------------
+--	 Assertions about Adapatation Pattern
+---------------------------------------------
+
+
+assert Pattern1 \ {|adaptRA,adaptE,ack|} [T= RUN(eventsR1)
+assert RUN(eventsR1)[F= Pattern1 \ {|adaptRA,adaptE,ack|}
+
+assert Pattern5C2 \ {|adaptRA,adaptE,ack|} [T= RUN(eventsR5C2)
+assert RUN(eventsR5C2)[F= Pattern5C2 \ {|adaptRA,adaptE,ack|}
+
+assert Pattern5RA \ {|adaptRA,adaptE,ack|} [T= RUN(eventsR5RA)
+assert RUN(eventsR5RA)[F= Pattern5RA \ {|adaptRA,adaptE,ack|}
+
+
+---------------------------------------------
+--		Requirements Assertions
+---------------------------------------------
+Requirement3 = let
+					T(m,n) = (n  == 0  & connect!True!Secure -> disconnect -> connect!True!HVAC-> T(0,n+1))
+							[] (n > 0 and n < MaxConnections & connect!True!Secure -> T(m,n+1))
+							[] (n > 0 & connect!False!Secure -> T(m,n-1))
+							[] (m  == 0  & connect!True!Open -> connect!False!HVAC -> T(m+1,n))
+							[] (m  == 0  & connect!False!Open  -> T(m,n))
+							[] (m > 0 and m < MaxConnections & connect!True!Open -> T(m+1,n))
+							[] (m > 1 & connect!False!Open -> T(m-1,n))
+							[] (m == 1 & connect!False!Open -> connect!True!HVAC -> T(m-1,n))
+							[] (update -> T(m,n))
+						within connect!True!HVAC ->T(0,0)
+
+
+Requirement6 =  (connect?_?_ -> Requirement6) [] (update -> disconnect -> connect!True!HVAC -> Requirement6) [] (disconnect->Requirement6)
+
+Requirement3A = let
+					T(n) = (n  == 0  & connect!True!Secure -> disconnect ->  T(n+1))
+							[] (n > 0 and n < MaxConnections & connect!True!Secure -> T(n+1))
+							[] (n > 0 & connect!False!Secure -> T(n-1))
+							[] (n == 0 & connect?_!Open -> T(n))
+							[] (update -> T(n))
+							[] (connect?_!HVAC -> T(n))
+							--[] (disconnect -> T(n))
+						within T(0)
+
+
+Requirement3B = let
+					T(n) = (n  == 0  & connect!True!Open -> connect!False!HVAC -> T(n+1))
+							[](n  == 0  & connect!False!Open  -> T(n))
+							[] (n > 0 and n < MaxConnections & connect!True!Open -> T(n+1))
+							[] (n > 1 & connect!False!Open -> T(n-1))
+							[] (n == 1 & connect!False!Open -> connect!True!HVAC -> T(n-1))
+							[] (update -> T(n))
+							[] (disconnect -> connect!True!HVAC-> T(0))
+							[] (connect?_!Secure -> T(n))
+						within connect!True!HVAC -> T(0)
+
+
+assert Requirement6 [T= accessPtComp
+assert Requirement3A [T= accessPtComp
+assert Requirement3B [T= accessPtComp
+
+assert accessPtComp :[deadlock free]
+assert accessPtComp :[deterministic]
+assert accessPtComp :[livelock free]
+
+assert Requirement6 [T= Upstairs
+assert Requirement3A [T= Upstairs
+assert Requirement3B [T= Upstairs
+
+assert Upstairs :[deadlock free]
+assert Upstairs :[deterministic]
+assert Upstairs :[livelock free]
+
+assert Requirement3 [T=  Requirement3B [|{|connect,disconnect,update|}|]Requirement3A
+
+
+assert Pattern3A \ {|adapt3,adapt6,ack|} [T= RUN(EventsAP)
+assert RUN(EventsAP)[F= Pattern3A \ {|adapt3,adapt6,ack|}
+
+assert Pattern3B \ {|adapt3,adapt6,ack|} [T= RUN(EventsAP)
+assert RUN(EventsAP)[F= Pattern3B \ {|adapt3,adapt6,ack|}
+
+assert Pattern6 \ {|adapt3,adapt6,ack|} [T=RUN(EventsAP)
+assert RUN(EventsAP)[F= Pattern6 \ {|adapt3,adapt6,ack|}
+
+---------- approach two of pair-wise count ----------
+approachOne = False
+
+
+---------- The people in the building should be able to reach the nearest emergency exit (With no composition) ----------
+
+assert Requirement5D [F=  RmD
+assert Requirement5B [F=  RmB
+assert Requirement5A [F=  RmA
+
+---------------------------------------------
+--	 Requirement 2 (First Approach)
+---------------------------------------------
+
+assert (Requirement2 [| event("D","B") |] RmB)  [T= RoomBD
+assert (Requirement2 [| event("D","AB") |] RoomAB)  [T= ExhibitionArea
+
+---------------------------------------------
+--	 Requirement 4 (First Approach)
+---------------------------------------------
+
+assert Requirement4 [T= ExhibitionArea
+
+---------------------------------------------
+--	 Requirement 2A & 2B (Second Approach)
+---------------------------------------------
+assert Requirement2B  [T= RoomBD
+assert Requirement2A [T= RoomAB
+assert (Requirement2A [| event("AB","D")|] RmD) [T= ExhibitionArea
+assert (Requirement2B [| event("BD","A")|] RmA ) [T= ExhibitionArea
+assert ExtraRequirement [T= ExhibitionArea
+
+---------------------------------------------
+--	 Condition 1 of Adaptation Pattern
+---------------------------------------------
+
+assert Pattern2A \ {|adapt,adaptE,ack|} [T= RUN(union(EventsA,Monitors2A))
+assert RUN(union(EventsA,Monitors2A))[F= Pattern2A \ {|adapt,adaptE,ack|}
+
+assert Pattern2B \ {|adapt,adaptE,ack|} [T= RUN(union(EventsB,Monitors2B))
+assert RUN(union(EventsB,Monitors2B))[F= Pattern2B \ {|adapt,adaptE,ack|}
+
+assert Pattern4 \ {|adapt,adaptE,ack|} [T= RUN(union(EventsA,MonitorsA))
+assert RUN(union(EventsA,MonitorsA))[F= Pattern4 \ {|adapt,adaptE,ack|}
+
+assert Pattern5A \ {|adapt,adaptE,ack|} [T= RUN(union(EventsA,Monitors5))
+assert RUN(union(EventsA,Monitors5))[F= Pattern5A \ {|adapt,adaptE,ack|}
+
+assert Pattern5B \ {|adapt,adaptE,ack|} [T= RUN(union(EventsB,Monitors5))
+assert RUN(union(EventsB,Monitors5))[F= Pattern5B \ {|adapt,adaptE,ack|}
+
+assert Pattern5D \ {|adapt,adaptE,ack|} [T= RUN(union(EventsD,Monitors5))
+assert RUN(union(EventsD,Monitors5))[F= Pattern5D \ {|adapt,adaptE,ack|}
+
+-----------------------------------------------
+----	 Assertions for EA
+-----------------------------------------------
+
+assert ExhibitionArea :[deadlock free]
+assert ExhibitionArea :[deterministic]
+assert ExhibitionArea :[livelock free]
+
+assert Movement [T= (ExhibitionArea [|{|emergency|}|] STOP)
+
+---------------------------------------------
+--		Room A Assertions
+---------------------------------------------
+assert RmA :[deadlock free]
+assert RmA :[deterministic]
+assert RmA :[livelock free]
+
+---------------------------------------------
+--	 Assertions for Room B
+---------------------------------------------
+assert RmB :[deadlock free]
+assert RmB :[deterministic]
+assert RmB :[livelock free]
+
+---------------------------------------------
+--	 Assertions for Room D
+---------------------------------------------
+
+assert RmD :[deadlock free]
+assert RmD :[deterministic]
+assert RmD :[livelock free]

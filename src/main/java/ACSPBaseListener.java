@@ -1,4 +1,4 @@
-// Generated from /Users/aimee/IdeaProjects/ACSP Compiler/src/main/java/ACSP.g4 by ANTLR 4.7
+// Generated from /Users/aimeeborda/ACSP-Compiler/src/main/java/ACSP.g4 by ANTLR 4.7
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ErrorNode;
@@ -159,6 +159,18 @@ public class ACSPBaseListener implements ACSPListener {
 	 *
 	 * <p>The default implementation does nothing.</p>
 	 */
+	@Override public void enterTuple(ACSPParser.TupleContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitTuple(ACSPParser.TupleContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
 	@Override public void enterAny(ACSPParser.AnyContext ctx) { }
 	/**
 	 * {@inheritDoc}
@@ -166,6 +178,18 @@ public class ACSPBaseListener implements ACSPListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitAny(ACSPParser.AnyContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterLiteral(ACSPParser.LiteralContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitLiteral(ACSPParser.LiteralContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

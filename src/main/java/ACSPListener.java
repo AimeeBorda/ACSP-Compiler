@@ -1,4 +1,4 @@
-// Generated from /Users/aimee/IdeaProjects/ACSP Compiler/src/main/java/ACSP.g4 by ANTLR 4.7
+// Generated from /Users/aimeeborda/ACSP-Compiler/src/main/java/ACSP.g4 by ANTLR 4.7
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
 /**
@@ -127,6 +127,16 @@ public interface ACSPListener extends ParseTreeListener {
 	 */
 	void exitDefinitionLeft(ACSPParser.DefinitionLeftContext ctx);
 	/**
+	 * Enter a parse tree produced by {@link ACSPParser#tuple}.
+	 * @param ctx the parse tree
+	 */
+	void enterTuple(ACSPParser.TupleContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ACSPParser#tuple}.
+	 * @param ctx the parse tree
+	 */
+	void exitTuple(ACSPParser.TupleContext ctx);
+	/**
 	 * Enter a parse tree produced by {@link ACSPParser#any}.
 	 * @param ctx the parse tree
 	 */
@@ -136,6 +146,16 @@ public interface ACSPListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitAny(ACSPParser.AnyContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link ACSPParser#literal}.
+	 * @param ctx the parse tree
+	 */
+	void enterLiteral(ACSPParser.LiteralContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link ACSPParser#literal}.
+	 * @param ctx the parse tree
+	 */
+	void exitLiteral(ACSPParser.LiteralContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link ACSPParser#checkConditionBody}.
 	 * @param ctx the parse tree

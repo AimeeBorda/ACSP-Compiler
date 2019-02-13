@@ -34,14 +34,18 @@ definitionLeft
 	| ID LPAREN any(COMMA any)* RPAREN
 	;
 
+tuple : (LT any GT)(LISTCT any)?;
+
 any
 	: proc
 	| boolExp
 	| expr
 	| event
 	| type
-
 	;
+
+literal : (DBLQUOTE | QUOTE) ID? (DBLQUOTE | QUOTE);
+
 checkConditionBody
 	: DEADLOCK FREE modelCheckType?
 	| LIVELOCK FREE modelCheckType?
@@ -61,6 +65,7 @@ type
 	| number
 	| type DOT type
 	| set
+	| tuple
 	;
 
 
@@ -78,7 +83,7 @@ proc:     Skip
      	| event ARROW proc
      	| proc ECHOICE proc
      	| proc ICHOICE proc
-     	| IF boolExp THEN proc ELSE proc
+     	| IF boolExp THEN any ELSE any
      	| boolExp GUARD proc
      	| proc (BACKSLASH | PROJECT) set
      	| proc TIMEOUT proc
@@ -92,7 +97,7 @@ proc:     Skip
 	    | definitionLeft
 	    ;
 
-event : ID ((QUERY | PLING | DOLLAR | DOT) expr (COLLON type)?)*;
+event : ID ((QUERY | PLING | DOLLAR | DOT) (expr | boolExp) (COLLON type)?)*;
 locProcess : ID LBRACKET proc RBRACKET ;
 locOutput :  ID PLING LT proc GT DOT proc ;
 parallelProc :  (LPAREN NEW locNames RPAREN)? LPAREN proc parallelSync proc RPAREN;
@@ -111,12 +116,11 @@ boolExp
 	| LPAREN boolExp RPAREN
 	;
 
-
-
 expr
 	: MINUS expr
 	| expr (TIMES | DIV | PLUS | MINUS | MOD) expr
 	| LPAREN expr RPAREN
+	| literal
 	| number
 	| ID
 	| set
@@ -192,6 +196,7 @@ FREE: ' free';
 LET : 'let';
 WITHIN : 'within';
 INCLUDE : 'include';
+QUOTE : '\'';
 DBLQUOTE : '"';
 ACSP : 'acsp';
 BAR : '|';
@@ -201,9 +206,9 @@ EXTERNAL : 'external';
 NAMETYPE : 'nametype';
 DIGIT: ('0' .. '9');
 POR : 'partial order reduce';
+LISTCT : '^';
 
-
-ID : [a-zA-Z_][a-zA-Z0-9'_]*	;
+ID : [a-zA-Z_][a-zA-Z0-9_]*	;
 
 LINECOMMENT : ('--') ~('\r'|'\n')* -> channel (HIDDEN) ;
 WS : ( '\t' | ' ' | '\r'|'\n'| '\u000C' )+ ->channel (HIDDEN) ;

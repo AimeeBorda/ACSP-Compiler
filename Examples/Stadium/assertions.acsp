@@ -1,4 +1,5 @@
 
+
 ReqA = 	let
 				R =  (goto?_?_:sections -> R)
 					[] (noisy?_ -> R)
@@ -218,21 +219,16 @@ ReqG = 	let
 
 ReqH =
 		let
-			B(emp,n) = (goto!Emp?_:sections -> B(emp,n))
-
-			--	[] (not emp & goto?_: notE?_ :sections -> B(emp,n))
+			B(emp,n) = ((goto!Emp?_:sections -> B(emp,n))
 				[] (goto?_ : notE?_:adj!s -> B(False,n))
 				[] (goto?_ : notE!s?_:adj -> B(emp,n))
-
 				[] (empty -> B(True,n))
 				[] (open?_ :openEvt -> B(emp,n))
-				[] (not emp & noisy!not n -> B(emp,not n))
+				[] ((not emp) & noisy!(not n) -> B(emp,(not n)))
 				[] (emp and n& noisy!False -> B(emp,False))
-
 				[] (event!After -> B(True,n))
 				[] (event!Before -> B(True,n))
-				[] (event!During -> B(emp,n))
-
+				[] (event!During -> B(emp,n)))
 		within B(True,False)
 
 
@@ -268,38 +264,4 @@ assert ReqE [T= PhysicalController
 assert ReqF [T= PhysicalController
 assert ReqG [T= PhysicalController
 assert ReqH [T= NoisePanel
-assert ReqI [T= LightsPanel [|{|event,goto,empty,open|}|] PhysicalController
-
----------------------------------------------
---		Verification for Adaptation Patterns
----------------------------------------------
-
-assert PG \ adEvents [T= RUN(events)
-assert RUN(events)[F= PG \ adEvents
-
-assert PF \ adEvents [T= RUN(events)
-assert RUN(events)[F= PF \ adEvents
-
-assert PE \ adEvents [T= RUN(events)
-assert RUN(events)[F= PE \ adEvents
-
-assert PD \ adEvents [T= RUN(events)
-assert RUN(events)[F= PD \ adEvents
-
-assert PC \ adEvents [T= RUN(events)
-assert RUN(events)[F= PC \ adEvents
-
-assert PB \ adEvents [T= RUN(events)
-assert RUN(events)[F= PB \ adEvents
-
-assert PA \ adEvents [T= RUN(events)
-assert RUN(events)[F= PA \ adEvents
-
-assert PHNoisy \ {|adapt2,ack|} [T= RUN(union(locEvents,{|noisy, empty,event|}))
-assert RUN(union(locEvents,{|noisy, empty,event|}))[F= PHNoisy \ {|adapt2,ack|}
-
-assert PHAlarm \ {|adapt2,ack|} [T= RUN(union(locEvents,{|alarm, empty,event|}))
-assert RUN(union(locEvents,{|alarm, empty,event|}))[F= PHAlarm \ {|adapt2,ack|}
-
-assert PI \ {|adapt2,ack|} [T= RUN(union(locEvents,{|lights, empty,event|}))
-assert RUN(union(locEvents,{|lights, empty,event|}))[F= PI \ {|adapt2,ack|}
+assert ReqI [T= (LightsPanel [|{|event,goto,empty,open|}|] PhysicalController)

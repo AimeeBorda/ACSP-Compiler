@@ -2,21 +2,37 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="53a9a71f-bbf0-4ac0-8c5b-275c2c36ead5" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/Examples/ArtGallery/HVAC/hvac.acsp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Examples/ArtGallery/RestorationArea/Composition.acsp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Examples/ArtGallery/RestorationArea/assertions.acsp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Examples/ArtGallery/RestorationArea/corrTwo.acsp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Examples/ArtGallery/RestorationArea/restorationArea.acsp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Examples/Stadium/AccessController.acsp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Examples/Stadium/Controller.acsp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Examples/ArtGallery/ArtGallery.acsp" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Examples/ArtGallery/assertions.acsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Examples/ArtGallery/ExhibitionArea/AssertionsF.acsp" beforeDir="false" afterPath="$PROJECT_DIR$/Examples/ArtGallery/ExhibitionArea/AssertionsF.acsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Examples/ArtGallery/HVAC/Upstairs.acsp" beforeDir="false" afterPath="$PROJECT_DIR$/Examples/ArtGallery/HVAC/Upstairs.acsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Examples/ArtGallery/HVAC/accessPoint.acsp" beforeDir="false" afterPath="$PROJECT_DIR$/Examples/ArtGallery/HVAC/accessPoint.acsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Examples/ArtGallery/HVAC/assertions.acsp" beforeDir="false" afterPath="$PROJECT_DIR$/Examples/ArtGallery/HVAC/assertions.acsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Examples/ArtGallery/ExhibitionArea/AssertionsF.acsp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Examples/ArtGallery/ExhibitionArea/ExhibitionArea.acsp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Examples/ArtGallery/ExhibitionArea/RmA.acsp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Examples/ArtGallery/ExhibitionArea/RmB.acsp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Examples/ArtGallery/ExhibitionArea/RmD.acsp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Examples/ArtGallery/HVAC/Upstairs.acsp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Examples/ArtGallery/HVAC/accessPoint.acsp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Examples/ArtGallery/HVAC/assertions.acsp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Examples/ArtGallery/HVAC/hvac.acsp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Examples/ArtGallery/RestorationArea/Composition.acsp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Examples/ArtGallery/RestorationArea/assertions.acsp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Examples/ArtGallery/RestorationArea/corrTwo.acsp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Examples/ArtGallery/RestorationArea/restorationArea.acsp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Examples/Stadium/AccessController.acsp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Examples/Stadium/Controller.acsp" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Examples/Stadium/Section.acsp" beforeDir="false" afterPath="$PROJECT_DIR$/Examples/Stadium/Section.acsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Examples/Stadium/Stadium.acsp" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Examples/Stadium/assertions.acsp" beforeDir="false" afterPath="$PROJECT_DIR$/Examples/Stadium/assertions.acsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ACSP.g4" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ACSP.g4" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ACSP.tokens" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ACSP.tokens" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ACSPBaseListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ACSPBaseListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ACSPBaseVisitor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ACSPBaseVisitor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ACSPLexer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ACSPLexer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ACSPLexer.tokens" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ACSPLexer.tokens" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ACSPListener.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ACSPListener.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ACSPParser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ACSPParser.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/ACSPVisitor.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/ACSPVisitor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/temp.csp" beforeDir="false" afterPath="$PROJECT_DIR$/temp.csp" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/out/" />
     <ignored path="$PROJECT_DIR$/target/" />
@@ -82,55 +98,57 @@
     <session id="-2012743013">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="16" />
+          <entry key="project.closed" value="19" />
           <entry key="project.open.time.10" value="1" />
           <entry key="project.open.time.11" value="1" />
           <entry key="project.open.time.13" value="2" />
           <entry key="project.open.time.14" value="1" />
           <entry key="project.open.time.15" value="4" />
           <entry key="project.open.time.16" value="3" />
-          <entry key="project.open.time.17" value="3" />
-          <entry key="project.open.time.18" value="1" />
+          <entry key="project.open.time.17" value="4" />
+          <entry key="project.open.time.18" value="2" />
           <entry key="project.open.time.20" value="1" />
-          <entry key="project.open.time.25" value="1" />
+          <entry key="project.open.time.25" value="2" />
           <entry key="project.open.time.31" value="1" />
-          <entry key="project.opened" value="19" />
+          <entry key="project.opened" value="22" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
-          <entry key="acsp" value="31" />
+          <entry key="acsp" value="61" />
           <entry key="class" value="17" />
-          <entry key="csp" value="8" />
-          <entry key="g4" value="11" />
-          <entry key="java" value="76" />
+          <entry key="csp" value="13" />
+          <entry key="g4" value="13" />
+          <entry key="iml" value="1" />
+          <entry key="java" value="79" />
           <entry key="tokens" value="2" />
           <entry key="xml" value="3" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="ANTLR v4 grammar file" value="10" />
+          <entry key="ANTLR v4 grammar file" value="12" />
           <entry key="CLASS" value="17" />
-          <entry key="JAVA" value="76" />
-          <entry key="PLAIN_TEXT" value="42" />
+          <entry key="IDEA_MODULE" value="1" />
+          <entry key="JAVA" value="79" />
+          <entry key="PLAIN_TEXT" value="77" />
           <entry key="XML" value="3" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="acsp" value="1313" />
-          <entry key="csp" value="18" />
-          <entry key="g4" value="1422" />
+          <entry key="acsp" value="2022" />
+          <entry key="csp" value="29" />
+          <entry key="g4" value="1698" />
           <entry key="java" value="8660" />
           <entry key="xml" value="15" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="ANTLR v4 grammar file" value="1422" />
+          <entry key="ANTLR v4 grammar file" value="1698" />
           <entry key="JAVA" value="8660" />
-          <entry key="PLAIN_TEXT" value="1331" />
+          <entry key="PLAIN_TEXT" value="2051" />
           <entry key="XML" value="15" />
         </counts>
       </usages-collector>
@@ -177,38 +195,38 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Examples/ArtGallery/HVAC/accessPoint.acsp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="667">
-              <caret line="57" column="27" lean-forward="true" selection-start-line="57" selection-start-column="27" selection-end-line="57" selection-end-column="27" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Examples/ArtGallery/HVAC/assertions.acsp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1035">
-              <caret line="69" lean-forward="true" selection-start-line="69" selection-end-line="69" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/Examples/ArtGallery/HVAC/hvac.acsp">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="375">
-              <caret line="25" column="54" lean-forward="true" selection-start-line="25" selection-start-column="54" selection-end-line="25" selection-end-column="54" />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/Examples/ArtGallery/HVAC/Upstairs.acsp">
+        <entry file="file://$PROJECT_DIR$/Examples/ArtGallery/assertions.acsp">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="525">
-              <caret line="35" column="61" selection-start-line="35" selection-start-column="61" selection-end-line="35" selection-end-column="61" />
+            <state relative-caret-position="409">
+              <caret line="171" column="59" selection-start-line="171" selection-start-column="59" selection-end-line="171" selection-end-column="59" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Examples/ArtGallery/ArtGallery.acsp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="769">
+              <caret line="462" column="24" selection-start-line="462" selection-start-column="24" selection-end-line="462" selection-end-column="24" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Examples/Stadium/assertions.acsp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="799">
+              <caret line="266" column="78" selection-start-line="266" selection-start-column="78" selection-end-line="266" selection-end-column="78" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/Examples/Stadium/Section.acsp">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="739">
+              <caret line="335" column="24" selection-start-line="335" selection-start-column="24" selection-end-line="335" selection-end-column="24" />
             </state>
           </provider>
         </entry>
@@ -224,14 +242,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>term</find>
-      <find>termina</find>
-      <find>normal</find>
-      <find>checkcon</find>
-      <find>parser</find>
-      <find>spec</find>
-      <find>terminal</find>
-      <find>typeCheck(</find>
       <find>channelN</find>
       <find>proc</find>
       <find>addIn</find>
@@ -254,6 +264,14 @@
       <find>number</find>
       <find>loc</find>
       <find>DCO</find>
+      <find>set</find>
+      <find>LT</find>
+      <find>quote</find>
+      <find>R</find>
+      <find>Beh</find>
+      <find>channel</find>
+      <find>beh</find>
+      <find>if</find>
     </findStrings>
     <replaceStrings>
       <replace />
@@ -274,7 +292,6 @@
         <option value="$PROJECT_DIR$/src/main/java/example/ExhibitionArea.java" />
         <option value="$PROJECT_DIR$/src/main/java/Main.java" />
         <option value="$PROJECT_DIR$/pom.xml" />
-        <option value="$PROJECT_DIR$/temp.csp" />
         <option value="$PROJECT_DIR$/src/main/java/ACSPParser.java" />
         <option value="$PROJECT_DIR$/src/main/java/ACSPTranslatorVisitor.java" />
         <option value="$PROJECT_DIR$/src/main/java/Environment.java" />
@@ -291,20 +308,25 @@
         <option value="$PROJECT_DIR$/src/main/java/ACSPPreProcessor.java" />
         <option value="$PROJECT_DIR$/Examples/Stadium/Stadium.acsp" />
         <option value="$PROJECT_DIR$/Examples/ArtGallery/ExhibitionArea/RmD.acsp" />
-        <option value="$PROJECT_DIR$/src/main/java/ACSP.g4" />
-        <option value="$PROJECT_DIR$/Examples/ArtGallery/ExhibitionArea/AssertionsF.acsp" />
-        <option value="$PROJECT_DIR$/Examples/Stadium/Section.acsp" />
+        <option value="$PROJECT_DIR$/Examples/ArtGallery/HVAC/hvac.acsp" />
         <option value="$PROJECT_DIR$/Examples/Stadium/AccessController.acsp" />
-        <option value="$PROJECT_DIR$/Examples/Stadium/assertions.acsp" />
         <option value="$PROJECT_DIR$/Examples/Stadium/Controller.acsp" />
-        <option value="$PROJECT_DIR$/Examples/ArtGallery/RestorationArea/restorationArea.acsp" />
-        <option value="$PROJECT_DIR$/Examples/ArtGallery/RestorationArea/corrTwo.acsp" />
-        <option value="$PROJECT_DIR$/Examples/ArtGallery/RestorationArea/Composition.acsp" />
         <option value="$PROJECT_DIR$/Examples/ArtGallery/RestorationArea/assertions.acsp" />
+        <option value="$PROJECT_DIR$/Examples/ArtGallery/ExhibitionArea/AssertionsF.acsp" />
+        <option value="$PROJECT_DIR$/Examples/ArtGallery/HVAC/Upstairs.acsp" />
         <option value="$PROJECT_DIR$/Examples/ArtGallery/HVAC/accessPoint.acsp" />
         <option value="$PROJECT_DIR$/Examples/ArtGallery/HVAC/assertions.acsp" />
-        <option value="$PROJECT_DIR$/Examples/ArtGallery/HVAC/hvac.acsp" />
-        <option value="$PROJECT_DIR$/Examples/ArtGallery/HVAC/Upstairs.acsp" />
+        <option value="$PROJECT_DIR$/Examples/ArtGallery/RestorationArea/corrTwo.acsp" />
+        <option value="$PROJECT_DIR$/Examples/ArtGallery/RestorationArea/restorationArea.acsp" />
+        <option value="$PROJECT_DIR$/Examples/ArtGallery/RestorationArea/Composition.acsp" />
+        <option value="$PROJECT_DIR$/temp.csp" />
+        <option value="$PROJECT_DIR$/Examples/Section.acsp" />
+        <option value="$PROJECT_DIR$/src/main/java/ACSP.g4" />
+        <option value="$PROJECT_DIR$/Examples/ArtGallery.acsp" />
+        <option value="$PROJECT_DIR$/Examples/Stadium/assertions.acsp" />
+        <option value="$PROJECT_DIR$/Examples/Stadium/Section.acsp" />
+        <option value="$PROJECT_DIR$/Examples/ArtGallery/ArtGallery.acsp" />
+        <option value="$PROJECT_DIR$/Examples/ArtGallery/assertions.acsp" />
       </list>
     </option>
   </component>
@@ -337,7 +359,7 @@
       <select />
     </treeState>
   </component>
-  <component name="ProjectFrameBounds" fullScreen="true">
+  <component name="ProjectFrameBounds" extendedState="6" fullScreen="true">
     <option name="y" value="-1200" />
     <option name="width" value="1920" />
     <option name="height" value="1200" />
@@ -351,7 +373,6 @@
     </navigator>
     <panes>
       <pane id="AndroidView" />
-      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -374,27 +395,6 @@
               <item name="ACSP-Compiler" type="b2602c69:ProjectViewProjectNode" />
               <item name="ACSP-Compiler" type="462c0819:PsiDirectoryNode" />
               <item name="Examples" type="462c0819:PsiDirectoryNode" />
-              <item name="ArtGallery" type="462c0819:PsiDirectoryNode" />
-              <item name="ExhibitionArea" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="ACSP-Compiler" type="b2602c69:ProjectViewProjectNode" />
-              <item name="ACSP-Compiler" type="462c0819:PsiDirectoryNode" />
-              <item name="Examples" type="462c0819:PsiDirectoryNode" />
-              <item name="ArtGallery" type="462c0819:PsiDirectoryNode" />
-              <item name="HVAC" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="ACSP-Compiler" type="b2602c69:ProjectViewProjectNode" />
-              <item name="ACSP-Compiler" type="462c0819:PsiDirectoryNode" />
-              <item name="Examples" type="462c0819:PsiDirectoryNode" />
-              <item name="ArtGallery" type="462c0819:PsiDirectoryNode" />
-              <item name="RestorationArea" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="ACSP-Compiler" type="b2602c69:ProjectViewProjectNode" />
-              <item name="ACSP-Compiler" type="462c0819:PsiDirectoryNode" />
-              <item name="Examples" type="462c0819:PsiDirectoryNode" />
               <item name="Stadium" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
@@ -402,11 +402,25 @@
               <item name="ACSP-Compiler" type="462c0819:PsiDirectoryNode" />
               <item name="src" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="ACSP-Compiler" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ACSP-Compiler" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ACSP-Compiler" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ACSP-Compiler" type="462c0819:PsiDirectoryNode" />
+              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="main" type="462c0819:PsiDirectoryNode" />
+              <item name="java" type="462c0819:PsiDirectoryNode" />
+            </path>
           </expand>
           <select />
         </subPane>
       </pane>
       <pane id="Scope" />
+      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -419,7 +433,7 @@
     <property name="SearchEverywhereHistoryKey" value="ACSPTy&#9;FILE&#9;file:///Users/aimee/IdeaProjects/untitled/src/main/java/ACSPTypeChecker.java&#10;example.&#9;FILE&#9;file:///Users/aimeeborda/ACSP-Compiler/Example.acsp" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1549821499445" />
+    <property name="com.android.tools.idea.instantapp.provision.ProvisionBeforeRunTaskProvider.myTimeStamp" value="1550058362134" />
     <property name="extract.method.default.visibility" value="private" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
@@ -430,15 +444,18 @@
     <property name="settings.editor.selected.configurable" value="preferences.keymap" />
   </component>
   <component name="RecentsManager">
-    <key name="CopyClassDialog.RECENTS_KEY">
-      <recent name="" />
-    </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/Examples/ArtGallery" />
+      <recent name="$PROJECT_DIR$/Examples/Stadium" />
       <recent name="$PROJECT_DIR$/Examples" />
       <recent name="$PROJECT_DIR$/ArtGallery/HVAC" />
       <recent name="$PROJECT_DIR$/ArtGallery" />
-      <recent name="$PROJECT_DIR$/ArtGallery/ExhibitionArea" />
-      <recent name="$PROJECT_DIR$/src/main/java" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/Examples" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -457,7 +474,7 @@
     <configuration name="Translation" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="Translation" />
       <module name="Translator" />
-      <option name="PROGRAM_PARAMETERS" value="Examples/Stadium/Stadium.acsp" />
+      <option name="PROGRAM_PARAMETERS" value="Examples/Stadium/Section.acsp" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -543,6 +560,9 @@
       <workItem from="1543064525108" duration="2317000" />
       <workItem from="1543067495217" duration="2452000" />
       <workItem from="1544041794649" duration="1341000" />
+      <workItem from="1549915302443" duration="3183000" />
+      <workItem from="1549998116323" duration="1691000" />
+      <workItem from="1550052155046" duration="3909000" />
     </task>
     <servers />
   </component>
@@ -552,7 +572,7 @@
     </history-entry>
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="102315000" />
+    <option name="totallyTimeSpent" value="112051000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -564,10 +584,10 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="-1200" width="1920" height="1200" extended-state="0" />
+    <frame x="0" y="-1200" width="1920" height="1200" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.4979592" visible="true" weight="0.17358893" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.4979592" visible="true" weight="0.17838125" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.24959612" />
       <window_info id="Designer" order="2" />
       <window_info id="Image Layers" order="3" />
@@ -576,7 +596,7 @@
       <window_info id="Capture Tool" order="6" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49676898" weight="0.24160583" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49676898" visible="true" weight="0.24159291" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -692,16 +712,6 @@
     </expressions>
   </component>
   <component name="editorHistoryManager">
-    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk-11.jdk/Contents/Home/lib/src.zip!/java.base/jdk/internal/util/Preconditions.java" />
-    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk-11.jdk/Contents/Home/lib/src.zip!/java.base/java/util/Objects.java" />
-    <entry file="jar:///Library/Java/JavaVirtualMachines/jdk-11.jdk/Contents/Home/lib/src.zip!/java.base/java/util/ArrayList.java" />
-    <entry file="file://$PROJECT_DIR$/src/main/java/ACSPBaseListener.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="135">
-          <caret line="11" column="13" selection-start-line="11" selection-start-column="13" selection-end-line="11" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="825">
@@ -813,13 +823,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/Translation.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="630">
-          <caret line="58" selection-start-line="58" selection-end-line="58" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/Example.acsp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="15">
@@ -834,16 +837,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ACSPTranslator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="53" lean-forward="true" selection-start-line="53" selection-end-line="53" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ACSPTypeChecker.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="440">
@@ -851,154 +844,89 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/ACSPPreProcessor.java">
+    <entry file="file://$PROJECT_DIR$/Examples/Stadium/Stadium.acsp" />
+    <entry file="file://$PROJECT_DIR$/Examples/Stadium/Controller.acsp" />
+    <entry file="file://$PROJECT_DIR$/Examples/Stadium/Section.acsp" />
+    <entry file="file://$PROJECT_DIR$/src/main/java/Translation.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="292">
-          <caret line="31" column="45" selection-start-line="31" selection-start-column="45" selection-end-line="31" selection-end-column="45" />
+        <state relative-caret-position="450">
+          <caret line="40" column="48" selection-start-line="40" selection-start-column="48" selection-end-line="40" selection-end-column="48" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Examples/ArtGallery/ExhibitionArea/RmA.acsp" />
+    <entry file="file://$PROJECT_DIR$/Examples/Stadium/AccessController.acsp" />
+    <entry file="file://$PROJECT_DIR$/Examples/ArtGallery/ExhibitionArea/RmD.acsp" />
+    <entry file="file://$PROJECT_DIR$/Examples/ArtGallery/ExhibitionArea/RmB.acsp" />
+    <entry file="file://$PROJECT_DIR$/Examples/ArtGallery/RestorationArea/assertions.acsp" />
+    <entry file="file://$PROJECT_DIR$/Translator.iml">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Examples/ArtGallery/ExhibitionArea/ExhibitionArea.acsp" />
+    <entry file="file://$PROJECT_DIR$/Examples/ArtGallery/ExhibitionArea/AssertionsF.acsp" />
+    <entry file="file://$PROJECT_DIR$/Examples/ArtGallery/HVAC/Upstairs.acsp" />
+    <entry file="file://$PROJECT_DIR$/Examples/ArtGallery/HVAC/accessPoint.acsp" />
+    <entry file="file://$PROJECT_DIR$/Examples/ArtGallery/HVAC/assertions.acsp" />
+    <entry file="file://$PROJECT_DIR$/Examples/ArtGallery/RestorationArea/corrTwo.acsp" />
+    <entry file="file://$PROJECT_DIR$/Examples/ArtGallery/RestorationArea/restorationArea.acsp" />
+    <entry file="file://$PROJECT_DIR$/Examples/ArtGallery/HVAC/hvac.acsp" />
+    <entry file="file://$PROJECT_DIR$/Examples/ArtGallery/RestorationArea/Composition.acsp" />
+    <entry file="file://$PROJECT_DIR$/src/main/java/ACSPTranslator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="570">
+          <caret line="38" lean-forward="true" selection-start-line="38" selection-end-line="38" />
           <folding>
-            <element signature="e#3029#3030#0" expanded="true" />
-            <element signature="e#3075#3076#0" expanded="true" />
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Examples/ArtGallery/ExhibitionArea/RmA.acsp">
+    <entry file="file://$PROJECT_DIR$/src/main/java/ACSPPreProcessor.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="921">
-          <caret line="63" column="99" lean-forward="true" selection-start-line="63" selection-start-column="99" selection-end-line="63" selection-end-column="99" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Examples/ArtGallery/ExhibitionArea/RmB.acsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
-          <caret line="24" column="69" lean-forward="true" selection-start-line="24" selection-start-column="69" selection-end-line="24" selection-end-column="69" />
+        <state relative-caret-position="30">
+          <caret line="7" selection-start-line="7" selection-end-line="7" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/temp.csp">
       <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret lean-forward="true" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Examples/Stadium/Stadium.acsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="570">
-          <caret line="38" column="21" selection-start-line="38" selection-start-column="21" selection-end-line="38" selection-end-column="21" />
+        <state relative-caret-position="3739">
+          <caret line="321" column="24" lean-forward="true" selection-start-line="321" selection-start-column="24" selection-end-line="321" selection-end-column="24" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/ACSP.g4">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="723">
-          <caret line="94" column="47" selection-start-line="94" selection-start-column="47" selection-end-line="94" selection-end-column="47" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Examples/ArtGallery/ExhibitionArea/RmD.acsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="630">
-          <caret line="42" lean-forward="true" selection-start-line="42" selection-end-line="42" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Examples/ArtGallery/ExhibitionArea/AssertionsF.acsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="147">
-          <caret line="52" column="121" selection-start-line="52" selection-start-column="121" selection-end-line="52" selection-end-column="121" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Examples/ArtGallery/ExhibitionArea/ExhibitionArea.acsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="8" column="4" lean-forward="true" selection-start-line="8" selection-start-column="4" selection-end-line="8" selection-end-column="4" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Examples/Stadium/assertions.acsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4560">
-          <caret line="304" column="75" selection-start-line="304" selection-start-column="75" selection-end-line="304" selection-end-column="75" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Examples/ArtGallery/RestorationArea/assertions.acsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="270">
-          <caret line="18" column="1" lean-forward="true" selection-start-line="18" selection-start-column="1" selection-end-line="18" selection-end-column="1" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Examples/ArtGallery/RestorationArea/Composition.acsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
-          <caret line="24" column="21" selection-start-line="24" selection-start-column="21" selection-end-line="24" selection-end-column="21" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Examples/ArtGallery/RestorationArea/corrTwo.acsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="525">
-          <caret line="35" lean-forward="true" selection-start-line="35" selection-end-line="35" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Examples/ArtGallery/RestorationArea/restorationArea.acsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="360">
-          <caret line="24" lean-forward="true" selection-start-line="24" selection-end-line="24" />
+        <state relative-caret-position="-1178">
+          <caret line="85" column="38" selection-start-line="85" selection-start-column="38" selection-end-line="85" selection-end-column="38" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/Examples/Stadium/Section.acsp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="195">
-          <caret line="13" column="15" selection-start-line="13" selection-start-column="15" selection-end-line="13" selection-end-column="15" />
+        <state relative-caret-position="739">
+          <caret line="335" column="24" selection-start-line="335" selection-start-column="24" selection-end-line="335" selection-end-column="24" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Examples/Stadium/Controller.acsp">
+    <entry file="file://$PROJECT_DIR$/Examples/ArtGallery/ArtGallery.acsp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="885">
-          <caret line="59" column="57" selection-start-line="59" selection-start-column="57" selection-end-line="59" selection-end-column="57" />
+        <state relative-caret-position="769">
+          <caret line="462" column="24" selection-start-line="462" selection-start-column="24" selection-end-line="462" selection-end-column="24" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Examples/Stadium/AccessController.acsp">
+    <entry file="file://$PROJECT_DIR$/Examples/Stadium/assertions.acsp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2940">
-          <caret line="196" column="22" lean-forward="true" selection-start-line="196" selection-start-column="22" selection-end-line="196" selection-end-column="22" />
+        <state relative-caret-position="799">
+          <caret line="266" column="78" selection-start-line="266" selection-start-column="78" selection-end-line="266" selection-end-column="78" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Examples/ArtGallery/HVAC/accessPoint.acsp">
+    <entry file="file://$PROJECT_DIR$/Examples/ArtGallery/assertions.acsp">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="667">
-          <caret line="57" column="27" lean-forward="true" selection-start-line="57" selection-start-column="27" selection-end-line="57" selection-end-column="27" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Examples/ArtGallery/HVAC/assertions.acsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1035">
-          <caret line="69" lean-forward="true" selection-start-line="69" selection-end-line="69" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Examples/ArtGallery/HVAC/hvac.acsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="375">
-          <caret line="25" column="54" lean-forward="true" selection-start-line="25" selection-start-column="54" selection-end-line="25" selection-end-column="54" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/Examples/ArtGallery/HVAC/Upstairs.acsp">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="525">
-          <caret line="35" column="61" selection-start-line="35" selection-start-column="61" selection-end-line="35" selection-end-column="61" />
+        <state relative-caret-position="409">
+          <caret line="171" column="59" selection-start-line="171" selection-start-column="59" selection-end-line="171" selection-end-column="59" />
         </state>
       </provider>
     </entry>
