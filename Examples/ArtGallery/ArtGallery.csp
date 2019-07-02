@@ -1,0 +1,533 @@
+transparent normal
+
+datatype Room = EA | EB | ED | Corr | Corr2 | RA | Str
+datatype Connection = Secure | Open | HVAC
+
+Processes = {0..4}
+MaxAgents = 100
+MaxAgentsEA = MaxAgents*2
+MaxAgentsPair = MaxAgents
+EmergencyCount = 2
+
+notR(rm) = {x | x<- Room, x != rm}
+channel adapt : {0..MaxAgentsEA}
+channel adaptRA : {0..MaxAgents*2}.Bool
+channel adaptE
+channel adapt6
+
+channel emergency
+channel goto : Room.Room
+channel grd : Room.Room
+
+channel connect : Bool.Connection
+channel disconnect 
+channel update
+
+channel ack
+
+Stairs = 
+
+		let P(n) = (n > 0 & goto!Str!Corr2 -> (connect!True!Open  -> P(n-1)))
+					[] (n > 0 & goto!Str!Corr -> P(n-1))
+					[] (n < MaxAgents & goto!Corr!Str -> P(n+1))
+					[] (n < MaxAgents & goto!Corr2!Str ->(connect!False!Open  -> P(n+1)))
+					[] (grd!Corr2!Str -> connect!False!Secure  -> P(n))
+					[] (grd!Str!Corr2 -> connect!True!Secure  -> P(n))
+					[] (grd!Str!Corr -> P(n))
+		within P(0)
+EventsD = {goto.EB.ED,goto.ED.Corr}
+Monitors2 = {|emergency|}
+
+MonitorsD = union(Monitors5, {x | x <- Monitors2, approachOne})
+
+D0 = (goto!ED!Corr -> D0) [] (goto!EB!ED -> D0)
+D1 = goto!ED!Corr -> D1
+
+BehaviourD = let D(n) =  (n > 0 & goto!ED!Corr -> D(n-1))
+					[] (n <= MaxAgentsEA & goto!EB!ED -> D(n+1))
+				within D(0)
+
+Pattern2 = let P(n) = 
+				   (goto!ED!Corr -> if n==MaxAgents then adapt!n-1 -> ack -> P(n-1) else if n > 0 then P(n-1) else P(0))
+				[] (goto!EB!ED -> if n >= MaxAgents - 1 then adapt!MaxAgents -> ack -> P(MaxAgents) else P(n+1))
+				[] (emergency -> RUN(union(EventsD,Monitors2)))
+		within P(0)
+Pi2 =  adapt?v  ->  if v == MaxAgents then ld!0 -> ack -> Pi2 else ld!1 -> ack -> Pi2
+
+
+Pattern5D = (emergency -> adaptE -> ack -> Pattern5D) [] (goto?_: {x | goto.x <- EventsD} -> Pattern5D)
+Pi5D =  adaptE  -> ld!1 -> ack -> Pi5D
+
+RmD = let
+		eventsR2 = union(EventsD,Monitors2)
+		eventsR5 = union(EventsD,Monitors5)
+
+		events = union(eventsR2,eventsR5)
+		R2 = normal((Pattern2[|{|adapt,ack|}|] Pi2) ) \ {|adapt,ack|}
+		R5 = normal((Pattern5D[|{|adaptE,ack|}|] Pi5D) ) \ {|adaptE,ack|}
+
+		FirstApproach = normal((BehaviourD[|inter(EventsD,events)|] normal((R2[|inter(eventsR2,eventsR5)|] R5) )) )
+		SecondApproach = normal((BehaviourD[|inter(EventsD,eventsR5)|] R5) )
+    within normal((let R = ld?id -> (map(ld,id) /\ R) 
+ within (D0/\ R)[|union( EventsD,{| ld|})|] (if(approachOne) then FirstApproach else SecondApproach))  \ {| ld|})
+EventsB = {goto.EB.EA,goto.EB.ED,goto.EA.EB}
+Monitors2B = union(EventsD,Monitors5)
+
+MonitorsB = union({x | x<- Monitors2B, not approachOne}, Monitors5)
+B0 = (goto!EB?_:{EA,ED} -> B0) [] (goto!EA!EB -> B0) 
+B1 = (goto!EB?_:{EA,ED} -> B1)
+BehaviourB = let B(n) =  (n > 0 & goto!EB?_:{EA,ED} -> B(n-1))
+					[] (n <= MaxAgentsEA & goto!EA!EB -> B(n+1))
+				within B(0)
+Pattern2B = let P(n) = 
+		   	   		(goto!EB!EA -> if(n == MaxAgentsPair) then adapt!n-1 -> ack -> P(n-1) else if(n > 0) then P(n-1) else P(0)) 
+		   	 	[] (goto!EA!EB -> if(n >= MaxAgentsPair-1) then adapt!n+1 -> ack -> P(MaxAgentsPair) else P(n+1))
+				[] (goto!ED!Corr -> if(n == MaxAgentsPair) then adapt!n-1 -> ack -> P(n-1) else if (n >0) then P(n-1) else P(0)) 
+				[] (goto!EB!ED -> P(n))
+				[] (emergency -> RUN(union(EventsB,Monitors2B)))
+			within P(0)
+Pi2B =  adapt?v  ->  if v == MaxAgentsPair then lb!0 -> ack -> Pi2B else lb!1 -> ack -> Pi2B
+
+
+Pattern5B = (emergency -> adaptE -> ack -> Pattern5B) [] (goto?_: {x | goto.x <- EventsB} -> Pattern5B)
+PiEmergencyB =  adaptE  -> lb!1 -> ack -> PiEmergencyB
+RmB = let
+			eventsR2B = union(EventsB,Monitors2B)
+			eventsR5 = union(EventsB,Monitors5)
+
+			events = Union({eventsR2B,eventsR5})
+			R5 = normal((PiEmergencyB[|{|adaptE,ack|}|] Pattern5B) )  \ {|adaptE,ack|}
+			R2B = normal((Pi2B[|{|adapt,ack|}|] Pattern2B) ) \ {|adapt,ack|}
+			
+			FirstApproach = normal((R5[|inter(EventsB,eventsR5)|] BehaviourB) )
+			SecondApproach = normal((BehaviourB[|inter(EventsB,events)|] normal((R5[|inter(eventsR5,eventsR2B)|] R2B) )) )
+		within normal((let R = lb?id -> (map(lb,id) /\ R) 
+ within (B0/\ R)[|union( EventsB,{| lb|})|] (if(approachOne) then FirstApproach else SecondApproach))  \ {| lb|})
+
+EventsA = {goto.EB.EA,goto.EA.Corr,goto.EA.EB,goto.Corr.EA}
+
+Monitors4 = union(EventsD,Monitors5)
+Monitors2A = union(EventsB,Monitors5)
+Monitors5 = {emergency}
+
+MonitorsA = Union({Monitors5,Monitors4, {x | x <- Monitors2A, not approachOne}})
+A0 = (goto!EB!EA -> A0) [] (goto!EA?_:{Corr,EB} -> A0) [] (goto!Corr!EA -> A0)
+A1 = (goto!EB!EA -> A1) [] (goto!EA?_:{Corr,EB} -> A1)
+BehaviourA =  let B(n) = (n <= MaxAgentsEA & goto!Corr!EA -> B(n+1))
+							[] (n > 0 & goto!EA!Corr -> B(n-1))
+							[] (n > 0 & goto!EA!EB -> B(n-1))
+							[] (n <= MaxAgentsEA & goto!EB!EA -> B(n+1))
+				within B(0)
+Pattern4 =  
+		let P(n) =  (goto?_:{EA,ED}!Corr -> if(n >= MaxAgentsEA) then adapt!n-1 -> ack-> P(n-1) else if (n > 0) then P(n-1) else P(0))
+				[] (goto!Corr!EA -> if(n >= MaxAgentsEA - 1) then adapt!MaxAgentsEA -> ack -> P(MaxAgentsEA) else P(n+1))
+				[] (goto!EA!EB -> P(n))  
+				[] (goto!EB!EA -> P(n)) 
+				[] (goto!EB!ED -> P(n))
+				[] (emergency -> RUN(union(EventsA,Monitors4))) 
+			
+		within P(0)
+Pi4 =  adapt?v  ->  if v >= MaxAgentsEA then la!0 -> ack -> Pi4 else la!1 ->  ack -> Pi4
+
+Pattern2A = let P(n) =  (goto!Corr!EA -> if(n >= MaxAgentsPair - 1) then adapt!MaxAgentsPair -> ack -> P(MaxAgentsPair) else P(n+1))
+					[] (goto!EA!Corr -> if(n >= MaxAgentsPair) then adapt!n-1 -> ack -> P(n-1) else if (n > 0) then P(n-1) else P(0))
+					[] (goto!EB!ED   -> if(n >= MaxAgentsPair) then adapt!n-1 -> ack -> P(n-1) else if (n > 0) then P(n-1) else P(0))
+					[] (goto!EA!EB -> P(n))  
+					[] (goto!EB!EA -> P(n)) 
+					[] (emergency -> RUN(union(EventsA,Monitors2A))) 
+			within P(0)
+Pi2A =  adapt?v  ->  if v >= MaxAgentsPair then la!0 -> ack -> Pi2A else la!1 -> ack -> Pi2A
+
+
+Pattern5A = (emergency -> adaptE -> ack -> Pattern5A) [] (goto?_: {x | goto.x <- EventsA} -> Pattern5A)
+PiEmergencyA =  adaptE  -> la!1 -> ack -> PiEmergencyA
+RmA = let
+			eventsR2A = union(EventsA,Monitors2A)
+			eventsR4 = union(EventsA,Monitors4)
+			eventsR5 = union(EventsA,Monitors5)
+
+
+			R4 = normal((Pi4[|{|adapt,ack|}|] Pattern4) ) \ {|adapt,ack|}
+			R2A = normal((Pi2A[|{|adapt,ack|}|] Pattern2A) ) \ {|adapt,ack|}
+			R5 = normal((PiEmergencyA[|{|adaptE,ack|}|] Pattern5A) ) \ {|adaptE,ack|}
+			
+			FirstApproach = normal(( normal((R4[|inter(eventsR4,eventsR5)|] R5) )[|inter(EventsA,Union({eventsR4,eventsR5}))|] BehaviourA) )
+			SecondApproach = normal(( normal((R2A[|inter(eventsR2A,eventsR5)|] R5) )[|inter(EventsA,Union({eventsR2A,eventsR5}))|] BehaviourA) )
+        within normal((let R = la?id -> (map(la,id) /\ R) 
+ within (A0/\ R)[|union( EventsA,{| la|})|] (if(approachOne) then FirstApproach else SecondApproach))  \ {| la|})
+EventsRA = {goto.RA.Corr2,goto.Corr2.RA,grd.Corr2.RA,grd.RA.Corr2}
+
+Monitors5RA = {|emergency|}
+Monitors1 =  union(EventsC2,Monitors5RA)
+
+MonitorsRA = union(Monitors5RA,Monitors1)
+
+EventsC2 = {goto.Str.Corr2,goto.Corr2.Str, grd.Corr2.Str, grd.Str.Corr2,goto.Corr2.RA,goto.RA.Corr2,grd.Corr2.RA,grd.RA.Corr2}
+Monitors1C2 =  {emergency}
+MonitorsC2 = union(Monitors5RA, Monitors1C2)
+
+eventsR1 = Union({EventsC2,EventsRA,Monitors1})
+eventsR5RA = union(EventsRA,Monitors5RA)
+eventsR5C2 = union(EventsC2,Monitors5RA)
+
+R0 = (goto!RA!Corr2 -> R0) [] (goto!Corr2!RA -> R0) [] (grd?_ :{x| grd.x <- EventsRA}-> R0)
+R1 = (goto!RA!Corr2 -> R1) [] (grd?_ :{x| grd.x <- EventsRA}-> R1)
+BehaviourRA = normal((R(0)||| R2(False)) )
+
+R(v) =  (v < MaxAgents & goto!Corr2!RA -> R(v+1))
+		[] (v > 0 & goto!RA!Corr2 -> R(v-1))
+			
+	
+R2(b) = (not b & grd!Corr2!RA -> R2(True)) 
+		[] (b & grd!RA!Corr2 -> R2(False))
+
+C2_0 =  (goto?_: {x | goto.x <- EventsC2} -> C2_0)
+		[] (grd?_: {x | grd.x <- EventsC2} -> C2_0)
+		
+
+C2_1 = 	(goto?_: {x | goto.x <- EventsC2} -> C2_1)
+		[] grd?_:{Str,RA}!Corr2 -> C2_1
+		[] grd!Corr2!RA -> C2_1
+
+C(n) = (n > 0 & goto!Corr2!RA -> C(n-1)) 
+		[](n > 0 & goto!Corr2!Str -> C(n-1)) 
+		[] (n < MaxAgents & goto!Str!Corr2 -> C(n+1))
+		[] (n < MaxAgents & goto!RA!Corr2 -> C(n+1))
+	
+C2(u) = (u & grd!Corr2!Str -> C2(False)) 
+		[] (u & grd!Corr2!RA -> C2(True)) 
+		[] (u & grd!RA!Corr2 -> C2(True))
+		[] (not u & grd!Str!Corr2 -> C2(True))
+
+
+		
+Beh = normal((C(0)||| C2(False)) )
+Pattern1 = let P(v,g) = 
+				 (grd!Str!Corr2 ->  adaptRA!v!True -> ack -> P(v,True))
+				[] (grd!Corr2!Str -> adaptRA!v!False -> ack -> P(v,False))
+				[] (grd?_: {x.y | x <-{Corr2,RA}, y<-{RA,Corr2}, x!= y} -> P(v,g))
+				
+				[] (goto!Corr2!Str -> if v == 1 then adaptRA!v-1!g -> ack -> P(v-1,g) else if v > 0 then P(v-1,g) else P(0,g)) 
+				[] (goto!Str!Corr2 -> if v == 0 then adaptRA!v+1!g -> ack -> P(v+1,g) else if v < MaxAgents*2 then P(v+1,g) else P(MaxAgents*2,g)) 
+				[] (goto?_ :{x.y| x <- {RA,Corr2}, y <- {RA,Corr2},x!=y} -> P(v,g))						
+				
+				[] (emergency -> RUN(Union({EventsC2,EventsRA,Monitors1})))
+		within P(0,False)
+Pi1 =  adaptRA?v?g  ->  let F2 = if g then ra!0 ->  ack -> Pi1 else ra!1 ->  ack -> Pi1
+					within if v>0 then c2!0 ->  F2 else c2!1 -> F2
+
+
+
+Pattern5RA = (emergency -> adaptE -> ack -> Pattern5RA) [] (goto?_: {x | goto.x <- EventsRA} -> Pattern5RA) [] (grd?_: {x | grd.x <- EventsRA} -> Pattern5RA)
+Pi5RA =  adaptE  -> ra!0 -> ack -> Pi5RA
+
+
+Pattern5C2 = (emergency -> adaptE -> ack -> Pattern5C2) [] (goto?_: {x | goto.x <- EventsC2} -> Pattern5C2) [] (grd?_: {x | grd.x <- EventsC2} -> Pattern5C2)
+Pi5C2 =  adaptE  -> c2!1 -> ack -> Pi5C2
+Composition = let
+		events = Union({eventsR1,eventsR5RA,eventsR5C2})
+
+		R1 = normal((Pattern1[|{|adaptRA,ack|}|] Pi1) ) \ {|adaptRA,ack|}
+		R5RA = normal((Pattern5RA[|{|adaptE,ack|}|] Pi5RA) ) \ {|adaptE,ack|}
+		R5C2 = normal((Pattern5C2[|{|adaptE,ack|}|] Pi5C2) ) \ {|adaptE,ack|}
+
+		
+        AdaptationProc = normal((R1[|inter(eventsR1,union(eventsR5RA,eventsR5C2))|] normal((R5RA[|inter(eventsR5C2,eventsR5RA)|] R5C2) )) )
+		
+		within normal(( normal(( normal((BehaviourRA[|EventsRA|]let R = ra?id -> (map(ra,id) /\ R) 
+ within (R0/\ R)) )[|inter(EventsRA,EventsC2)|] normal((Beh[|EventsC2|]let R = c2?id -> (map(c2,id) /\ R) 
+ within (C2_0/\ R)) )) )[|union( Union({EventsRA,EventsC2}),{| c2,ra|})|] AdaptationProc)  \ {| c2,ra|})
+
+
+
+
+EventsAP = {|connect,disconnect,update|}
+MonitorsAP = {}
+
+channel adapt3 : Connections
+
+AP0 = connect!True!HVAC -> RUN({connect.x.y | x<- Bool, y <- {Secure,Open}})
+AP1 = connect!False!HVAC -> RUN({connect.x.y | x<- Bool, y <- {Secure,Open}})
+AP2 = disconnect -> connect!True!HVAC -> RUN({connect.x.Secure | x<- Bool})
+AP3 = RUN({connect.x.y | x<- Bool, y <- {Secure,Open}})
+AP4 = disconnect -> connect!True!HVAC -> RUN({connect.x.y | x<- Bool, y <- {Secure,Open}})
+SAV(v) =  (v < MaxConnections & connect!True!Open -> SAV(v + 1))
+		[] (v > 0 & connect!False!Open -> SAV(v - 1))
+		[] (disconnect -> SAV(0))
+
+SAS(s) =  (s < MaxConnections & connect!True!Secure -> SAS(s + 1))
+		[] (s > 0 & connect!False!Secure -> SAS(s - 1))
+
+SAH(h) =  (connect!True!HVAC -> SAH(True))
+		[] (connect!False!HVAC -> SAH(False))
+
+SAU = update -> SAU
+		
+Behaviour = normal(( normal(( normal((SAV(0)||| SAS(0)) )||| SAH(False)) )||| SAU) )
+Pattern3A =   let P(n) = 
+				   (connect!True!Secure -> if n == 0 then adapt3!1 -> ack -> P(1) else if n < MaxConnections then P(n+1) else P(MaxConnections))
+					[] (connect!False!Secure -> if n == 1 then adapt3!0 -> ack -> P(0) else if n > 0 then P(n-1) else P(0))
+					[] (disconnect -> P(n))
+					[] (update -> P(n))
+					[] (connect?_:Bool?_:{HVAC,Open} -> P(n))
+				within P(0)			
+	
+Pattern3B =   let P(n) = (connect!True!Open -> if n == 0 then adapt3!n+1 -> ack -> P(1) else if n < MaxConnections then P(n+1) else P(MaxConnections))
+						[] (connect!False!Open -> if (n == 1) then adapt3!0 -> ack -> P(0) else if n > 0 then P(n-1) else P(0))				
+						[] (disconnect -> P(0))
+						[] (update -> P(n))
+						[] (connect?_:Bool?_:{HVAC,Secure} -> P(n))
+				within P(0)
+
+Pattern6 =      (connect?_ -> Pattern6)  [] (disconnect -> Pattern6) [] (update -> adapt6 -> ack -> Pattern6)
+Pi3A =  adapt3?n : Connections ->  
+						if n == 1 then l!0 -> ack -> Pi3A
+						else if n == 0 then l!1 -> ack -> Pi3A
+						else ack -> Pi3A
+
+Pi3B =  adapt3?n : Connections ->  
+						if n == 1 then l!2 -> ack -> Pi3B
+						else if n == 0 then l!3 -> ack -> Pi3B
+						else ack -> Pi3B
+
+Pi6 =  adapt6 -> l!4 -> ack -> Pi6
+accessPtComp = let
+			R3A = normal((Pi3A[|{|adapt3,ack|}|] Pattern3A) ) \ {| adapt3,ack|}
+			R3B = normal((Pi3B[|{|adapt3,ack|}|] Pattern3B) ) \ {| adapt3,ack|}
+			R6 = normal((Pi6[|{|adapt6,ack|}|] Pattern6) ) \ {|adapt6,ack|}
+			AdaptationProc = normal(( normal(( normal((R3A[|EventsAP|] R6) )[|EventsAP|] R3B) )[|{|connect,disconnect|}|] Behaviour) )
+		within normal((let R = l?id -> (map(l,id) /\ R) 
+ within (AP0/\ R)[|union( union(EventsAP,{|l|}),{| l|})|] AdaptationProc)  \ {| l|})
+
+
+MaxConnections = 3
+Connections = {0 .. MaxConnections}
+
+Upstairs = let 	
+				EventSet = {|connect.True.HVAC, connect.False.HVAC |}
+				hvacComp = connect?_:Bool!HVAC -> hvacComp
+			within normal((hvacComp[|EventSet|]accessPtComp) )
+
+RoomAB = normal( normal((RmA[|event("A","B")|] RmB) ))
+RoomBD = normal( normal((RmD[|event("D","B")|] RmB) ))
+
+ExhibitionArea = normal( normal((RoomAB[|event("AB","D")|] RmD) ))
+
+event(x,t)= Union({inter(E(x), M(t)), inter(E(t),M(x)),inter(E(t),E(x)), inter(M(t),M(x))})
+
+
+
+E("") = {}
+E(<x>^xs) = (if (x == 'A') then union(EventsA,E(xs)) else if (x == 'B') then union(EventsB,E(xs)) else if x == 'D' then union(EventsD,E(xs)) else {})
+
+M("") = {}
+M(<x>^xs) = (if x == 'A' then union(MonitorsA,M(xs)) else if (x == 'B') then union(MonitorsB,M(xs)) else if (x == 'D') then union(MonitorsD,M(xs)) else {})
+
+
+ArtGallery = normal(( normal(( normal((Upstairs[|{|connect,disconnect|}|]Stairs) )[|{|goto.Str.Corr2,goto.Corr2.Str,grd.Str.Corr2,grd.Corr2.Str|}|] Composition) )[|{|goto.Str.Corr,goto.Corr.Str,grd.Str.Corr,grd.Corr.Str|}|] ExhibitionArea) )
+ -- File /Users/aimeeborda/ACSP-Compiler/Examples/ArtGallery/assertions.acsp
+
+assert Composition :[deadlock free]
+assert Composition :[deterministic]
+assert Composition :[livelock free]
+
+ Specification = let NoGrd =  (grd!Str!Corr2 -> GrdPres(0))
+						[] (goto!Str!Corr2 -> NoGrd)
+						[] (goto!Corr2!Str -> NoGrd)
+					GrdPres(n) =  (n < MaxAgents & goto!Corr2!RA -> GrdPres(n+1))
+						[] (n > 0  & goto!RA!Corr2 -> GrdPres(n-1))
+						[] (n == 0 & grd!Corr2!Str -> NoGrd)
+						[] (grd!Str!Corr2 -> GrdPres(n))
+						[] (grd?_:{Corr2,RA}?_:{RA,Corr2} -> GrdPres(n))
+						[] (goto?_:{Corr2,Str}?_:{Str,Corr2} -> GrdPres(n))
+				within normal((NoGrd||| emergency -> RUN(Union({MonitorsC2,MonitorsRA,EventsRA,EventsC2}))) )
+
+assert Specification [T= Composition
+
+
+assert Pattern1 \ {|adaptRA,adaptE,ack|} [T= RUN(eventsR1)
+assert RUN(eventsR1)[F= Pattern1 \ {|adaptRA,adaptE,ack|}
+
+assert Pattern5C2 \ {|adaptRA,adaptE,ack|} [T= RUN(eventsR5C2)
+assert RUN(eventsR5C2)[F= Pattern5C2 \ {|adaptRA,adaptE,ack|}
+
+assert Pattern5RA \ {|adaptRA,adaptE,ack|} [T= RUN(eventsR5RA)
+assert RUN(eventsR5RA)[F= Pattern5RA \ {|adaptRA,adaptE,ack|}
+Requirement3 = let
+					T(m,n) = (n  == 0  & connect!True!Secure -> disconnect -> connect!True!HVAC-> T(0,n+1))
+							[] (n > 0 and n < MaxConnections & connect!True!Secure -> T(m,n+1))
+							[] (n > 0 & connect!False!Secure -> T(m,n-1))
+							[] (m  == 0  & connect!True!Open -> connect!False!HVAC -> T(m+1,n))
+							[] (m  == 0  & connect!False!Open  -> T(m,n))
+							[] (m > 0 and m < MaxConnections & connect!True!Open -> T(m+1,n))
+							[] (m > 1 & connect!False!Open -> T(m-1,n))
+							[] (m == 1 & connect!False!Open -> connect!True!HVAC -> T(m-1,n))
+							[] (update -> T(m,n))
+						within connect!True!HVAC ->T(0,0)
+
+
+Requirement6 =  (connect?_?_ -> Requirement6) [] (update -> disconnect -> connect!True!HVAC -> Requirement6) [] (disconnect->Requirement6)
+
+Requirement3A = let
+					T(n) = (n  == 0  & connect!True!Secure -> disconnect ->  T(n+1))
+							[] (n > 0 and n < MaxConnections & connect!True!Secure -> T(n+1))
+							[] (n > 0 & connect!False!Secure -> T(n-1))
+							[] (n == 0 & connect?_!Open -> T(n))
+							[] (update -> T(n))
+							[] (connect?_!HVAC -> T(n))
+						within T(0)
+
+
+Requirement3B = let
+					T(n) = (n  == 0  & connect!True!Open -> connect!False!HVAC -> T(n+1))
+							[](n  == 0  & connect!False!Open  -> T(n))
+							[] (n > 0 and n < MaxConnections & connect!True!Open -> T(n+1))
+							[] (n > 1 & connect!False!Open -> T(n-1))
+							[] (n == 1 & connect!False!Open -> connect!True!HVAC -> T(n-1))
+							[] (update -> T(n))
+							[] (disconnect -> connect!True!HVAC-> T(0))
+							[] (connect?_!Secure -> T(n))
+						within connect!True!HVAC -> T(0)
+Requirement2 = let T(n) =   (n < MaxAgents & goto!EB!ED  -> T(n+1))
+								[] (n > 0  & goto!ED!Corr -> T(n-1))
+								[] (emergency -> RUN(union(EventsD,MonitorsD)))
+				within T(0)
+Requirement4 = let T(n) =   (n < MaxAgentsEA & goto!Corr!EA  -> T(n+1))
+							[] (n >= 0  & goto?_:{EA,ED}!Corr -> T(n-1))
+							[] (goto?_:{EA.EB,EB.EA,EB.ED} -> T(n))
+							[] (emergency -> RUN(Union({MonitorsA,MonitorsB,MonitorsD,EventsA,EventsB,EventsD})))
+			within T(0)
+Movement = let M(a,b,d) = (a > 0 and b <= MaxAgentsEA & goto!EA!EB -> M(a-1,b+1,d))
+							[] (b > 0 and a <= MaxAgentsEA & goto!EB!EA -> M(a+1,b-1,d))
+							[] (b > 0 and d <= MaxAgentsEA & goto!EB!ED -> M(a,b-1,d+1))
+							[] (d > 0 & goto!ED!Corr -> M(a,b,d-1))
+							[] (a > 0 & goto!EA!Corr -> M(a-1,b,d))
+							[] (a <= MaxAgentsEA & goto!Corr!EA -> M(a+1,b,d))
+			within M(0,0,0)
+
+Requirement5D =  RmD /\  (emergency -> RUN(union(EventsD,{emergency})))
+Requirement5B =  RmB /\ (emergency -> RUN(union(EventsB,{emergency})))
+Requirement5A =  RmA /\ (emergency -> RUN(union(EventsA,{emergency})))
+
+
+ExtraRequirement = normal((Requirement2A[|{emergency,goto.EA.EB,goto.EB.EA,goto.EB.ED}|] Requirement2B) )
+
+
+Requirement2A = let P(a,b) =  (a > 0  & goto!EA!EB -> P(a-1,b+1))
+								[] (b > 0  & goto!EB!EA -> P(a+1,b-1))
+								[] (b > 0 & goto!EB!ED -> P(a,b-1))
+								[] (a > 0  & goto!EA!Corr -> P(a-1,b))
+								[] (a + b < MaxAgentsPair & goto!Corr!EA -> P(a+1,b))
+								[] (goto!ED!Corr -> P(a,b))
+								[] (emergency -> RUN(Union({MonitorsA,MonitorsB,EventsA,EventsB})))
+			within P(0,0)
+
+Requirement2B = let P(b,d) =  (d + b < MaxAgentsPair & goto!EA!EB -> P(b+1,d))
+								[] (b > 0  & goto!EB!EA -> P(b-1,d))
+								[] (b > 0  & goto!EB!ED -> P(b-1,d+1))
+								[] (d > 0  & goto!ED!Corr -> P(b,d-1))
+								[] (emergency -> RUN(Union({MonitorsB,MonitorsD,EventsB,EventsD})))
+				within P(0,0)
+
+
+assert Requirement6 [T= accessPtComp
+assert Requirement3A [T= accessPtComp
+assert Requirement3B [T= accessPtComp
+
+assert accessPtComp :[deadlock free]
+assert accessPtComp :[deterministic]
+assert accessPtComp :[livelock free]
+
+assert Requirement6 [T= Upstairs
+assert Requirement3A [T= Upstairs
+assert Requirement3B [T= Upstairs
+
+assert Upstairs :[deadlock free]
+assert Upstairs :[deterministic]
+assert Upstairs :[livelock free]
+
+assert Requirement3 [T= normal((Requirement3B[|{|connect,disconnect,update|}|]Requirement3A) )
+
+
+assert Pattern3A \ {|adapt3,adapt6,ack|} [T= RUN(EventsAP)
+assert RUN(EventsAP)[F= Pattern3A \ {|adapt3,adapt6,ack|}
+
+assert Pattern3B \ {|adapt3,adapt6,ack|} [T= RUN(EventsAP)
+assert RUN(EventsAP)[F= Pattern3B \ {|adapt3,adapt6,ack|}
+
+assert Pattern6 \ {|adapt3,adapt6,ack|} [T=RUN(EventsAP)
+assert RUN(EventsAP)[F= Pattern6 \ {|adapt3,adapt6,ack|}
+approachOne = False
+
+assert Requirement5D [F=  RmD
+assert Requirement5B [F=  RmB
+assert Requirement5A [F=  RmA
+
+assert normal((Requirement2[|event("D","B")|] RmB) )  [T= RoomBD
+assert normal((Requirement2[|event("D","AB")|] RoomAB) )  [T= ExhibitionArea
+
+assert Requirement4 [T= ExhibitionArea
+assert Requirement2B  [T= RoomBD
+assert Requirement2A [T= RoomAB
+assert normal((Requirement2A[|event("AB","D")|] RmD) ) [T= ExhibitionArea
+assert normal((Requirement2B[|event("BD","A")|] RmA) ) [T= ExhibitionArea
+assert ExtraRequirement [T= ExhibitionArea
+
+assert Pattern2A \ {|adapt,adaptE,ack|} [T= RUN(union(EventsA,Monitors2A))
+assert RUN(union(EventsA,Monitors2A))[F= Pattern2A \ {|adapt,adaptE,ack|}
+
+assert Pattern2B \ {|adapt,adaptE,ack|} [T= RUN(union(EventsB,Monitors2B))
+assert RUN(union(EventsB,Monitors2B))[F= Pattern2B \ {|adapt,adaptE,ack|}
+
+assert Pattern4 \ {|adapt,adaptE,ack|} [T= RUN(union(EventsA,MonitorsA))
+assert RUN(union(EventsA,MonitorsA))[F= Pattern4 \ {|adapt,adaptE,ack|}
+
+assert Pattern5A \ {|adapt,adaptE,ack|} [T= RUN(union(EventsA,Monitors5))
+assert RUN(union(EventsA,Monitors5))[F= Pattern5A \ {|adapt,adaptE,ack|}
+
+assert Pattern5B \ {|adapt,adaptE,ack|} [T= RUN(union(EventsB,Monitors5))
+assert RUN(union(EventsB,Monitors5))[F= Pattern5B \ {|adapt,adaptE,ack|}
+
+assert Pattern5D \ {|adapt,adaptE,ack|} [T= RUN(union(EventsD,Monitors5))
+assert RUN(union(EventsD,Monitors5))[F= Pattern5D \ {|adapt,adaptE,ack|}
+
+assert ExhibitionArea :[deadlock free]
+assert ExhibitionArea :[deterministic]
+assert ExhibitionArea :[livelock free]
+
+assert Movement [T= normal((ExhibitionArea[|{|emergency|}|] STOP) )
+assert RmA :[deadlock free]
+assert RmA :[deterministic]
+assert RmA :[livelock free]
+assert RmB :[deadlock free]
+assert RmB :[deterministic]
+assert RmB :[livelock free]
+
+assert RmD :[deadlock free]
+assert RmD :[deterministic]
+assert RmD :[livelock free]
+
+
+channel la : {0..1}
+channel lb : {0..1}
+channel ld : {0..1}
+channel l : {0..4}
+channel ra : {0..1}
+channel c2 : {0..1}
+
+map = \ chName,id @ if chName == la and id == 0 then A1 
+else if chName == la and id == 1 then A0 
+else if chName == lb and id == 0 then B1 
+else if chName == lb and id == 1 then B0 
+else if chName == ld and id == 0 then D1 
+else if chName == ld and id == 1 then D0 
+else if chName == l and id == 0 then AP2 
+else if chName == l and id == 1 then AP3 
+else if chName == l and id == 2 then AP1 
+else if chName == l and id == 3 then AP0 
+else if chName == l and id == 4 then AP4 
+else if chName == ra and id == 0 then R0 
+else if chName == ra and id == 1 then R1 
+else if chName == c2 and id == 0 then C2_1 
+else if chName == c2 and id == 1 then C2_0 
+else SKIP

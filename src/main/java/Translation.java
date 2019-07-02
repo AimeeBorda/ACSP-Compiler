@@ -19,18 +19,16 @@ public class Translation {
     private ACSPTranslator translator;
     private ACSPTypeChecker typeChecker;
     private final String input;
+    private final String output;
 
 
     public static String getFileName(ACSPParser.IncludeFileContext ctx,String dir){
         return dir+ctx.ID().stream().map(c -> c.getText().trim()).collect(Collectors.joining("/")) +".acsp";
     }
 
-    public void translate() throws IOException {
-        translate("temp.csp");
-    }
-
     public Translation(String input) {
         this.input = input;
+        this.output = input.replace(".acsp",".csp");
     }
 
     private ACSPParser getParser() throws IOException {
@@ -41,13 +39,13 @@ public class Translation {
         return new ACSPParser(new CommonTokenStream(new ACSPLexer(input)));
     }
 
-    public void translate(String output) throws IOException {
+    public void translate() throws IOException {
         typeCheckProcess();
 
         if(isWellTyped()){
             translateProcess();
-            writeToFile(output);
-            openFDR(output);
+            writeToFile();
+            openFDR();
         }else {
             showErrorMessages();
         }
@@ -57,15 +55,15 @@ public class Translation {
         translator = new ACSPTranslator(getParser(),dir);
     }
 
-    private  void writeToFile(String fileName) throws FileNotFoundException {
+    private  void writeToFile() throws FileNotFoundException {
         System.out.println(translator.cspProcess);
-        PrintWriter out = new PrintWriter(fileName);
+        PrintWriter out = new PrintWriter(output);
         out.println(translator.cspProcess);
         out.flush();
     }
 
-    private void openFDR(String file) throws IOException {
-        new ProcessBuilder("/bin/bash", "-c", "open " + file).start();
+    private void openFDR() throws IOException {
+        new ProcessBuilder("/bin/bash", "-c", "open " + output).start();
     }
 
     private  void typeCheckProcess() throws IOException {
