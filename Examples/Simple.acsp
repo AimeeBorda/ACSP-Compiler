@@ -1,0 +1,3 @@
+Example = (new l)(l[A0] [| Ev |] m!<SKIP>.P)
+
+assert Example [T= SKIP

@@ -1,0 +1,13 @@
+transparent normal 
+
+Test = normal((let R = l?id -> (map(l,id) /\ R) 
+ within (P/\ R)[|{| l,m,n|}|] m!0 -> SKIP)  \ {| l,m,n|})
+
+assert Test :[deterministic]
+
+channel l : {0..0}
+channel m : {0..0}
+channel n : {0..0}
+
+map = \ chName,id @ if chName == m and id == 0 then R 
+else SKIP

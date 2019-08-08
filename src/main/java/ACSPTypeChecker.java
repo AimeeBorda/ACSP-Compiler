@@ -38,7 +38,7 @@ public class ACSPTypeChecker extends ACSPBaseVisitor<Environment> {
         if(res != null && res.isEmpty()){
             return res.in(ctx.ID().getSymbol().getText());
         }else{
-            errors.add("location "+ctx.ID().getText() +" is not well-typed");
+            errors.add("location "+ctx.ID().getText() +" is not well-formed");
             return defaultResult();
         }
     }
@@ -59,7 +59,7 @@ public class ACSPTypeChecker extends ACSPBaseVisitor<Environment> {
         if(ctx.proc().stream().map(c ->visit(c)).anyMatch(e -> !e.isEmpty()) ||
                 (ctx.definitionLeft() != null && !visit(ctx.definitionLeft()).isEmpty())
         ){
-            errors.add("error in assertion "+ctx.getText()+" is not well typed");
+            errors.add("error in assertion "+ctx.getText() +" is not well-formed");
         }
 
         return ctx.children.stream().map(c -> visit(c)).reduce((r, t) -> r = r.merge(t)).orElse(defaultResult());
@@ -78,7 +78,7 @@ public class ACSPTypeChecker extends ACSPBaseVisitor<Environment> {
         if(proc != null && cont != null && proc.isEmpty()){
             return cont.out(ctx.ID().getText());
         } else {
-            errors.add("A process being communicated over " + ctx.ID() +" was not well-typed at \n"+ ctx.getText());
+            errors.add("A process being communicated over " + ctx.ID() +" was not well-formed at \n"+ ctx.getText());
             return defaultResult();
         }
 
@@ -114,7 +114,7 @@ public class ACSPTypeChecker extends ACSPBaseVisitor<Environment> {
             return defaultResult();
         }
         if((left.locations().stream().anyMatch(right.locations()::contains))){
-            String names = left.locations().stream().filter(right.prefixes()::contains).collect(Collectors.joining());
+            String names = left.locations().stream().filter(right.locations()::contains).collect(Collectors.joining());
             errors.add(names +" are in left in and right in");
             return defaultResult();
         }
